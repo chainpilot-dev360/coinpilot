@@ -4,10 +4,13 @@ import DashboardPreview from "./components/DashboardPreview";
 import AdminPanel from "./components/AdminPanel";
 import Notification from "./components/Notification";
 import LandingPage from "./components/LandingPage";
+import VerifyEmail from "./components/VerifyEmail";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
+  const isVerifyPage = window.location.pathname === "/verify-email";
+
   const [authMode, setAuthMode] = useState("login");
   const [showAuth, setShowAuth] = useState(false);
 
@@ -219,7 +222,11 @@ function App() {
       showNotification(error.response?.data?.message || "Processing failed", "error");
     }
   }
-
+  
+  if (isVerifyPage) {
+  return <VerifyEmail onLoginClick={openLogin} />;
+  }
+  
   if (!user && !showAuth) {
     return (
       <>
