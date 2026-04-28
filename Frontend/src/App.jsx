@@ -14,7 +14,9 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
+
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const [balances, setBalances] = useState([]);
   const [depositAmount, setDepositAmount] = useState("");
@@ -24,6 +26,15 @@ function App() {
   const [plans, setPlans] = useState([]);
   const [selectedPlanId, setSelectedPlanId] = useState("");
   const [investmentAmount, setInvestmentAmount] = useState("");
+
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth < 768);
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (!token) return;
@@ -53,29 +64,39 @@ function App() {
   useEffect(() => {
     axios.get(`${API_URL}/api/investment-plans`).then((res) => {
       setPlans(res.data);
-      if (res.data.length > 0) setSelectedPlanId(String(res.data[0].id));
+      if (res.data.length > 0) {
+        setSelectedPlanId(String(res.data[0].id));
+      }
     });
   }, []);
 
   async function register() {
-    const res = await axios.post(`${API_URL}/api/auth/register`, {
-      fullName: name,
-      email,
-      password,
-    });
+    try {
+      const res = await axios.post(`${API_URL}/api/auth/register`, {
+        fullName: name,
+        email,
+        password,
+      });
 
-    localStorage.setItem("token", res.data.token);
-    setToken(res.data.token);
+      localStorage.setItem("token", res.data.token);
+      setToken(res.data.token);
+    } catch (error) {
+      alert(error.response?.data?.message || "Registration failed");
+    }
   }
 
   async function login() {
-    const res = await axios.post(`${API_URL}/api/auth/login`, {
-      email,
-      password,
-    });
+    try {
+      const res = await axios.post(`${API_URL}/api/auth/login`, {
+        email,
+        password,
+      });
 
-    localStorage.setItem("token", res.data.token);
-    setToken(res.data.token);
+      localStorage.setItem("token", res.data.token);
+      setToken(res.data.token);
+    } catch (error) {
+      alert(error.response?.data?.message || "Login failed");
+    }
   }
 
   function logout() {
@@ -84,55 +105,76 @@ function App() {
     setUser(null);
   }
 
-  async function createDeposit() {
-    await axios.post(
-      `${API_URL}/api/deposits`,
-      { currency: "USD", amount: Number(depositAmount) },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+  function openTab(tab) {
+    setActiveTab(tab);
+    setMenuOpen(false);
+  }
 
-    alert("Deposit request created");
-    setDepositAmount("");
+  async function createDeposit() {
+    try {
+      await axios.post(
+        `${API_URL}/api/deposits`,
+        { currency: "USD", amount: Number(depositAmount) },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Deposit request created");
+      setDepositAmount("");
+    } catch (error) {
+      alert(error.response?.data?.message || "Deposit failed");
+    }
   }
 
   async function createWithdrawal() {
-    await axios.post(
-      `${API_URL}/api/withdrawals`,
-      {
-        currency: "USD",
-        amount: Number(withdrawAmount),
-        walletAddress,
-      },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    try {
+      await axios.post(
+        `${API_URL}/api/withdrawals`,
+        {
+          currency: "USD",
+          amount: Number(withdrawAmount),
+          walletAddress,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    alert("Withdrawal request created");
-    setWithdrawAmount("");
-    setWalletAddress("");
+      alert("Withdrawal request created");
+      setWithdrawAmount("");
+      setWalletAddress("");
+    } catch (error) {
+      alert(error.response?.data?.message || "Withdrawal failed");
+    }
   }
 
   async function startInvestment() {
-    await axios.post(
-      `${API_URL}/api/investments`,
-      {
-        planId: Number(selectedPlanId),
-        amount: Number(investmentAmount),
-      },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    try {
+      await axios.post(
+        `${API_URL}/api/investments`,
+        {
+          planId: Number(selectedPlanId),
+          amount: Number(investmentAmount),
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    alert("Investment started");
-    setInvestmentAmount("");
+      alert("Investment started");
+      setInvestmentAmount("");
+    } catch (error) {
+      alert(error.response?.data?.message || "Investment failed");
+    }
   }
 
   async function processInvestments() {
-    const res = await axios.post(
-      `${API_URL}/api/admin/process-investments`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    try {
+      const res = await axios.post(
+        `${API_URL}/api/admin/process-investments`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    alert(`Processed ${res.data.count} matured investments`);
+      alert(`Processed ${res.data.count} matured investments`);
+    } catch (error) {
+      alert(error.response?.data?.message || "Processing failed");
+    }
   }
 
   if (!user) {
@@ -143,25 +185,53 @@ function App() {
           <p style={muted}>Crypto investment dashboard</p>
 
           <div style={{ marginBottom: 20 }}>
-            <button onClick={() => setAuthMode("login")} style={authMode === "login" ? activeButton : secondaryButton}>
+            <button
+              onClick={() => setAuthMode("login")}
+              style={authMode === "login" ? activeButton : secondaryButton}
+            >
               Login
             </button>
-            <button onClick={() => setAuthMode("register")} style={authMode === "register" ? activeButton : secondaryButton}>
+
+            <button
+              onClick={() => setAuthMode("register")}
+              style={authMode === "register" ? activeButton : secondaryButton}
+            >
               Register
             </button>
           </div>
 
           {authMode === "register" && (
-            <input placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} />
+            <input
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              style={inputStyle}
+            />
           )}
 
-          <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} style={inputStyle} />
+          <input
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={inputStyle}
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={inputStyle}
+          />
 
           {authMode === "login" ? (
-            <button onClick={login} style={primaryButton}>Login</button>
+            <button onClick={login} style={primaryButton}>
+              Login
+            </button>
           ) : (
-            <button onClick={register} style={primaryButton}>Register</button>
+            <button onClick={register} style={primaryButton}>
+              Register
+            </button>
           )}
         </div>
       </div>
@@ -170,45 +240,80 @@ function App() {
 
   return (
     <div style={layout}>
-<>
-  {/* MOBILE TOP BAR */}
-  <div style={mobileTopBar}>
-    <button onClick={() => setMenuOpen(!menuOpen)} style={menuButton}>
-      ☰
-    </button>
-    <h3>ChainPilot</h3>
-  </div>
-
-  {/* SIDEBAR */}
-  <aside
-    style={{
-      ...sidebar,
-      transform: menuOpen ? "translateX(0)" : "translateX(-100%)",
-    }}
-  >
-    <h2>ChainPilot</h2>
-    <p style={mutedSmall}>{user.role}</p>
-
-    <nav style={{ marginTop: 30 }}>
-      <button onClick={() => { setActiveTab("dashboard"); setMenuOpen(false); }} style={menu}>Dashboard</button>
-      <button onClick={() => { setActiveTab("wallet"); setMenuOpen(false); }} style={menu}>Wallet</button>
-      <button onClick={() => { setActiveTab("invest"); setMenuOpen(false); }} style={menu}>Invest</button>
-
-      {user.role === "ADMIN" && (
-        <button onClick={() => { setActiveTab("admin"); setMenuOpen(false); }} style={menu}>Admin</button>
+      {isMobile && (
+        <div style={mobileTopBar}>
+          <button onClick={() => setMenuOpen(!menuOpen)} style={menuButton}>
+            ☰
+          </button>
+          <h3>ChainPilot</h3>
+        </div>
       )}
-    </nav>
 
-    <button onClick={logout} style={logoutButton}>Logout</button>
-  </aside>
-</>
+      {isMobile && menuOpen && (
+        <div style={overlay} onClick={() => setMenuOpen(false)} />
+      )}
 
-      <main style={main}>
+      <aside
+        style={{
+          ...sidebar,
+          transform: isMobile
+            ? menuOpen
+              ? "translateX(0)"
+              : "translateX(-100%)"
+            : "translateX(0)",
+        }}
+      >
+        <h2 style={{ marginBottom: 4 }}>ChainPilot</h2>
+        <p style={mutedSmall}>{user.role}</p>
+
+        <nav style={{ marginTop: 30 }}>
+          <button
+            onClick={() => openTab("dashboard")}
+            style={activeTab === "dashboard" ? activeMenu : menu}
+          >
+            Dashboard
+          </button>
+
+          <button
+            onClick={() => openTab("wallet")}
+            style={activeTab === "wallet" ? activeMenu : menu}
+          >
+            Wallet
+          </button>
+
+          <button
+            onClick={() => openTab("invest")}
+            style={activeTab === "invest" ? activeMenu : menu}
+          >
+            Invest
+          </button>
+
+          {user.role === "ADMIN" && (
+            <button
+              onClick={() => openTab("admin")}
+              style={activeTab === "admin" ? activeMenu : menu}
+            >
+              Admin
+            </button>
+          )}
+        </nav>
+
+        <button onClick={logout} style={logoutButton}>
+          Logout
+        </button>
+      </aside>
+
+      <main
+        style={{
+          ...main,
+          marginLeft: isMobile ? "0" : "240px",
+          marginTop: isMobile ? "60px" : "0",
+          padding: isMobile ? "16px" : "32px",
+        }}
+      >
         <header style={header}>
-          <div>
-            <h1 style={{ marginBottom: 5 }}>Welcome, {user.full_name}</h1>
-            <p style={muted}>Manage your wallet, investments, and transactions.</p>
-          </div>
+          <h1 style={{ marginBottom: 5 }}>Welcome, {user.full_name}</h1>
+          <p style={muted}>Manage your wallet, investments, and transactions.</p>
         </header>
 
         {activeTab === "dashboard" && (
@@ -238,87 +343,98 @@ function App() {
             <div style={twoColumns}>
               <div style={miniPanel}>
                 <h3>Deposit Request</h3>
-                <input placeholder="Deposit Amount" value={depositAmount} onChange={(e) => setDepositAmount(e.target.value)} style={inputStyle} />
-                <button onClick={createDeposit} style={primaryButton}>Create Deposit</button>
+                <input
+                  placeholder="Deposit Amount"
+                  value={depositAmount}
+                  onChange={(e) => setDepositAmount(e.target.value)}
+                  style={inputStyle}
+                />
+                <button onClick={createDeposit} style={primaryButton}>
+                  Create Deposit
+                </button>
               </div>
 
               <div style={miniPanel}>
                 <h3>Withdrawal Request</h3>
-                <input placeholder="Withdrawal Amount" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} style={inputStyle} />
-                <input placeholder="Wallet Address" value={walletAddress} onChange={(e) => setWalletAddress(e.target.value)} style={inputStyle} />
-                <button onClick={createWithdrawal} style={dangerButton}>Create Withdrawal</button>
+                <input
+                  placeholder="Withdrawal Amount"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  style={inputStyle}
+                />
+                <input
+                  placeholder="Wallet Address"
+                  value={walletAddress}
+                  onChange={(e) => setWalletAddress(e.target.value)}
+                  style={inputStyle}
+                />
+                <button onClick={createWithdrawal} style={dangerButton}>
+                  Create Withdrawal
+                </button>
               </div>
             </div>
           </section>
         )}
 
         {activeTab === "invest" && (
-  <section style={panel}>
-    <h2>Investment Plans</h2>
-    <p style={muted}>
-      Choose a plan based on your capital and risk preference.
-      Returns are projected daily earnings.
-    </p>
+          <section style={panel}>
+            <h2>Investment Plans</h2>
+            <p style={muted}>
+              Choose a plan based on your capital and preferred return structure.
+            </p>
 
-    {/* PLAN CARDS */}
-    <div style={cardGrid}>
-      {plans.map((plan) => (
-        <div key={plan.id} style={statCard}>
-          <h3>{plan.name}</h3>
+            <div style={cardGrid}>
+              {plans.map((plan) => (
+                <div key={plan.id} style={statCard}>
+                  <h3>{plan.name}</h3>
+                  <p>
+                    <strong>Minimum:</strong> ${plan.min_amount}
+                  </p>
+                  <p>
+                    <strong>Projected Daily Return:</strong>{" "}
+                    {plan.expected_return_percent}%
+                  </p>
+                  <p>
+                    <strong>Duration:</strong> {plan.duration_days} day(s)
+                  </p>
+                </div>
+              ))}
+            </div>
 
-          <p><strong>Minimum:</strong> ${plan.min_amount}</p>
+            <div style={miniPanel}>
+              <h3>Start Investment</h3>
 
-          <p>
-            <strong>Projected Daily Return:</strong>{" "}
-            {plan.expected_return_percent}%
-          </p>
+              <select
+                value={selectedPlanId}
+                onChange={(e) => setSelectedPlanId(e.target.value)}
+                style={inputStyle}
+              >
+                {plans.map((plan) => (
+                  <option key={plan.id} value={plan.id}>
+                    {plan.name}
+                  </option>
+                ))}
+              </select>
 
-          <p>
-            <strong>Duration:</strong> {plan.duration_days} day(s)
-          </p>
+              <input
+                placeholder="Enter Amount"
+                value={investmentAmount}
+                onChange={(e) => setInvestmentAmount(e.target.value)}
+                style={inputStyle}
+              />
 
-          <p style={mutedSmall}>
-            Estimated return calculated daily based on plan performance.
-          </p>
-        </div>
-      ))}
-    </div>
+              <button onClick={startInvestment} style={primaryButton}>
+                Start Investment
+              </button>
 
-    {/* INVEST FORM */}
-    <div style={miniPanel}>
-      <h3>Start Investment</h3>
-
-      <select
-        value={selectedPlanId}
-        onChange={(e) => setSelectedPlanId(e.target.value)}
-        style={inputStyle}
-      >
-        {plans.map((plan) => (
-          <option key={plan.id} value={plan.id}>
-            {plan.name}
-          </option>
-        ))}
-      </select>
-
-      <input
-        placeholder="Enter Amount"
-        value={investmentAmount}
-        onChange={(e) => setInvestmentAmount(e.target.value)}
-        style={inputStyle}
-      />
-
-      <button onClick={startInvestment} style={primaryButton}>
-        Start Investment
-      </button>
-
-      {user.role === "ADMIN" && (
-        <button onClick={processInvestments} style={secondaryButton}>
-          Process Matured Investments
-        </button>
-      )}
-    </div>
-  </section>
-)}
+              {user.role === "ADMIN" && (
+                <button onClick={processInvestments} style={secondaryButton}>
+                  Process Matured Investments
+                </button>
+              )}
+            </div>
+          </section>
+        )}
 
         {activeTab === "admin" && user.role === "ADMIN" && (
           <section style={panel}>
@@ -335,49 +451,62 @@ const layout = {
   minHeight: "100vh",
   background: "#0f172a",
   color: "white",
-  flexDirection: "row",
+  fontFamily: "Arial, sans-serif",
 };
 
-const mobileTopBar = {
-  display: "none",
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  height: "60px",
-  background: "#020617",
-  alignItems: "center",
-  padding: "0 15px",
-  zIndex: 1000,
-};
-
-const menuButton = {
-  fontSize: "24px",
-  background: "none",
-  border: "none",
-  color: "white",
-  marginRight: "15px",
-  cursor: "pointer",
-};
-
-coconst sidebar = {
+const sidebar = {
   width: "240px",
   background: "#020617",
   padding: "24px",
   display: "flex",
   flexDirection: "column",
   position: "fixed",
-  height: "100%",
+  height: "100vh",
   left: 0,
   top: 0,
-  transition: "0.3s",
-  zIndex: 999,
+  transition: "transform 0.3s ease",
+  zIndex: 1001,
+  boxSizing: "border-box",
 };
 
 const main = {
   flex: 1,
-  padding: "32px",
-  marginLeft: "240px",
+  overflowY: "auto",
+  width: "100%",
+  boxSizing: "border-box",
+};
+
+const mobileTopBar = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  height: "60px",
+  background: "#020617",
+  display: "flex",
+  alignItems: "center",
+  padding: "0 16px",
+  zIndex: 1000,
+  boxSizing: "border-box",
+};
+
+const menuButton = {
+  fontSize: "26px",
+  background: "transparent",
+  border: "none",
+  color: "white",
+  marginRight: "14px",
+  cursor: "pointer",
+};
+
+const overlay = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  background: "rgba(0,0,0,0.55)",
+  zIndex: 1000,
 };
 
 const header = {
@@ -389,6 +518,7 @@ const panel = {
   padding: "24px",
   borderRadius: "18px",
   boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+  overflowX: "auto",
 };
 
 const miniPanel = {
@@ -413,7 +543,7 @@ const statCard = {
 
 const twoColumns = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
   gap: "20px",
 };
 
@@ -446,6 +576,7 @@ const inputStyle = {
   border: "1px solid #334155",
   background: "#020617",
   color: "white",
+  boxSizing: "border-box",
 };
 
 const primaryButton = {
@@ -456,6 +587,7 @@ const primaryButton = {
   borderRadius: "10px",
   cursor: "pointer",
   marginRight: "10px",
+  marginBottom: "10px",
 };
 
 const secondaryButton = {
@@ -466,6 +598,7 @@ const secondaryButton = {
   borderRadius: "10px",
   cursor: "pointer",
   marginRight: "10px",
+  marginBottom: "10px",
 };
 
 const activeButton = {
@@ -495,14 +628,18 @@ const authPage = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  padding: "16px",
+  boxSizing: "border-box",
 };
 
 const authCard = {
-  width: "380px",
+  width: "100%",
+  maxWidth: "380px",
   background: "#111827",
   padding: "30px",
   borderRadius: "18px",
   boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+  boxSizing: "border-box",
 };
 
 const muted = {
@@ -513,12 +650,5 @@ const mutedSmall = {
   color: "#94a3b8",
   fontSize: "14px",
 };
-
-if (window.innerWidth < 768) {
-  sidebar.transform = "translateX(-100%)";
-  mobileTopBar.display = "flex";
-  main.marginLeft = "0";
-  main.marginTop = "60px";
-}
 
 export default App;
