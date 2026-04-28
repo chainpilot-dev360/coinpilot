@@ -37,6 +37,26 @@ function AnimatedNumber({ value }) {
   return <span>{display.toFixed(2)}</span>;
 }
 
+function HoverCard({ children }) {
+  return (
+    <div
+      style={card}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-6px)";
+        e.currentTarget.style.boxShadow = "0 20px 45px rgba(56,189,248,0.18)";
+        e.currentTarget.style.borderColor = "rgba(56,189,248,0.35)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "none";
+        e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function MarketChart() {
   const containerRef = useRef(null);
 
@@ -130,7 +150,7 @@ function DashboardPreview({ token, user }) {
     }
   }
 
-  if (!data) return <p>Loading dashboard...</p>;
+  if (!data) return <SkeletonDashboard />;
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
@@ -167,7 +187,7 @@ function DashboardPreview({ token, user }) {
     <div style={pageFade}>
       <div style={dashboardHeader}>
         <div>
-          <h2>Dashboard</h2>
+          <h2 style={{ marginBottom: 4 }}>Dashboard</h2>
           <p style={muted}>Track your wallet, investments, and notifications.</p>
         </div>
 
@@ -178,6 +198,12 @@ function DashboardPreview({ token, user }) {
               if (!notificationOpen) markNotificationsRead();
             }}
             style={bellButton}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform = "scale(1.08)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.transform = "scale(1)")
+            }
           >
             🔔
             {unreadCount > 0 && <span style={badge}>{unreadCount}</span>}
@@ -226,10 +252,7 @@ function DashboardPreview({ token, user }) {
           title="Current Value"
           value={<AnimatedNumber value={totalCurrentValue} />}
         />
-        <SummaryCard
-  title="Total Profit"
-  value={`$${totalProfit.toFixed(2)}`}
-/>
+        <SummaryCard title="Total Profit" value={`$${totalProfit.toFixed(2)}`} />
       </div>
 
       <h3>Live Forex Market Chart</h3>
@@ -266,9 +289,9 @@ function DashboardPreview({ token, user }) {
         />
       ) : (
         data.balances.map((b) => (
-          <div key={b.id} style={card}>
+          <HoverCard key={b.id}>
             <strong>{b.currency}</strong>: {b.available}
-          </div>
+          </HoverCard>
         ))
       )}
 
@@ -280,7 +303,7 @@ function DashboardPreview({ token, user }) {
         />
       ) : (
         data.investments.map((inv) => (
-          <div key={inv.id} style={card}>
+          <HoverCard key={inv.id}>
             <p>
               <strong>{inv.plan_name}</strong>
             </p>
@@ -308,7 +331,7 @@ function DashboardPreview({ token, user }) {
                 </p>
               </>
             )}
-          </div>
+          </HoverCard>
         ))
       )}
 
@@ -320,7 +343,7 @@ function DashboardPreview({ token, user }) {
         />
       ) : (
         data.ledger.slice(0, 8).map((entry) => (
-          <div key={entry.id} style={card}>
+          <HoverCard key={entry.id}>
             <p>
               <strong>{entry.type}</strong>
             </p>
@@ -328,7 +351,7 @@ function DashboardPreview({ token, user }) {
               {entry.amount} {entry.currency}
             </p>
             <small>{entry.reason}</small>
-          </div>
+          </HoverCard>
         ))
       )}
     </div>
@@ -337,17 +360,28 @@ function DashboardPreview({ token, user }) {
 
 function SummaryCard({ title, value }) {
   return (
-    <div style={summaryCard}>
+    <div
+      style={summaryCard}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-6px)";
+        e.currentTarget.style.boxShadow = "0 25px 60px rgba(37,99,235,0.25)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "0 15px 40px rgba(0,0,0,0.4)";
+      }}
+    >
       <p style={mutedSmall}>{title}</p>
       <h2
-  style={{
-    color: typeof value === "string" && value.includes("-")
-      ? "#ef4444"
-      : "#22c55e",
-  }}
->
-  {value}
-</h2>
+        style={{
+          color:
+            typeof value === "string" && value.includes("-")
+              ? "#ef4444"
+              : "#22c55e",
+        }}
+      >
+        {value}
+      </h2>
     </div>
   );
 }
@@ -360,6 +394,25 @@ function EmptyState({ title, text }) {
     </div>
   );
 }
+
+function SkeletonDashboard() {
+  return (
+    <div style={pageFade}>
+      <div style={skeletonTitle} />
+      <div style={summaryGrid}>
+        <div style={skeletonCard} />
+        <div style={skeletonCard} />
+        <div style={skeletonCard} />
+        <div style={skeletonCard} />
+      </div>
+      <div style={skeletonChart} />
+    </div>
+  );
+}
+
+const pageFade = {
+  animation: "fadeIn 0.6s ease",
+};
 
 const dashboardHeader = {
   display: "flex",
@@ -376,13 +429,15 @@ const notificationArea = {
 
 const bellButton = {
   position: "relative",
-  background: "#1e293b",
+  background: "rgba(30, 41, 59, 0.75)",
   color: "white",
-  border: "1px solid #334155",
-  borderRadius: "12px",
+  border: "1px solid rgba(255,255,255,0.12)",
+  borderRadius: "14px",
   padding: "12px 15px",
   cursor: "pointer",
   fontSize: "18px",
+  transition: "all 0.25s ease",
+  boxShadow: "0 15px 35px rgba(0,0,0,0.25)",
 };
 
 const badge = {
@@ -394,6 +449,7 @@ const badge = {
   borderRadius: "999px",
   padding: "3px 7px",
   fontSize: "12px",
+  animation: "pulse 1.4s infinite",
 };
 
 const notificationBox = {
@@ -402,12 +458,14 @@ const notificationBox = {
   top: "55px",
   width: "340px",
   maxWidth: "90vw",
-  background: "#020617",
+  background: "rgba(2, 6, 23, 0.96)",
+  backdropFilter: "blur(16px)",
   border: "1px solid #334155",
   borderRadius: "16px",
   padding: "15px",
   zIndex: 20,
   boxShadow: "0 20px 50px rgba(0,0,0,0.45)",
+  animation: "fadeIn 0.25s ease",
 };
 
 const notificationItem = {
@@ -436,22 +494,24 @@ const summaryCard = {
 const marketChartBox = {
   height: "420px",
   background: "#020617",
-  borderRadius: "16px",
+  borderRadius: "18px",
   overflow: "hidden",
   marginBottom: "28px",
-  border: "1px solid #334155",
+  border: "1px solid rgba(255,255,255,0.1)",
+  boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
 };
 
 const chartBox = {
   height: "300px",
-  background: "#020617",
-  borderRadius: "16px",
+  background: "rgba(2,6,23,0.75)",
+  borderRadius: "18px",
   padding: "15px",
   marginBottom: "28px",
+  border: "1px solid rgba(255,255,255,0.08)",
 };
 
 const card = {
-  background: "rgba(30, 41, 59, 0.6)",
+  background: "rgba(30, 41, 59, 0.65)",
   backdropFilter: "blur(14px)",
   padding: "16px",
   borderRadius: "14px",
@@ -470,24 +530,45 @@ const progressTrack = {
 
 const progressFill = {
   height: "100%",
-  background: "#38bdf8",
+  background: "linear-gradient(90deg, #2563eb, #38bdf8)",
   borderRadius: "999px",
+  transition: "width 0.8s ease",
 };
 
 const emptyState = {
-  background: "#020617",
+  background: "rgba(2,6,23,0.6)",
   border: "1px dashed #334155",
   padding: "18px",
-  borderRadius: "12px",
+  borderRadius: "14px",
   marginBottom: "18px",
+};
+
+const skeletonTitle = {
+  width: "220px",
+  height: "28px",
+  background: "#1e293b",
+  borderRadius: "10px",
+  marginBottom: "20px",
+  animation: "shimmer 1.4s infinite",
+};
+
+const skeletonCard = {
+  height: "100px",
+  background: "#1e293b",
+  borderRadius: "16px",
+  animation: "shimmer 1.4s infinite",
+};
+
+const skeletonChart = {
+  height: "320px",
+  background: "#1e293b",
+  borderRadius: "18px",
+  marginTop: "20px",
+  animation: "shimmer 1.4s infinite",
 };
 
 const muted = {
   color: "#94a3b8",
-};
-
-const pageFade = {
-  animation: "fadeIn 0.6s ease",
 };
 
 const mutedSmall = {
