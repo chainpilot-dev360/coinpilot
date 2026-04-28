@@ -1,586 +1,209 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-const slides = [
-  {
-    title: "Satisfied Investors",
-    text: "Join a growing community of users managing digital wealth with confidence.",
-    image:
-      "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80",
-  },
-  {
-    title: "Crypto Trading Intelligence",
-    text: "Monitor opportunities, track portfolio activity, and manage investment growth.",
-    image:
-      "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?auto=format&fit=crop&w=1600&q=80",
-  },
-  {
-    title: "Stock Market Inspired Analytics",
-    text: "A premium dashboard experience designed for modern finance users.",
-    image:
-      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1600&q=80",
-  },
-];
-
-const testimonials = [
-  {
-    name: "Michael R.",
-    text: "ChainPilot has completely changed how I manage my crypto investments.",
-  },
-  {
-    name: "Sarah K.",
-    text: "Clean dashboard, fast withdrawals, and consistent tracking.",
-  },
-  {
-    name: "David L.",
-    text: "Finally a platform that makes investing feel structured and professional.",
-  },
-];
-
-function LandingPage({ onLoginClick, onRegisterClick }) {
-  const [activeSlide, setActiveSlide] = useState(0);
-
+function LandingPage({ setView }) {
   useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveSlide((current) => (current + 1) % slides.length);
-    }, 4500);
+    const cards = document.querySelectorAll(".fade-in");
 
-    return () => clearInterval(timer);
+    cards.forEach((card, i) => {
+      card.style.animationDelay = `${i * 0.15}s`;
+    });
   }, []);
-
-  const slide = slides[activeSlide];
 
   return (
     <div style={page}>
-      <section
-        style={{
-          ...hero,
-          backgroundImage: `linear-gradient(rgba(2,6,23,0.55), rgba(2,6,23,0.95)), url(${slide.image})`,
-        }}
-      >
-        <div style={heroOverlay}>
-          <nav style={nav}>
-            <div style={brand}>
-              <div style={logoMark}>CP</div>
-              <div>
-                <h2 style={brandName}>ChainPilot</h2>
-                <small style={brandTag}>Digital Asset Growth</small>
-              </div>
-            </div>
+      {/* HERO */}
+      <section style={hero}>
+        <div style={heroOverlay} />
 
-            <div>
-              <button onClick={onLoginClick} style={navButton}>
-                Login
-              </button>
+        <div style={heroContent}>
+          <h1 style={heroTitle}>
+            Smart Investing <span style={highlight}>Made Simple</span>
+          </h1>
 
-              <button onClick={onRegisterClick} style={navPrimary}>
-                Get Started
-              </button>
-            </div>
-          </nav>
+          <p style={heroText}>
+            Grow your portfolio with automated crypto, forex, and stock
+            strategies.
+          </p>
 
-          <div style={floatingCard}>
-            <p style={badge}>{slide.title}</p>
-
-            <h1 style={heroTitle}>
-              A Premium Platform for Digital Asset Growth
-            </h1>
-
-            <p style={heroText}>{slide.text}</p>
-
-            <div>
-              <button onClick={onRegisterClick} style={primaryButton}>
-                Create Account
-              </button>
-
-              <button onClick={onLoginClick} style={secondaryButton}>
-                Access Dashboard
-              </button>
-            </div>
-          </div>
+          <button style={ctaButton} onClick={() => setView("register")}>
+            Get Started
+          </button>
         </div>
       </section>
 
-      <section style={statsSection}>
-        <Stat number="12,500+" label="Active Users" />
-        <Stat number="$2.8M+" label="Processed Deposits" />
-        <Stat number="8,900+" label="Investments Created" />
-      </section>
-
+      {/* FEATURES */}
       <section style={section}>
-        <h2 style={sectionTitle}>Built for Serious Investors</h2>
-
-        <section style={section}>
-  <h2 style={sectionTitle}>How It Works</h2>
-
-  <div style={grid}>
-    <Step
-      number="1"
-      title="Create Account"
-      text="Sign up in seconds and access your dashboard."
-    />
-
-    <Step
-      number="2"
-      title="Fund Wallet"
-      text="Submit a deposit request and wait for approval."
-    />
-
-    <Step
-      number="3"
-      title="Start Investment"
-      text="Choose a plan and begin earning daily returns."
-    />
-
-    <Step
-      number="4"
-      title="Track & Withdraw"
-      text="Monitor growth and request withdrawals anytime."
-    />
-  </div>
-</section>
+        <h2 style={sectionTitle}>Why Choose Us</h2>
 
         <div style={grid}>
-          <Card
-            title="Automated Growth"
-            text="Track projected daily portfolio growth through a clean dashboard."
-          />
-          <Card
-            title="Secure Wallet"
-            text="Monitor balances, deposits, withdrawals, and investment activity."
-          />
-          <Card
-            title="Admin Verified"
-            text="Platform transactions are controlled through a secure admin system."
-          />
+          <Feature title="Secure Platform" text="Advanced protection systems." />
+          <Feature title="Daily Growth" text="Automated profit generation." />
+          <Feature title="Real Markets" text="Crypto, forex, and stocks." />
         </div>
       </section>
 
-      <section style={darkSection}>
-        <h2 style={sectionTitle}>Investment Plans</h2>
-
-        <div style={grid}>
-          <Plan title="Starter" amount="$100" returnText="5% daily" />
-          <Plan title="Growth" amount="$10,000" returnText="7.5% daily" />
-          <Plan title="Premium" amount="$100,000" returnText="12% daily" />
-        </div>
-      </section>
-
+      {/* HOW IT WORKS */}
       <section style={section}>
-        <h2 style={sectionTitle}>What Investors Say</h2>
+        <h2 style={sectionTitle}>How It Works</h2>
 
         <div style={grid}>
-          {testimonials.map((item, index) => (
-            <div key={index} style={testimonialCard}>
-              <p style={cardText}>"{item.text}"</p>
-              <h4>— {item.name}</h4>
-            </div>
-          ))}
+          <Step number="1" title="Register" text="Create your account." />
+          <Step number="2" title="Deposit" text="Fund your wallet." />
+          <Step number="3" title="Invest" text="Choose a plan." />
+          <Step number="4" title="Withdraw" text="Get your profits." />
         </div>
       </section>
 
-      <section style={trustSection}>
-        <h2 style={sectionTitle}>Platform Confidence</h2>
-
-        <div style={grid}>
-          <Trust title="SSL Protected" />
-          <Trust title="Live Support" />
-          <Trust title="Transaction Monitoring" />
-          <Trust title="Admin Approval System" />
-        </div>
-      </section>
-
+      {/* FAQ */}
       <section style={darkSection}>
-  <h2 style={sectionTitle}>Frequently Asked Questions</h2>
+        <h2 style={sectionTitle}>FAQ</h2>
 
-  <FAQItem
-    question="How do I start investing?"
-    answer="Create an account, fund your wallet, and choose an investment plan."
-  />
+        <FAQItem
+          q="How do I start?"
+          a="Register, deposit funds, and start investing."
+        />
+        <FAQItem
+          q="Is it secure?"
+          a="Yes, all data is protected and encrypted."
+        />
+        <FAQItem
+          q="How do withdrawals work?"
+          a="Submit request, admin processes it."
+        />
+      </section>
 
-  <FAQItem
-    question="How long do investments last?"
-    answer="Each plan has a fixed duration. Returns are processed automatically."
-  />
-
-  <FAQItem
-    question="How do withdrawals work?"
-    answer="Submit a withdrawal request and wait for admin approval."
-  />
-
-  <FAQItem
-    question="Is my account secure?"
-    answer="Yes. All user balances and activities are securely tracked."
-  />
-</section>
-
+      {/* CTA */}
       <section style={cta}>
-        <h2>Start Managing Your Portfolio Today</h2>
-        <p style={heroText}>
-          Create an account and access your ChainPilot dashboard in minutes.
-        </p>
-
-        <button onClick={onRegisterClick} style={primaryButton}>
-          Get Started Now
+        <h2>Start Growing Your Investment Today</h2>
+        <button style={ctaButton} onClick={() => setView("register")}>
+          Create Account
         </button>
       </section>
-
-      <footer style={footer}>
-        <div style={footerBrand}>
-          <div style={logoMark}>CP</div>
-          <div>
-            <h3 style={{ margin: 0 }}>ChainPilot</h3>
-            <p style={footerText}>Digital asset portfolio management platform.</p>
-          </div>
-        </div>
-
-        <div style={footerLinks}>
-          <button onClick={onRegisterClick} style={footerLink}>
-            Create Account
-          </button>
-          <button onClick={onLoginClick} style={footerLink}>
-            Login
-          </button>
-          <a href="mailto:support@chainpilot.com" style={footerAnchor}>
-            support@chainpilot.com
-          </a>
-        </div>
-
-        <p style={footerBottom}>
-          © {new Date().getFullYear()} ChainPilot. All rights reserved.
-        </p>
-      </footer>
     </div>
   );
 }
 
-function Stat({ number, label }) {
-  return (
-    <div style={statBox}>
-      <h2>{number}</h2>
-      <p>{label}</p>
-    </div>
-  );
-}
+/* COMPONENTS */
 
-function Card({ title, text }) {
+function Feature({ title, text }) {
   return (
-    <div style={card}>
+    <div className="fade-in" style={card}>
       <h3>{title}</h3>
-      <p style={cardText}>{text}</p>
+      <p style={muted}>{text}</p>
     </div>
   );
 }
 
-function Plan({ title, amount, returnText }) {
+function Step({ number, title, text }) {
   return (
-    <div style={planCard}>
-      <p style={badge}>{title} Plan</p>
-      <h2>{amount}</h2>
-      <p style={cardText}>Minimum investment</p>
-      <h3>{returnText}</h3>
-      <p style={cardText}>Projected daily return</p>
+    <div className="fade-in" style={card}>
+      <h2 style={{ color: "#38bdf8" }}>{number}</h2>
+      <h3>{title}</h3>
+      <p style={muted}>{text}</p>
     </div>
   );
 }
 
-function Trust({ title }) {
+function FAQItem({ q, a }) {
   return (
-    <div style={trustCard}>
-      <span style={check}>✓</span>
-      <strong>{title}</strong>
+    <div className="fade-in" style={card}>
+      <strong>{q}</strong>
+      <p style={muted}>{a}</p>
     </div>
   );
 }
+
+/* STYLES */
 
 const page = {
-  background: "#020617",
   color: "white",
-  fontFamily: "Arial, sans-serif",
 };
 
 const hero = {
-  minHeight: "100vh",
+  height: "80vh",
+  backgroundImage:
+    "url('https://images.unsplash.com/photo-1642543492481-44e81e3914a7')",
   backgroundSize: "cover",
   backgroundPosition: "center",
-  backgroundAttachment: "fixed",
-};
-
-const heroOverlay = {
-  minHeight: "100vh",
-  padding: "24px",
-};
-
-const nav = {
-  maxWidth: "1200px",
-  margin: "0 auto",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-};
-
-const brand = {
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-};
-
-const logoMark = {
-  width: "44px",
-  height: "44px",
-  borderRadius: "14px",
-  background: "linear-gradient(135deg, #2563eb, #38bdf8)",
+  position: "relative",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  fontWeight: "bold",
 };
 
-const brandName = {
-  margin: 0,
+const heroOverlay = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(0,0,0,0.6)",
 };
 
-const brandTag = {
-  color: "#94a3b8",
-};
-
-const floatingCard = {
-  maxWidth: "760px",
-  margin: "120px auto 0",
-  padding: "52px",
-  borderRadius: "30px",
-  background: "rgba(15, 23, 42, 0.76)",
-  backdropFilter: "blur(20px)",
-  border: "1px solid rgba(255,255,255,0.16)",
-  boxShadow: "0 35px 100px rgba(0,0,0,0.55)",
+const heroContent = {
+  position: "relative",
   textAlign: "center",
-};
-
-const badge = {
-  color: "#38bdf8",
-  fontWeight: "bold",
-  textTransform: "uppercase",
-  letterSpacing: "1px",
-  fontSize: "13px",
+  animation: "fadeIn 1s ease",
 };
 
 const heroTitle = {
-  fontSize: "56px",
-  lineHeight: "1.05",
-  margin: "15px 0",
+  fontSize: "42px",
+  marginBottom: "10px",
+};
+
+const highlight = {
+  color: "#38bdf8",
 };
 
 const heroText = {
+  marginBottom: "20px",
   color: "#cbd5e1",
-  fontSize: "18px",
-  lineHeight: "1.6",
-  marginBottom: "28px",
 };
 
-const statsSection = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-  gap: "20px",
-  padding: "50px 24px",
-  background: "#0f172a",
-};
-
-const statBox = {
-  textAlign: "center",
-  background: "#1e293b",
-  padding: "24px",
-  borderRadius: "18px",
+const ctaButton = {
+  padding: "14px 28px",
+  borderRadius: "10px",
+  border: "none",
+  background: "linear-gradient(90deg,#2563eb,#38bdf8)",
+  color: "white",
+  cursor: "pointer",
+  fontWeight: "bold",
+  transition: "all 0.3s ease",
 };
 
 const section = {
-  padding: "80px 24px",
-  maxWidth: "1200px",
-  margin: "0 auto",
-  textAlign: "center",
+  padding: "60px 20px",
 };
 
 const darkSection = {
-  padding: "80px 24px",
-  background: "#0f172a",
-  textAlign: "center",
-};
-
-const trustSection = {
-  padding: "80px 24px",
+  padding: "60px 20px",
   background: "#020617",
-  maxWidth: "1200px",
-  margin: "0 auto",
-  textAlign: "center",
 };
 
 const sectionTitle = {
-  fontSize: "36px",
+  textAlign: "center",
   marginBottom: "30px",
 };
 
 const grid = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-  gap: "22px",
+  gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))",
+  gap: "20px",
 };
 
 const card = {
-  background: "#1e293b",
-  padding: "28px",
-  borderRadius: "18px",
-  boxShadow: "0 20px 45px rgba(0,0,0,0.25)",
-};
-
-const testimonialCard = {
-  ...card,
-  fontStyle: "italic",
-};
-
-const planCard = {
-  background: "linear-gradient(180deg, #1e293b, #020617)",
-  padding: "32px",
-  borderRadius: "22px",
-  border: "1px solid #334155",
-  boxShadow: "0 20px 45px rgba(0,0,0,0.3)",
-};
-
-const trustCard = {
-  background: "#1e293b",
+  background: "rgba(30,41,59,0.6)",
   padding: "20px",
-  borderRadius: "16px",
-  display: "flex",
-  gap: "10px",
-  alignItems: "center",
-  justifyContent: "center",
+  borderRadius: "14px",
+  backdropFilter: "blur(10px)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  transition: "all 0.3s ease",
 };
 
-const check = {
-  color: "#22c55e",
-  fontWeight: "bold",
-};
-
-const cardText = {
+const muted = {
   color: "#94a3b8",
-  lineHeight: "1.6",
 };
 
 const cta = {
-  padding: "90px 24px",
+  padding: "60px 20px",
   textAlign: "center",
-  background: "#0f172a",
 };
-
-const footer = {
-  padding: "40px 24px",
-  background: "#020617",
-  borderTop: "1px solid #1e293b",
-};
-
-const footerBrand = {
-  maxWidth: "1200px",
-  margin: "0 auto 24px",
-  display: "flex",
-  gap: "12px",
-  alignItems: "center",
-};
-
-const footerText = {
-  color: "#94a3b8",
-  margin: "6px 0 0",
-};
-
-const footerLinks = {
-  maxWidth: "1200px",
-  margin: "0 auto",
-  display: "flex",
-  flexWrap: "wrap",
-  gap: "14px",
-};
-
-const footerLink = {
-  background: "transparent",
-  color: "#cbd5e1",
-  border: "none",
-  cursor: "pointer",
-};
-
-const footerAnchor = {
-  color: "#38bdf8",
-  textDecoration: "none",
-};
-
-const footerBottom = {
-  maxWidth: "1200px",
-  margin: "24px auto 0",
-  color: "#64748b",
-};
-
-const primaryButton = {
-  padding: "14px 24px",
-  background: "#2563eb",
-  color: "white",
-  border: "none",
-  borderRadius: "12px",
-  marginRight: "12px",
-  cursor: "pointer",
-  fontWeight: "bold",
-};
-
-const secondaryButton = {
-  padding: "14px 24px",
-  background: "rgba(255,255,255,0.12)",
-  color: "white",
-  border: "1px solid rgba(255,255,255,0.2)",
-  borderRadius: "12px",
-  cursor: "pointer",
-};
-
-const navButton = {
-  ...secondaryButton,
-  padding: "10px 16px",
-};
-
-const navPrimary = {
-  ...primaryButton,
-  padding: "10px 16px",
-};
-
-function Step({ number, title, text }) {
-  return (
-    <div style={card}>
-      <h2 style={{ color: "#38bdf8" }}>{number}</h2>
-      <h3>{title}</h3>
-      <p style={cardText}>{text}</p>
-    </div>
-  );
-}
-
-const faqItem = {
-  background: "#1e293b",
-  padding: "16px",
-  borderRadius: "12px",
-  marginBottom: "10px",
-  cursor: "pointer",
-};
-
-const faqHeader = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-};
-
-function FAQItem({ question, answer }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div style={faqItem}>
-      <div style={faqHeader} onClick={() => setOpen(!open)}>
-        <strong>{question}</strong>
-        <span>{open ? "-" : "+"}</span>
-      </div>
-
-      {open && <p style={cardText}>{answer}</p>}
-    </div>
-  );
-}
 
 export default LandingPage;
