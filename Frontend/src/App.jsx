@@ -244,40 +244,76 @@ function App() {
         )}
 
         {activeTab === "invest" && (
-          <section style={panel}>
-            <h2>Investment Plans</h2>
+  <section style={panel}>
+    <h2>Investment Plans</h2>
+    <p style={muted}>
+      Choose a plan based on your capital and risk preference.
+      Returns are projected daily earnings.
+    </p>
 
-            <div style={cardGrid}>
-              {plans.map((plan) => (
-                <div key={plan.id} style={statCard}>
-                  <h3>{plan.name}</h3>
-                  <p>Minimum: {plan.min_amount} {plan.currency}</p>
-                  <p>Duration: {plan.duration_days} days</p>
-                  <p>Expected Return: {plan.expected_return_percent}%</p>
-                </div>
-              ))}
-            </div>
+    {/* PLAN CARDS */}
+    <div style={cardGrid}>
+      {plans.map((plan) => (
+        <div key={plan.id} style={statCard}>
+          <h3>{plan.name}</h3>
 
-            <div style={miniPanel}>
-              <h3>Start Investment</h3>
+          <p><strong>Minimum:</strong> ${plan.min_amount}</p>
 
-              <select value={selectedPlanId} onChange={(e) => setSelectedPlanId(e.target.value)} style={inputStyle}>
-                {plans.map((plan) => (
-                  <option key={plan.id} value={plan.id}>{plan.name}</option>
-                ))}
-              </select>
+          <p>
+            <strong>Projected Daily Return:</strong>{" "}
+            {plan.expected_return_percent}%
+          </p>
 
-              <input placeholder="Investment Amount" value={investmentAmount} onChange={(e) => setInvestmentAmount(e.target.value)} style={inputStyle} />
-              <button onClick={startInvestment} style={primaryButton}>Start Investment</button>
+          <p>
+            <strong>Duration:</strong> {plan.duration_days} day(s)
+          </p>
 
-              {user.role === "ADMIN" && (
-                <button onClick={processInvestments} style={secondaryButton}>
-                  Process Matured Investments
-                </button>
-              )}
-            </div>
-          </section>
-        )}
+          <p style={mutedSmall}>
+            Estimated return calculated daily based on plan performance.
+          </p>
+        </div>
+      ))}
+    </div>
+
+    {/* INVEST FORM */}
+    <div style={miniPanel}>
+      <h3>Start Investment</h3>
+
+      <select
+        value={selectedPlanId}
+        onChange={(e) => setSelectedPlanId(e.target.value)}
+        style={inputStyle}
+      >
+        {plans.map((plan) => (
+          <option key={plan.id} value={plan.id}>
+            {plan.name}
+          </option>
+        ))}
+      </select>
+
+      <input
+        placeholder="Enter Amount"
+        value={investmentAmount}
+        onChange={(e) => setInvestmentAmount(e.target.value)}
+        style={inputStyle}
+      />
+
+      <button onClick={startInvestment} style={primaryButton}>
+        Start Investment
+      </button>
+
+      <p style={mutedSmall}>
+        ⚠️ Investments carry risk. Returns are not guaranteed.
+      </p>
+
+      {user.role === "ADMIN" && (
+        <button onClick={processInvestments} style={secondaryButton}>
+          Process Matured Investments
+        </button>
+      )}
+    </div>
+  </section>
+)}
 
         {activeTab === "admin" && user.role === "ADMIN" && (
           <section style={panel}>
