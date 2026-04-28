@@ -23,6 +23,14 @@ const slides = [
 
 function LandingPage({ onLoginClick, onRegisterClick }) {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([
+    {
+      from: "support",
+      text: "Hello 👋 Welcome to ChainPilot. How can we assist you today?",
+    },
+  ]);
+  const [chatInput, setChatInput] = useState("");
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -31,6 +39,21 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
 
     return () => clearInterval(timer);
   }, []);
+
+  function sendChatMessage() {
+    if (!chatInput.trim()) return;
+
+    setChatMessages((messages) => [
+      ...messages,
+      { from: "visitor", text: chatInput },
+      {
+        from: "support",
+        text: "Thank you for contacting us. A support representative will respond shortly.",
+      },
+    ]);
+
+    setChatInput("");
+  }
 
   const slide = slides[activeSlide];
 
@@ -84,7 +107,9 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
                   style={{
                     ...dot,
                     background:
-                      index === activeSlide ? "#38bdf8" : "rgba(255,255,255,0.35)",
+                      index === activeSlide
+                        ? "#38bdf8"
+                        : "rgba(255,255,255,0.35)",
                   }}
                 />
               ))}
@@ -119,7 +144,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
             alt="investors"
             style={image}
           />
-          <h3>Trusted by Modern Investors</h3>
+          <h3 style={imageTitle}>Trusted by Modern Investors</h3>
         </div>
 
         <div style={imageCard}>
@@ -128,7 +153,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
             alt="crypto"
             style={image}
           />
-          <h3>Built for Digital Assets</h3>
+          <h3 style={imageTitle}>Built for Digital Assets</h3>
         </div>
 
         <div style={imageCard}>
@@ -137,7 +162,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
             alt="stock chart"
             style={image}
           />
-          <h3>Market-Ready Analytics</h3>
+          <h3 style={imageTitle}>Market-Ready Analytics</h3>
         </div>
       </section>
 
@@ -161,6 +186,59 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
           Get Started Now
         </button>
       </section>
+
+      {/* LIVE CHAT */}
+      {chatOpen && (
+        <div style={chatBox}>
+          <div style={chatHeader}>
+            <div>
+              <strong>ChainPilot Support</strong>
+              <p style={chatStatus}>Online now</p>
+            </div>
+
+            <button onClick={() => setChatOpen(false)} style={chatClose}>
+              ×
+            </button>
+          </div>
+
+          <div style={chatBody}>
+            {chatMessages.map((message, index) => (
+              <div
+                key={index}
+                style={
+                  message.from === "visitor"
+                    ? visitorMessage
+                    : supportMessage
+                }
+              >
+                {message.text}
+              </div>
+            ))}
+          </div>
+
+          <div style={chatInputRow}>
+            <input
+              placeholder="Type your message..."
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") sendChatMessage();
+              }}
+              style={chatInputStyle}
+            />
+
+            <button onClick={sendChatMessage} style={chatSend}>
+              Send
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!chatOpen && (
+        <button onClick={() => setChatOpen(true)} style={chatButton}>
+          💬 Live Chat
+        </button>
+      )}
     </div>
   );
 }
@@ -297,6 +375,10 @@ const imageCard = {
   boxShadow: "0 25px 60px rgba(0,0,0,0.35)",
 };
 
+const imageTitle = {
+  padding: "0 18px 18px",
+};
+
 const image = {
   width: "100%",
   height: "220px",
@@ -364,6 +446,108 @@ const dot = {
   height: "12px",
   borderRadius: "50%",
   border: "none",
+  cursor: "pointer",
+};
+
+const chatButton = {
+  position: "fixed",
+  right: "22px",
+  bottom: "22px",
+  background: "#2563eb",
+  color: "white",
+  border: "none",
+  borderRadius: "999px",
+  padding: "15px 22px",
+  fontWeight: "bold",
+  boxShadow: "0 20px 45px rgba(0,0,0,0.45)",
+  cursor: "pointer",
+  zIndex: 9999,
+};
+
+const chatBox = {
+  position: "fixed",
+  right: "22px",
+  bottom: "22px",
+  width: "340px",
+  maxWidth: "calc(100vw - 44px)",
+  background: "#0f172a",
+  border: "1px solid #334155",
+  borderRadius: "20px",
+  boxShadow: "0 30px 80px rgba(0,0,0,0.55)",
+  overflow: "hidden",
+  zIndex: 9999,
+};
+
+const chatHeader = {
+  background: "#2563eb",
+  padding: "16px",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+};
+
+const chatStatus = {
+  margin: "4px 0 0",
+  fontSize: "13px",
+  color: "#dbeafe",
+};
+
+const chatClose = {
+  background: "transparent",
+  border: "none",
+  color: "white",
+  fontSize: "26px",
+  cursor: "pointer",
+};
+
+const chatBody = {
+  padding: "16px",
+  height: "260px",
+  overflowY: "auto",
+  background: "#020617",
+};
+
+const supportMessage = {
+  background: "#1e293b",
+  color: "white",
+  padding: "10px 12px",
+  borderRadius: "12px",
+  marginBottom: "10px",
+  maxWidth: "85%",
+};
+
+const visitorMessage = {
+  background: "#2563eb",
+  color: "white",
+  padding: "10px 12px",
+  borderRadius: "12px",
+  marginBottom: "10px",
+  maxWidth: "85%",
+  marginLeft: "auto",
+};
+
+const chatInputRow = {
+  display: "flex",
+  gap: "8px",
+  padding: "12px",
+  background: "#0f172a",
+};
+
+const chatInputStyle = {
+  flex: 1,
+  padding: "11px",
+  borderRadius: "10px",
+  border: "1px solid #334155",
+  background: "#020617",
+  color: "white",
+};
+
+const chatSend = {
+  padding: "11px 14px",
+  background: "#16a34a",
+  color: "white",
+  border: "none",
+  borderRadius: "10px",
   cursor: "pointer",
 };
 
