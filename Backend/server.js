@@ -1,9 +1,9 @@
 import express from "express";
 import cors from "cors";
-import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import rateLimit from "express-rate-limit";
 import { pool } from "./db.js";
 import { sendWelcomeEmail } from "./email.js";
 
@@ -23,7 +23,9 @@ const generalLimiter = rateLimit({
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
-  message: { message: "Too many login/register attempts. Please try again later." },
+  message: {
+    message: "Too many login/register attempts. Please try again later.",
+  },
 });
 
 app.use(generalLimiter);
@@ -53,6 +55,20 @@ function requireAuth(req, res, next) {
     next();
   } catch {
     return res.status(401).json({ message: "Invalid token" });
+  }
+}
+
+async function createNotification(userId, title, message, type = "INFO") {
+  try {
+    await pool.query(
+      `
+      INSERT INTO notifications (user_id, title, message, type)
+      VALUES ($1, $2, $3, $4)
+      `,
+      [userId, title, message, type]
+    );
+  } catch (error) {
+    console.error("Create notification error:", error);
   }
 }
 
@@ -111,6 +127,13 @@ async function processMaturedInvestments() {
           investment.expected_return,
           `Investment #${investment.id} completed. Principal and profit released.`,
         ]
+      );
+
+      await createNotification(
+        investment.user_id,
+        "Investment Completed",
+        `Your investment #${investment.id} has completed. ${investment.expected_return} ${investment.currency} has been released.`,
+        "SUCCESS"
       );
 
       processed.push({
@@ -193,6 +216,13 @@ app.post("/api/auth/register", authLimiter, async (req, res) => {
     const token = createToken(user);
 
     sendWelcomeEmail(user.email, user.full_name);
+
+    await createNotification(
+      user.id,
+      "Welcome to ChainPilot",
+      "Your ChainPilot account has been created successfully.",
+      "SUCCESS"
+    );
 
     res.status(201).json({
       message: "Registration successful",
@@ -322,7 +352,29 @@ app.get("/api/users/:id/balances", requireAuth, async (req, res) => {
     res.json({
       balances: balances.rows,
       ledger: ledger.rows,
-      investments: investments.rows,
+      investments: investments.rows.map((inv) => {
+        if (inv.status !== "ACTIVE") return inv;
+
+        const start = new Date(inv.start_date);
+        const now = new Date();
+        const end = new Date(inv.end_date);
+
+        const totalDuration = end - start;
+        const elapsed = now - start;
+
+        const progress =
+          totalDuration <= 0 ? 100 : Math.min(elapsed / totalDuration, 1);
+
+        const currentValue =
+          Number(inv.amount) +
+          (Number(inv.expected_return) - Number(inv.amount)) * progress;
+
+        return {
+          ...inv,
+          progress: Math.floor(progress * 100),
+          current_value: currentValue.toFixed(2),
+        };
+      }),
     });
   } catch (error) {
     console.error("Fetch balances error:", error);
@@ -379,6 +431,13 @@ app.post("/api/deposits", requireAuth, async (req, res) => {
       [userId, currency, numericAmount]
     );
 
+    await createNotification(
+      userId,
+      "Deposit Request Created",
+      `Your deposit request of ${numericAmount} ${currency} has been submitted.`,
+      "INFO"
+    );
+
     res.status(201).json({
       message: "Deposit request created",
       deposit: result.rows[0],
@@ -408,6 +467,13 @@ app.post("/api/withdrawals", requireAuth, async (req, res) => {
       RETURNING *
       `,
       [userId, currency, numericAmount, walletAddress || ""]
+    );
+
+    await createNotification(
+      userId,
+      "Withdrawal Request Created",
+      `Your withdrawal request of ${numericAmount} ${currency} has been submitted.`,
+      "INFO"
     );
 
     res.status(201).json({
@@ -451,6 +517,47 @@ app.get("/api/admin/pending", requireAuth, requireAdmin, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch pending requests" });
   }
 });
+
+app.get(
+  "/api/admin/analytics",
+  requireAuth,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const deposits = await pool.query(
+        "SELECT COALESCE(SUM(amount),0) AS total FROM deposits WHERE status = 'APPROVED'"
+      );
+
+      const withdrawals = await pool.query(
+        "SELECT COALESCE(SUM(amount),0) AS total FROM withdrawals WHERE status = 'APPROVED'"
+      );
+
+      const activeInvestments = await pool.query(
+        "SELECT COUNT(*) FROM user_investments WHERE status = 'ACTIVE'"
+      );
+
+      const completedInvestments = await pool.query(
+        "SELECT COUNT(*) FROM user_investments WHERE status = 'COMPLETED'"
+      );
+
+      const totalDeposits = Number(deposits.rows[0].total);
+      const totalWithdrawals = Number(withdrawals.rows[0].total);
+
+      const platformProfit = totalDeposits - totalWithdrawals;
+
+      res.json({
+        totalDeposits,
+        totalWithdrawals,
+        platformProfit,
+        activeInvestments: Number(activeInvestments.rows[0].count),
+        completedInvestments: Number(completedInvestments.rows[0].count),
+      });
+    } catch (error) {
+      console.error("Analytics error:", error);
+      res.status(500).json({ message: "Failed to load analytics" });
+    }
+  }
+);
 
 app.post(
   "/api/admin/adjust-balance",
@@ -512,6 +619,13 @@ app.post(
           "ADMIN_ADJUSTMENT",
           reason || "Manual admin balance adjustment",
         ]
+      );
+
+      await createNotification(
+        userId,
+        "Balance Updated",
+        `Your balance was updated by admin: ${numericAmount} ${currency}.`,
+        numericAmount > 0 ? "SUCCESS" : "INFO"
       );
 
       await client.query("COMMIT");
@@ -593,6 +707,13 @@ app.post(
         ]
       );
 
+      await createNotification(
+        deposit.user_id,
+        "Deposit Approved",
+        `Your deposit of ${deposit.amount} ${deposit.currency} has been approved.`,
+        "SUCCESS"
+      );
+
       await client.query("COMMIT");
 
       res.json({
@@ -634,48 +755,22 @@ app.post(
         });
       }
 
+      const deposit = result.rows[0];
+
+      await createNotification(
+        deposit.user_id,
+        "Deposit Rejected",
+        `Your deposit of ${deposit.amount} ${deposit.currency} was rejected.`,
+        "ERROR"
+      );
+
       res.json({
         message: "Deposit rejected",
-        deposit: result.rows[0],
+        deposit,
       });
     } catch (error) {
       console.error("Reject deposit error:", error);
       res.status(500).json({ message: "Failed to reject deposit" });
-    }
-  }
-);
-
-app.post(
-  "/api/admin/withdrawals/:id/reject",
-  requireAuth,
-  requireAdmin,
-  async (req, res) => {
-    try {
-      const withdrawalId = Number(req.params.id);
-
-      const result = await pool.query(
-        `
-        UPDATE withdrawals
-        SET status = 'REJECTED'
-        WHERE id = $1 AND status = 'PENDING'
-        RETURNING *
-        `,
-        [withdrawalId]
-      );
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({
-          message: "Pending withdrawal not found",
-        });
-      }
-
-      res.json({
-        message: "Withdrawal rejected",
-        withdrawal: result.rows[0],
-      });
-    } catch (error) {
-      console.error("Reject withdrawal error:", error);
-      res.status(500).json({ message: "Failed to reject withdrawal" });
     }
   }
 );
@@ -763,6 +858,13 @@ app.post(
         ]
       );
 
+      await createNotification(
+        withdrawal.user_id,
+        "Withdrawal Approved",
+        `Your withdrawal of ${withdrawal.amount} ${withdrawal.currency} has been approved.`,
+        "SUCCESS"
+      );
+
       await client.query("COMMIT");
 
       res.json({
@@ -776,6 +878,50 @@ app.post(
       res.status(500).json({ message: "Failed to approve withdrawal" });
     } finally {
       client.release();
+    }
+  }
+);
+
+app.post(
+  "/api/admin/withdrawals/:id/reject",
+  requireAuth,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const withdrawalId = Number(req.params.id);
+
+      const result = await pool.query(
+        `
+        UPDATE withdrawals
+        SET status = 'REJECTED'
+        WHERE id = $1 AND status = 'PENDING'
+        RETURNING *
+        `,
+        [withdrawalId]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          message: "Pending withdrawal not found",
+        });
+      }
+
+      const withdrawal = result.rows[0];
+
+      await createNotification(
+        withdrawal.user_id,
+        "Withdrawal Rejected",
+        `Your withdrawal of ${withdrawal.amount} ${withdrawal.currency} was rejected.`,
+        "ERROR"
+      );
+
+      res.json({
+        message: "Withdrawal rejected",
+        withdrawal,
+      });
+    } catch (error) {
+      console.error("Reject withdrawal error:", error);
+      res.status(500).json({ message: "Failed to reject withdrawal" });
     }
   }
 );
@@ -884,6 +1030,13 @@ app.post("/api/investments", requireAuth, async (req, res) => {
       [userId, plan.currency, -numericAmount, `Investment started: ${plan.name}`]
     );
 
+    await createNotification(
+      userId,
+      "Investment Started",
+      `Your ${plan.name} investment of ${numericAmount} ${plan.currency} has started.`,
+      "SUCCESS"
+    );
+
     await client.query("COMMIT");
 
     res.status(201).json({
@@ -915,47 +1068,6 @@ app.post(
       });
     } catch {
       res.status(500).json({ message: "Failed to process matured investments" });
-    }
-  }
-);
-
-app.get(
-  "/api/admin/analytics",
-  requireAuth,
-  requireAdmin,
-  async (req, res) => {
-    try {
-      const deposits = await pool.query(
-        "SELECT COALESCE(SUM(amount),0) AS total FROM deposits WHERE status = 'APPROVED'"
-      );
-
-      const withdrawals = await pool.query(
-        "SELECT COALESCE(SUM(amount),0) AS total FROM withdrawals WHERE status = 'APPROVED'"
-      );
-
-      const activeInvestments = await pool.query(
-        "SELECT COUNT(*) FROM user_investments WHERE status = 'ACTIVE'"
-      );
-
-      const completedInvestments = await pool.query(
-        "SELECT COUNT(*) FROM user_investments WHERE status = 'COMPLETED'"
-      );
-
-      const totalDeposits = Number(deposits.rows[0].total);
-      const totalWithdrawals = Number(withdrawals.rows[0].total);
-
-      const platformProfit = totalDeposits - totalWithdrawals;
-
-      res.json({
-        totalDeposits,
-        totalWithdrawals,
-        platformProfit,
-        activeInvestments: Number(activeInvestments.rows[0].count),
-        completedInvestments: Number(completedInvestments.rows[0].count),
-      });
-    } catch (error) {
-      console.error("Analytics error:", error);
-      res.status(500).json({ message: "Failed to load analytics" });
     }
   }
 );
@@ -1019,6 +1131,13 @@ app.post(
         ]
       );
 
+      await createNotification(
+        investment.user_id,
+        "Investment Stopped",
+        `Your investment #${investmentId} was stopped by admin. Principal has been returned.`,
+        "INFO"
+      );
+
       await client.query("COMMIT");
 
       res.json({ message: "Investment stopped and principal returned" });
@@ -1031,6 +1150,44 @@ app.post(
     }
   }
 );
+
+app.get("/api/notifications", requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM notifications
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      LIMIT 20
+      `,
+      [req.user.userId]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Fetch notifications error:", error);
+    res.status(500).json({ message: "Failed to fetch notifications" });
+  }
+});
+
+app.post("/api/notifications/read", requireAuth, async (req, res) => {
+  try {
+    await pool.query(
+      `
+      UPDATE notifications
+      SET is_read = TRUE
+      WHERE user_id = $1
+      `,
+      [req.user.userId]
+    );
+
+    res.json({ message: "Notifications marked as read" });
+  } catch (error) {
+    console.error("Mark notifications read error:", error);
+    res.status(500).json({ message: "Failed to update notifications" });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 
