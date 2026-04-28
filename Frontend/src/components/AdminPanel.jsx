@@ -68,6 +68,21 @@ function AdminPanel({ token }) {
     }
   }
 
+  async function rejectDeposit(id) {
+    try {
+      await axios.post(
+        `${API_URL}/api/admin/deposits/${id}/reject`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Deposit rejected");
+      loadData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Error rejecting deposit");
+    }
+  }
+
   async function approveWithdrawal(id) {
     try {
       await axios.post(
@@ -80,6 +95,21 @@ function AdminPanel({ token }) {
       loadData();
     } catch (error) {
       alert(error.response?.data?.message || "Error approving withdrawal");
+    }
+  }
+
+  async function rejectWithdrawal(id) {
+    try {
+      await axios.post(
+        `${API_URL}/api/admin/withdrawals/${id}/reject`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Withdrawal rejected");
+      loadData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Error rejecting withdrawal");
     }
   }
 
@@ -216,6 +246,13 @@ function AdminPanel({ token }) {
             >
               Approve Deposit
             </button>
+
+            <button
+              onClick={() => rejectDeposit(deposit.id)}
+              style={dangerButton}
+            >
+              Reject Deposit
+            </button>
           </div>
         ))
       )}
@@ -243,9 +280,16 @@ function AdminPanel({ token }) {
 
             <button
               onClick={() => approveWithdrawal(withdrawal.id)}
-              style={dangerButton}
+              style={approveButton}
             >
               Approve Withdrawal
+            </button>
+
+            <button
+              onClick={() => rejectWithdrawal(withdrawal.id)}
+              style={dangerButton}
+            >
+              Reject Withdrawal
             </button>
           </div>
         ))
@@ -325,6 +369,7 @@ const approveButton = {
   border: "none",
   borderRadius: "8px",
   cursor: "pointer",
+  marginRight: "10px",
 };
 
 const dangerButton = {
