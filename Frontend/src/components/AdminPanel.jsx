@@ -9,8 +9,13 @@ function AdminPanel({ token }) {
   const [withdrawals, setWithdrawals] = useState([]);
   const [users, setUsers] = useState([]);
   const [selectedUserData, setSelectedUserData] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("Loading admin data...");
+
+  const [balanceAmount, setBalanceAmount] = useState("");
+  const [balanceReason, setBalanceReason] = useState("");
 
   useEffect(() => {
     loadData();
@@ -48,6 +53,7 @@ function AdminPanel({ token }) {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      setSelectedUserId(userId);
       setSelectedUserData({
         userId,
         balances: res.data.balances || [],
@@ -56,6 +62,61 @@ function AdminPanel({ token }) {
       });
     } catch (error) {
       alert(error.response?.data?.message || "Failed to load user data");
+    }
+  }
+
+  async function adjustBalance() {
+    if (!selectedUserId) {
+      alert("Select a user first");
+      return;
+    }
+
+    if (!balanceAmount) {
+      alert("Enter amount");
+      return;
+    }
+
+    try {
+      await axios.post(
+        `${API_URL}/api/admin/adjust-balance`,
+        {
+          userId: selectedUserId,
+          currency: "USD",
+          amount: Number(balanceAmount),
+          reason: balanceReason || "Manual admin balance adjustment",
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Balance updated");
+      setBalanceAmount("");
+      setBalanceReason("");
+      viewUser(selectedUserId);
+      loadData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to update balance");
+    }
+  }
+
+  async function stopInvestment(investmentId) {
+    const confirmStop = confirm(
+      "Are you sure you want to stop this investment and return the principal?"
+    );
+
+    if (!confirmStop) return;
+
+    try {
+      await axios.post(
+        `${API_URL}/api/admin/investments/${investmentId}/stop`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Investment stopped");
+      viewUser(selectedUserId);
+      loadData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to stop investment");
     }
   }
 
@@ -130,6 +191,8 @@ function AdminPanel({ token }) {
     );
   });
 
+  const selectedUser = users.find((u) => u.id === selectedUserId);
+
   return (
     <div>
       <h2>Admin Control Center</h2>
@@ -177,11 +240,14 @@ function AdminPanel({ token }) {
               <strong>Email:</strong> {user.email}
             </p>
             <p>
+              <strong>Password:</strong> Protected / Not visible for security
+            </p>
+            <p>
               <strong>Role:</strong> {user.role}
             </p>
 
             <button onClick={() => viewUser(user.id)} style={buttonStyle}>
-              View User Data
+              View / Manage User
             </button>
           </div>
         ))
@@ -189,7 +255,33 @@ function AdminPanel({ token }) {
 
       {selectedUserData && (
         <div style={sectionStyle}>
-          <h3>Selected User Data — ID {selectedUserData.userId}</h3>
+          <h3>
+            Managing User — ID {selectedUserData.userId}
+            {selectedUser ? ` (${selectedUser.email})` : ""}
+          </h3>
+
+          <h4>Manual Balance Adjustment</h4>
+          <p style={muted}>
+            Use positive amount to add balance. Use negative amount to subtract.
+          </p>
+
+          <input
+            placeholder="Amount e.g. 500 or -100"
+            value={balanceAmount}
+            onChange={(e) => setBalanceAmount(e.target.value)}
+            style={inputStyle}
+          />
+
+          <input
+            placeholder="Reason e.g. Admin correction"
+            value={balanceReason}
+            onChange={(e) => setBalanceReason(e.target.value)}
+            style={inputStyle}
+          />
+
+          <button onClick={adjustBalance} style={approveButton}>
+            Update User Balance
+          </button>
 
           <h4>Balances</h4>
           {selectedUserData.balances.length === 0 ? (
@@ -208,11 +300,23 @@ function AdminPanel({ token }) {
           ) : (
             selectedUserData.investments.map((investment) => (
               <div key={investment.id} style={miniCard}>
-                <p>{investment.plan_name}</p>
                 <p>
-                  {investment.amount} {investment.currency}
+                  <strong>{investment.plan_name}</strong>
                 </p>
+                <p>
+                  Amount: {investment.amount} {investment.currency}
+                </p>
+                <p>Expected Return: {investment.expected_return}</p>
                 <p>Status: {investment.status}</p>
+
+                {investment.status === "ACTIVE" && (
+                  <button
+                    onClick={() => stopInvestment(investment.id)}
+                    style={dangerButton}
+                  >
+                    Stop Investment
+                  </button>
+                )}
               </div>
             ))
           )}
@@ -383,6 +487,7 @@ const approveButton = {
   borderRadius: "8px",
   cursor: "pointer",
   marginRight: "10px",
+  marginBottom: "10px",
 };
 
 const dangerButton = {
@@ -392,6 +497,11 @@ const dangerButton = {
   border: "none",
   borderRadius: "8px",
   cursor: "pointer",
+  marginBottom: "10px",
+};
+
+const muted = {
+  color: "#94a3b8",
 };
 
 export default AdminPanel;
