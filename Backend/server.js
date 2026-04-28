@@ -901,6 +901,46 @@ app.post(
   }
 );
 
+app.get(
+  "/api/admin/analytics",
+  requireAuth,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const deposits = await pool.query(
+        "SELECT COALESCE(SUM(amount),0) AS total FROM deposits WHERE status = 'APPROVED'"
+      );
+
+      const withdrawals = await pool.query(
+        "SELECT COALESCE(SUM(amount),0) AS total FROM withdrawals WHERE status = 'APPROVED'"
+      );
+
+      const activeInvestments = await pool.query(
+        "SELECT COUNT(*) FROM user_investments WHERE status = 'ACTIVE'"
+      );
+
+      const completedInvestments = await pool.query(
+        "SELECT COUNT(*) FROM user_investments WHERE status = 'COMPLETED'"
+      );
+
+      const totalDeposits = Number(deposits.rows[0].total);
+      const totalWithdrawals = Number(withdrawals.rows[0].total);
+
+      const platformProfit = totalDeposits - totalWithdrawals;
+
+      res.json({
+        totalDeposits,
+        totalWithdrawals,
+        platformProfit,
+        activeInvestments: Number(activeInvestments.rows[0].count),
+        completedInvestments: Number(completedInvestments.rows[0].count),
+      });
+    } catch (error) {
+      console.error("Analytics error:", error);
+      res.status(500).json({ message: "Failed to load analytics" });
+    }
+  }
+);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
