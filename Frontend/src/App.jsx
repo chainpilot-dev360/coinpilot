@@ -3,11 +3,14 @@ import axios from "axios";
 import DashboardPreview from "./components/DashboardPreview";
 import AdminPanel from "./components/AdminPanel";
 import Notification from "./components/Notification";
+import LandingPage from "./components/LandingPage";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [authMode, setAuthMode] = useState("login");
+  const [showAuth, setShowAuth] = useState(false);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -120,12 +123,23 @@ function App() {
     localStorage.removeItem("token");
     setToken("");
     setUser(null);
+    setShowAuth(false);
     showNotification("Logged out", "success");
   }
 
   function openTab(tab) {
     setActiveTab(tab);
     setMenuOpen(false);
+  }
+
+  function openLogin() {
+    setAuthMode("login");
+    setShowAuth(true);
+  }
+
+  function openRegister() {
+    setAuthMode("register");
+    setShowAuth(true);
   }
 
   async function refreshBalances() {
@@ -206,16 +220,81 @@ function App() {
     }
   }
 
-import LandingPage from "./components/LandingPage";
+  if (!user && !showAuth) {
+    return (
+      <>
+        <Notification message={notification.message} type={notification.type} />
+        <LandingPage onLoginClick={openLogin} onRegisterClick={openRegister} />
+      </>
+    );
+  }
 
-if (!user && !token) {
-  return (
-    <LandingPage
-      onLoginClick={() => setAuthMode("login")}
-      onRegisterClick={() => setAuthMode("register")}
-    />
-  );
-}
+  if (!user && showAuth) {
+    return (
+      <div style={authPage}>
+        <Notification message={notification.message} type={notification.type} />
+
+        <div style={authCard}>
+          <button onClick={() => setShowAuth(false)} style={backButton}>
+            ← Back to Home
+          </button>
+
+          <h1 style={{ marginBottom: 5 }}>ChainPilot</h1>
+          <p style={muted}>Crypto investment dashboard</p>
+
+          <div style={{ marginBottom: 20 }}>
+            <button
+              onClick={() => setAuthMode("login")}
+              style={authMode === "login" ? activeButton : secondaryButton}
+            >
+              Login
+            </button>
+
+            <button
+              onClick={() => setAuthMode("register")}
+              style={authMode === "register" ? activeButton : secondaryButton}
+            >
+              Register
+            </button>
+          </div>
+
+          {authMode === "register" && (
+            <input
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              style={inputStyle}
+            />
+          )}
+
+          <input
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={inputStyle}
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={inputStyle}
+          />
+
+          {authMode === "login" ? (
+            <button onClick={login} style={primaryButton}>
+              Login
+            </button>
+          ) : (
+            <button onClick={register} style={primaryButton}>
+              Register
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={layout}>
@@ -603,6 +682,14 @@ const logoutButton = {
   color: "white",
   border: "none",
   borderRadius: "10px",
+  cursor: "pointer",
+};
+
+const backButton = {
+  background: "transparent",
+  color: "#94a3b8",
+  border: "none",
+  marginBottom: "16px",
   cursor: "pointer",
 };
 
