@@ -147,3 +147,12 @@ code {
     opacity: 0.45;
   }
 }
+
+@keyframes tickerMove {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

@@ -11,6 +11,37 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+const tickerItems = [
+  { symbol: "BTC/USD", price: "$67,240", change: "+2.4%" },
+  { symbol: "ETH/USD", price: "$3,420", change: "+1.8%" },
+  { symbol: "EUR/USD", price: "1.0842", change: "-0.2%" },
+  { symbol: "NASDAQ", price: "16,340", change: "+0.9%" },
+  { symbol: "S&P 500", price: "5,218", change: "+0.6%" },
+  { symbol: "GOLD", price: "$2,336", change: "+0.4%" },
+];
+
+function MarketTicker() {
+  return (
+    <div style={tickerWrap}>
+      <div style={tickerTrack}>
+        {[...tickerItems, ...tickerItems].map((item, index) => {
+          const positive = item.change.startsWith("+");
+
+          return (
+            <div key={index} style={tickerItem}>
+              <strong>{item.symbol}</strong>
+              <span>{item.price}</span>
+              <span style={{ color: positive ? "#22c55e" : "#ef4444" }}>
+                {item.change}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function AnimatedNumber({ value }) {
   const [display, setDisplay] = useState(0);
 
@@ -185,6 +216,8 @@ function DashboardPreview({ token, user }) {
 
   return (
     <div style={pageFade}>
+      <MarketTicker />
+
       <div style={dashboardHeader}>
         <div>
           <h2 style={{ marginBottom: 4 }}>Dashboard</h2>
@@ -412,6 +445,31 @@ function SkeletonDashboard() {
 
 const pageFade = {
   animation: "fadeIn 0.6s ease",
+};
+
+const tickerWrap = {
+  overflow: "hidden",
+  background: "rgba(2,6,23,0.9)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: "14px",
+  marginBottom: "20px",
+  padding: "12px 0",
+};
+
+const tickerTrack = {
+  display: "flex",
+  gap: "18px",
+  width: "max-content",
+  animation: "tickerMove 28s linear infinite",
+};
+
+const tickerItem = {
+  display: "flex",
+  gap: "8px",
+  alignItems: "center",
+  padding: "0 16px",
+  whiteSpace: "nowrap",
+  color: "#cbd5e1",
 };
 
 const dashboardHeader = {
