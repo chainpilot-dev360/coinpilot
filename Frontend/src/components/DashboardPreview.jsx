@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,55 +35,64 @@ function DashboardPreview({ token, user }) {
 
   if (!data) return <p>Loading dashboard...</p>;
 
+  const chartData = data.investments.map((inv) => ({
+    name: inv.plan_name,
+    value:
+      inv.status === "ACTIVE"
+        ? Number(inv.current_value || inv.amount)
+        : Number(inv.expected_return),
+  }));
+
   return (
     <div>
       <h2>Dashboard</h2>
 
+      {/* CHART */}
+      <h3>Portfolio Growth</h3>
+      <div style={{ height: 300 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData}>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Line type="monotone" dataKey="value" stroke="#2563eb" />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
       {/* BALANCES */}
       <h3>Your Wallet</h3>
-      {data.balances.length === 0 ? (
-        <p>No balances yet</p>
-      ) : (
-        data.balances.map((b) => (
-          <div key={b.id} style={card}>
-            {b.currency}: {b.available}
-          </div>
-        ))
-      )}
+      {data.balances.map((b) => (
+        <div key={b.id} style={card}>
+          {b.currency}: {b.available}
+        </div>
+      ))}
 
       {/* INVESTMENTS */}
       <h3>Your Investments</h3>
-      {data.investments.length === 0 ? (
-        <p>No investments yet</p>
-      ) : (
-        data.investments.map((inv) => (
-          <div key={inv.id} style={card}>
-            <p>{inv.plan_name}</p>
-            <p>
-              {inv.amount} {inv.currency}
-            </p>
-            <p>Status: {inv.status}</p>
-          </div>
-        ))
-      )}
+      {data.investments.map((inv) => (
+        <div key={inv.id} style={card}>
+          <p><strong>{inv.plan_name}</strong></p>
+          <p>Invested: {inv.amount}</p>
+          <p>Status: {inv.status}</p>
+
+          {inv.status === "ACTIVE" && (
+            <>
+              <p>Progress: {inv.progress}%</p>
+              <p>Current Value: {inv.current_value}</p>
+            </>
+          )}
+        </div>
+      ))}
 
       {/* LEDGER */}
       <h3>Recent Transactions</h3>
-      {data.ledger.length === 0 ? (
-        <p>No transactions yet</p>
-      ) : (
-        data.ledger.slice(0, 10).map((entry) => (
-          <div key={entry.id} style={card}>
-            <p>
-              <strong>{entry.type}</strong>
-            </p>
-            <p>
-              {entry.amount} {entry.currency}
-            </p>
-            <small>{entry.reason}</small>
-          </div>
-        ))
-      )}
+      {data.ledger.slice(0, 5).map((entry) => (
+        <div key={entry.id} style={card}>
+          <p>{entry.type}</p>
+          <p>{entry.amount}</p>
+        </div>
+      ))}
     </div>
   );
 }
