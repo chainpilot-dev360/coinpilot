@@ -1,7 +1,47 @@
+import { useEffect, useState } from "react";
+
+const slides = [
+  {
+    title: "Satisfied Investors",
+    text: "Join a growing community of users managing digital wealth with confidence.",
+    image:
+      "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    title: "Crypto Trading Intelligence",
+    text: "Monitor opportunities, track portfolio activity, and manage investment growth.",
+    image:
+      "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    title: "Stock Market Inspired Analytics",
+    text: "A premium dashboard experience designed for modern finance users.",
+    image:
+      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1600&q=80",
+  },
+];
+
 function LandingPage({ onLoginClick, onRegisterClick }) {
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSlide((current) => (current + 1) % slides.length);
+    }, 4500);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const slide = slides[activeSlide];
+
   return (
     <div style={page}>
-      <section style={hero}>
+      <section
+        style={{
+          ...hero,
+          backgroundImage: `linear-gradient(rgba(2,6,23,0.55), rgba(2,6,23,0.95)), url(${slide.image})`,
+        }}
+      >
         <div style={heroOverlay}>
           <nav style={nav}>
             <h2>ChainPilot</h2>
@@ -18,16 +58,13 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
           </nav>
 
           <div style={floatingCard}>
-            <p style={badge}>Crypto Investment Platform</p>
+            <p style={badge}>{slide.title}</p>
 
             <h1 style={heroTitle}>
               Build Wealth With Smart Digital Asset Investing
             </h1>
 
-            <p style={heroText}>
-              Track your wallet, grow your portfolio, monitor investments, and
-              manage earnings from one secure dashboard.
-            </p>
+            <p style={heroText}>{slide.text}</p>
 
             <div>
               <button onClick={onRegisterClick} style={primaryButton}>
@@ -38,26 +75,69 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
                 Access Dashboard
               </button>
             </div>
+
+            <div style={dots}>
+              {slides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveSlide(index)}
+                  style={{
+                    ...dot,
+                    background:
+                      index === activeSlide ? "#38bdf8" : "rgba(255,255,255,0.35)",
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       <section style={section}>
-        <h2 style={sectionTitle}>Why Investors Choose ChainPilot</h2>
+        <h2 style={sectionTitle}>A Premium Finance Experience</h2>
 
         <div style={grid}>
           <Card
-            title="Daily Growth Plans"
-            text="Choose investment plans designed around projected daily portfolio growth."
+            title="Investor-Focused Platform"
+            text="A modern experience built for users who want clarity, performance, and simple portfolio control."
+          />
+          <Card
+            title="Crypto & Stock Inspired Design"
+            text="Professional visuals inspired by trading desks, digital assets, and financial analytics."
           />
           <Card
             title="Live Dashboard"
-            text="Monitor wallet balances, investments, transactions, and performance from one place."
+            text="Track wallet balances, investment activity, transactions, and portfolio updates from one place."
           />
-          <Card
-            title="Admin-Controlled Security"
-            text="Deposits and withdrawals are reviewed through a secure admin approval system."
+        </div>
+      </section>
+
+      <section style={imageBand}>
+        <div style={imageCard}>
+          <img
+            src="https://images.unsplash.com/photo-1560472355-536de3962603?auto=format&fit=crop&w=900&q=80"
+            alt="investors"
+            style={image}
           />
+          <h3>Trusted by Modern Investors</h3>
+        </div>
+
+        <div style={imageCard}>
+          <img
+            src="https://images.unsplash.com/photo-1642104704074-907c0698cbd9?auto=format&fit=crop&w=900&q=80"
+            alt="crypto"
+            style={image}
+          />
+          <h3>Built for Digital Assets</h3>
+        </div>
+
+        <div style={imageCard}>
+          <img
+            src="https://images.unsplash.com/photo-1535320903710-d993d3d77d29?auto=format&fit=crop&w=900&q=80"
+            alt="stock chart"
+            style={image}
+          />
+          <h3>Market-Ready Analytics</h3>
         </div>
       </section>
 
@@ -114,11 +194,10 @@ const page = {
 
 const hero = {
   minHeight: "100vh",
-  backgroundImage:
-    "linear-gradient(rgba(2,6,23,0.65), rgba(2,6,23,0.95)), url('https://images.unsplash.com/photo-1640340434855-6084b1f4901c?auto=format&fit=crop&w=1600&q=80')",
   backgroundSize: "cover",
   backgroundPosition: "center",
   backgroundAttachment: "fixed",
+  transition: "background-image 0.8s ease-in-out",
 };
 
 const heroOverlay = {
@@ -138,14 +217,14 @@ const nav = {
 };
 
 const floatingCard = {
-  maxWidth: "760px",
-  margin: "120px auto 0",
-  padding: "50px",
-  borderRadius: "28px",
+  maxWidth: "780px",
+  margin: "110px auto 0",
+  padding: "52px",
+  borderRadius: "30px",
   background: "rgba(15, 23, 42, 0.72)",
-  backdropFilter: "blur(18px)",
-  border: "1px solid rgba(255,255,255,0.14)",
-  boxShadow: "0 30px 90px rgba(0,0,0,0.45)",
+  backdropFilter: "blur(20px)",
+  border: "1px solid rgba(255,255,255,0.16)",
+  boxShadow: "0 35px 100px rgba(0,0,0,0.55)",
   textAlign: "center",
 };
 
@@ -201,6 +280,30 @@ const card = {
   boxShadow: "0 20px 45px rgba(0,0,0,0.25)",
 };
 
+const imageBand = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+  gap: "22px",
+  padding: "80px 24px",
+  maxWidth: "1200px",
+  margin: "0 auto",
+};
+
+const imageCard = {
+  background: "#0f172a",
+  borderRadius: "22px",
+  overflow: "hidden",
+  border: "1px solid #1e293b",
+  boxShadow: "0 25px 60px rgba(0,0,0,0.35)",
+};
+
+const image = {
+  width: "100%",
+  height: "220px",
+  objectFit: "cover",
+  display: "block",
+};
+
 const planCard = {
   background: "linear-gradient(180deg, #1e293b, #020617)",
   padding: "32px",
@@ -247,6 +350,21 @@ const navButton = {
 const navPrimary = {
   ...primaryButton,
   padding: "10px 16px",
+};
+
+const dots = {
+  marginTop: "28px",
+  display: "flex",
+  justifyContent: "center",
+  gap: "10px",
+};
+
+const dot = {
+  width: "12px",
+  height: "12px",
+  borderRadius: "50%",
+  border: "none",
+  cursor: "pointer",
 };
 
 export default LandingPage;
