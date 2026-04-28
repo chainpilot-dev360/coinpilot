@@ -3,9 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import rateLimit from "express-rate-limit";
 import { pool } from "./db.js";
-import { sendWelcomeEmail } from "./email.js";
+import { sendWelcomeEmail, sendVerificationEmail } from "./email.js";
 
 dotenv.config();
 
@@ -203,19 +204,23 @@ app.post("/api/auth/register", authLimiter, async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const verificationExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
+
     const result = await pool.query(
       `
-      INSERT INTO users (full_name, email, password_hash, role)
-      VALUES ($1, $2, $3, 'USER')
+      INSERT INTO users (full_name, email, password_hash, role, verification_token, verification_token_expires)
+      VALUES ($1, $2, $3, 'USER', $4, $5)
       RETURNING id, full_name, email, role, created_at
       `,
-      [fullName, email, passwordHash]
+      [fullName, email, passwordHash, verificationToken, verificationExpires]
     );
 
     const user = result.rows[0];
     const token = createToken(user);
 
     sendWelcomeEmail(user.email, user.full_name);
+    sendVerificationEmail(user.email, user.full_name, verificationToken);
 
     await createNotification(
       user.id,
@@ -1186,6 +1191,57 @@ app.post("/api/notifications/read", requireAuth, async (req, res) => {
   } catch (error) {
     console.error("Mark notifications read error:", error);
     res.status(500).json({ message: "Failed to update notifications" });
+  }
+});
+
+app.get("/api/auth/verify-email", async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({ message: "Verification token is required" });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM users
+      WHERE verification_token = $1
+      AND verification_token_expires > CURRENT_TIMESTAMP
+      `,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({
+        message: "Invalid or expired verification link",
+      });
+    }
+
+    const user = result.rows[0];
+
+    await pool.query(
+      `
+      UPDATE users
+      SET email_verified = TRUE,
+          verification_token = NULL,
+          verification_token_expires = NULL
+      WHERE id = $1
+      `,
+      [user.id]
+    );
+
+    await createNotification(
+      user.id,
+      "Email Verified",
+      "Your email address has been verified successfully.",
+      "SUCCESS"
+    );
+
+    res.json({ message: "Email verified successfully" });
+  } catch (error) {
+    console.error("Verify email error:", error);
+    res.status(500).json({ message: "Email verification failed" });
   }
 });
 
