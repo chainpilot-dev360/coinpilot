@@ -14,6 +14,7 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const [balances, setBalances] = useState([]);
   const [depositAmount, setDepositAmount] = useState("");
@@ -169,30 +170,38 @@ function App() {
 
   return (
     <div style={layout}>
-      <aside style={sidebar}>
-        <h2 style={{ marginBottom: 4 }}>ChainPilot</h2>
-        <p style={mutedSmall}>{user.role}</p>
+<>
+  {/* MOBILE TOP BAR */}
+  <div style={mobileTopBar}>
+    <button onClick={() => setMenuOpen(!menuOpen)} style={menuButton}>
+      ☰
+    </button>
+    <h3>ChainPilot</h3>
+  </div>
 
-        <nav style={{ marginTop: 30 }}>
-          <button onClick={() => setActiveTab("dashboard")} style={activeTab === "dashboard" ? activeMenu : menu}>
-            Dashboard
-          </button>
-          <button onClick={() => setActiveTab("wallet")} style={activeTab === "wallet" ? activeMenu : menu}>
-            Wallet
-          </button>
-          <button onClick={() => setActiveTab("invest")} style={activeTab === "invest" ? activeMenu : menu}>
-            Invest
-          </button>
+  {/* SIDEBAR */}
+  <aside
+    style={{
+      ...sidebar,
+      transform: menuOpen ? "translateX(0)" : "translateX(-100%)",
+    }}
+  >
+    <h2>ChainPilot</h2>
+    <p style={mutedSmall}>{user.role}</p>
 
-          {user.role === "ADMIN" && (
-            <button onClick={() => setActiveTab("admin")} style={activeTab === "admin" ? activeMenu : menu}>
-              Admin
-            </button>
-          )}
-        </nav>
+    <nav style={{ marginTop: 30 }}>
+      <button onClick={() => { setActiveTab("dashboard"); setMenuOpen(false); }} style={menu}>Dashboard</button>
+      <button onClick={() => { setActiveTab("wallet"); setMenuOpen(false); }} style={menu}>Wallet</button>
+      <button onClick={() => { setActiveTab("invest"); setMenuOpen(false); }} style={menu}>Invest</button>
 
-        <button onClick={logout} style={logoutButton}>Logout</button>
-      </aside>
+      {user.role === "ADMIN" && (
+        <button onClick={() => { setActiveTab("admin"); setMenuOpen(false); }} style={menu}>Admin</button>
+      )}
+    </nav>
+
+    <button onClick={logout} style={logoutButton}>Logout</button>
+  </aside>
+</>
 
       <main style={main}>
         <header style={header}>
@@ -326,21 +335,49 @@ const layout = {
   minHeight: "100vh",
   background: "#0f172a",
   color: "white",
-  fontFamily: "Arial, sans-serif",
+  flexDirection: "row",
 };
 
-const sidebar = {
+const mobileTopBar = {
+  display: "none",
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  height: "60px",
+  background: "#020617",
+  alignItems: "center",
+  padding: "0 15px",
+  zIndex: 1000,
+};
+
+const menuButton = {
+  fontSize: "24px",
+  background: "none",
+  border: "none",
+  color: "white",
+  marginRight: "15px",
+  cursor: "pointer",
+};
+
+coconst sidebar = {
   width: "240px",
   background: "#020617",
   padding: "24px",
   display: "flex",
   flexDirection: "column",
+  position: "fixed",
+  height: "100%",
+  left: 0,
+  top: 0,
+  transition: "0.3s",
+  zIndex: 999,
 };
 
 const main = {
   flex: 1,
   padding: "32px",
-  overflowY: "auto",
+  marginLeft: "240px",
 };
 
 const header = {
@@ -476,5 +513,12 @@ const mutedSmall = {
   color: "#94a3b8",
   fontSize: "14px",
 };
+
+if (window.innerWidth < 768) {
+  sidebar.transform = "translateX(-100%)";
+  mobileTopBar.display = "flex";
+  main.marginLeft = "0";
+  main.marginTop = "60px";
+}
 
 export default App;
