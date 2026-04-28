@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -12,6 +13,20 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  message: { message: "Too many requests. Please try again later." },
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { message: "Too many login/register attempts. Please try again later." },
+});
+
+app.use(generalLimiter);
 
 function createToken(user) {
   return jwt.sign(
@@ -136,7 +151,7 @@ app.get("/api/message", (req, res) => {
   res.json({ message: "Hello from ChainPilot backend" });
 });
 
-app.post("/api/auth/register", async (req, res) => {
+app.post("/api/auth/register", authLimiter, async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
 
@@ -176,7 +191,7 @@ app.post("/api/auth/register", async (req, res) => {
 
     const user = result.rows[0];
     const token = createToken(user);
-    
+
     sendWelcomeEmail(user.email, user.full_name);
 
     res.status(201).json({
@@ -190,7 +205,7 @@ app.post("/api/auth/register", async (req, res) => {
   }
 });
 
-app.post("/api/auth/login", async (req, res) => {
+app.post("/api/auth/login", authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
