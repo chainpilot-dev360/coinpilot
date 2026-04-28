@@ -959,6 +959,79 @@ app.get(
     }
   }
 );
+
+app.post(
+  "/api/admin/investments/:id/stop",
+  requireAuth,
+  requireAdmin,
+  async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+      const investmentId = Number(req.params.id);
+
+      await client.query("BEGIN");
+
+      const result = await client.query(
+        "SELECT * FROM user_investments WHERE id = $1 FOR UPDATE",
+        [investmentId]
+      );
+
+      if (result.rows.length === 0) {
+        await client.query("ROLLBACK");
+        return res.status(404).json({ message: "Investment not found" });
+      }
+
+      const investment = result.rows[0];
+
+      if (investment.status !== "ACTIVE") {
+        await client.query("ROLLBACK");
+        return res.status(400).json({ message: "Investment is not active" });
+      }
+
+      await client.query(
+        "UPDATE user_investments SET status = 'STOPPED' WHERE id = $1",
+        [investmentId]
+      );
+
+      await client.query(
+        `
+        INSERT INTO account_balances (user_id, currency, available, locked)
+        VALUES ($1, $2, $3, 0)
+        ON CONFLICT (user_id, currency)
+        DO UPDATE SET
+          available = account_balances.available + EXCLUDED.available,
+          updated_at = CURRENT_TIMESTAMP
+        `,
+        [investment.user_id, investment.currency, investment.amount]
+      );
+
+      await client.query(
+        `
+        INSERT INTO ledger_entries (user_id, currency, amount, type, reason)
+        VALUES ($1, $2, $3, 'INVESTMENT_STOPPED', $4)
+        `,
+        [
+          investment.user_id,
+          investment.currency,
+          investment.amount,
+          `Investment #${investmentId} stopped by admin. Principal returned.`,
+        ]
+      );
+
+      await client.query("COMMIT");
+
+      res.json({ message: "Investment stopped and principal returned" });
+    } catch (error) {
+      await client.query("ROLLBACK");
+      console.error("Stop investment error:", error);
+      res.status(500).json({ message: "Failed to stop investment" });
+    } finally {
+      client.release();
+    }
+  }
+);
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
