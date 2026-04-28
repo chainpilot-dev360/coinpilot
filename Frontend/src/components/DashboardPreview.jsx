@@ -77,12 +77,16 @@ function MarketChart() {
 
 function DashboardPreview({ token, user }) {
   const [data, setData] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [notificationOpen, setNotificationOpen] = useState(false);
 
   useEffect(() => {
     loadDashboard();
+    loadNotifications();
 
     const interval = setInterval(() => {
       loadDashboard();
+      loadNotifications();
     }, 5000);
 
     return () => clearInterval(interval);
@@ -100,7 +104,35 @@ function DashboardPreview({ token, user }) {
     }
   }
 
+  async function loadNotifications() {
+    try {
+      const res = await axios.get(`${API_URL}/api/notifications`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setNotifications(res.data || []);
+    } catch (error) {
+      console.error("Notifications load error", error);
+    }
+  }
+
+  async function markNotificationsRead() {
+    try {
+      await axios.post(
+        `${API_URL}/api/notifications/read`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      loadNotifications();
+    } catch (error) {
+      console.error("Mark read error", error);
+    }
+  }
+
   if (!data) return <p>Loading dashboard...</p>;
+
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   const totalBalance = data.balances.reduce(
     (sum, b) => sum + Number(b.available || 0),
@@ -133,7 +165,56 @@ function DashboardPreview({ token, user }) {
 
   return (
     <div>
-      <h2>Dashboard</h2>
+      <div style={dashboardHeader}>
+        <div>
+          <h2>Dashboard</h2>
+          <p style={muted}>Track your wallet, investments, and notifications.</p>
+        </div>
+
+        <div style={notificationArea}>
+          <button
+            onClick={() => {
+              setNotificationOpen(!notificationOpen);
+              if (!notificationOpen) markNotificationsRead();
+            }}
+            style={bellButton}
+          >
+            🔔
+            {unreadCount > 0 && <span style={badge}>{unreadCount}</span>}
+          </button>
+
+          {notificationOpen && (
+            <div style={notificationBox}>
+              <h4>Notifications</h4>
+
+              {notifications.length === 0 ? (
+                <p style={muted}>No notifications yet.</p>
+              ) : (
+                notifications.map((item) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      ...notificationItem,
+                      borderLeft:
+                        item.type === "SUCCESS"
+                          ? "4px solid #16a34a"
+                          : item.type === "ERROR"
+                          ? "4px solid #dc2626"
+                          : "4px solid #2563eb",
+                    }}
+                  >
+                    <strong>{item.title}</strong>
+                    <p>{item.message}</p>
+                    <small style={muted}>
+                      {new Date(item.created_at).toLocaleString()}
+                    </small>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      </div>
 
       <div style={summaryGrid}>
         <SummaryCard title="Total Balance" value={`$${totalBalance.toFixed(2)}`} />
@@ -268,6 +349,62 @@ function EmptyState({ title, text }) {
     </div>
   );
 }
+
+const dashboardHeader = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "flex-start",
+  gap: "15px",
+  marginBottom: "20px",
+  flexWrap: "wrap",
+};
+
+const notificationArea = {
+  position: "relative",
+};
+
+const bellButton = {
+  position: "relative",
+  background: "#1e293b",
+  color: "white",
+  border: "1px solid #334155",
+  borderRadius: "12px",
+  padding: "12px 15px",
+  cursor: "pointer",
+  fontSize: "18px",
+};
+
+const badge = {
+  position: "absolute",
+  top: "-8px",
+  right: "-8px",
+  background: "#dc2626",
+  color: "white",
+  borderRadius: "999px",
+  padding: "3px 7px",
+  fontSize: "12px",
+};
+
+const notificationBox = {
+  position: "absolute",
+  right: 0,
+  top: "55px",
+  width: "340px",
+  maxWidth: "90vw",
+  background: "#020617",
+  border: "1px solid #334155",
+  borderRadius: "16px",
+  padding: "15px",
+  zIndex: 20,
+  boxShadow: "0 20px 50px rgba(0,0,0,0.45)",
+};
+
+const notificationItem = {
+  background: "#1e293b",
+  padding: "12px",
+  borderRadius: "10px",
+  marginBottom: "10px",
+};
 
 const summaryGrid = {
   display: "grid",
