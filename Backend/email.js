@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend("paste_your_api_key_here");
 
 export async function sendWelcomeEmail(to, name) {
   try {
