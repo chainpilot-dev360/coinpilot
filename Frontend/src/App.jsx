@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import DashboardPreview from "./components/DashboardPreview";
 import AdminPanel from "./components/AdminPanel";
+import Notification from "./components/Notification";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -18,6 +19,11 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
+  const [notification, setNotification] = useState({
+    message: "",
+    type: "success",
+  });
+
   const [balances, setBalances] = useState([]);
   const [depositAmount, setDepositAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
@@ -26,6 +32,14 @@ function App() {
   const [plans, setPlans] = useState([]);
   const [selectedPlanId, setSelectedPlanId] = useState("");
   const [investmentAmount, setInvestmentAmount] = useState("");
+
+  function showNotification(message, type = "success") {
+    setNotification({ message, type });
+
+    setTimeout(() => {
+      setNotification({ message: "", type: "success" });
+    }, 3000);
+  }
 
   useEffect(() => {
     function handleResize() {
@@ -64,6 +78,7 @@ function App() {
   useEffect(() => {
     axios.get(`${API_URL}/api/investment-plans`).then((res) => {
       setPlans(res.data);
+
       if (res.data.length > 0) {
         setSelectedPlanId(String(res.data[0].id));
       }
@@ -80,8 +95,9 @@ function App() {
 
       localStorage.setItem("token", res.data.token);
       setToken(res.data.token);
+      showNotification("Registration successful", "success");
     } catch (error) {
-      alert(error.response?.data?.message || "Registration failed");
+      showNotification(error.response?.data?.message || "Registration failed", "error");
     }
   }
 
@@ -94,8 +110,9 @@ function App() {
 
       localStorage.setItem("token", res.data.token);
       setToken(res.data.token);
+      showNotification("Login successful", "success");
     } catch (error) {
-      alert(error.response?.data?.message || "Login failed");
+      showNotification(error.response?.data?.message || "Login failed", "error");
     }
   }
 
@@ -103,11 +120,22 @@ function App() {
     localStorage.removeItem("token");
     setToken("");
     setUser(null);
+    showNotification("Logged out", "success");
   }
 
   function openTab(tab) {
     setActiveTab(tab);
     setMenuOpen(false);
+  }
+
+  async function refreshBalances() {
+    if (!user) return;
+
+    const res = await axios.get(`${API_URL}/api/users/${user.id}/balances`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setBalances(res.data.balances || []);
   }
 
   async function createDeposit() {
@@ -118,10 +146,10 @@ function App() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("Deposit request created");
+      showNotification("Deposit request created", "success");
       setDepositAmount("");
     } catch (error) {
-      alert(error.response?.data?.message || "Deposit failed");
+      showNotification(error.response?.data?.message || "Deposit failed", "error");
     }
   }
 
@@ -137,11 +165,11 @@ function App() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("Withdrawal request created");
+      showNotification("Withdrawal request created", "success");
       setWithdrawAmount("");
       setWalletAddress("");
     } catch (error) {
-      alert(error.response?.data?.message || "Withdrawal failed");
+      showNotification(error.response?.data?.message || "Withdrawal failed", "error");
     }
   }
 
@@ -156,10 +184,11 @@ function App() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("Investment started");
+      showNotification("Investment started successfully", "success");
       setInvestmentAmount("");
+      refreshBalances();
     } catch (error) {
-      alert(error.response?.data?.message || "Investment failed");
+      showNotification(error.response?.data?.message || "Investment failed", "error");
     }
   }
 
@@ -171,15 +200,17 @@ function App() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert(`Processed ${res.data.count} matured investments`);
+      showNotification(`Processed ${res.data.count} matured investments`, "success");
     } catch (error) {
-      alert(error.response?.data?.message || "Processing failed");
+      showNotification(error.response?.data?.message || "Processing failed", "error");
     }
   }
 
   if (!user) {
     return (
       <div style={authPage}>
+        <Notification message={notification.message} type={notification.type} />
+
         <div style={authCard}>
           <h1 style={{ marginBottom: 5 }}>ChainPilot</h1>
           <p style={muted}>Crypto investment dashboard</p>
@@ -240,6 +271,8 @@ function App() {
 
   return (
     <div style={layout}>
+      <Notification message={notification.message} type={notification.type} />
+
       {isMobile && (
         <div style={mobileTopBar}>
           <button onClick={() => setMenuOpen(!menuOpen)} style={menuButton}>
@@ -325,6 +358,10 @@ function App() {
         {activeTab === "wallet" && (
           <section style={panel}>
             <h2>Wallet</h2>
+
+            <button onClick={refreshBalances} style={secondaryButton}>
+              Refresh Balance
+            </button>
 
             <h3>Your Balances</h3>
             {balances.length === 0 ? (
