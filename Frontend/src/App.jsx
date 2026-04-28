@@ -302,10 +302,6 @@ function App() {
         Start Investment
       </button>
 
-      <p style={mutedSmall}>
-        ⚠️ Investments carry risk. Returns are not guaranteed.
-      </p>
-
       {user.role === "ADMIN" && (
         <button onClick={processInvestments} style={secondaryButton}>
           Process Matured Investments
