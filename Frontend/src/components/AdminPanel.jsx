@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function AdminPanel({ token }) {
   const [deposits, setDeposits] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
@@ -14,7 +16,7 @@ function AdminPanel({ token }) {
     try {
       setMessage("Loading pending requests...");
 
-      const res = await axios.get("http://127.0.0.1:5000/api/admin/pending", {
+      const res = await axios.get(`${API_URL}/api/admin/pending`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -31,7 +33,7 @@ function AdminPanel({ token }) {
   async function approveDeposit(id) {
     try {
       await axios.post(
-        `http://127.0.0.1:5000/api/admin/deposits/${id}/approve`,
+        `${API_URL}/api/admin/deposits/${id}/approve`,
         {},
         {
           headers: {
@@ -50,7 +52,7 @@ function AdminPanel({ token }) {
   async function approveWithdrawal(id) {
     try {
       await axios.post(
-        `http://127.0.0.1:5000/api/admin/withdrawals/${id}/approve`,
+        `${API_URL}/api/admin/withdrawals/${id}/approve`,
         {},
         {
           headers: {
@@ -114,7 +116,8 @@ function AdminPanel({ token }) {
               <strong>User:</strong> {withdrawal.full_name} ({withdrawal.email})
             </p>
             <p>
-              <strong>Amount:</strong> {withdrawal.amount} {withdrawal.currency}
+              <strong>Amount:</strong> {withdrawal.amount}{" "}
+              {withdrawal.currency}
             </p>
             <p>
               <strong>Wallet:</strong> {withdrawal.wallet_address}

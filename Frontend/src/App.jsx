@@ -3,6 +3,8 @@ import axios from "axios";
 import DashboardPreview from "./components/DashboardPreview";
 import AdminPanel from "./components/AdminPanel";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function App() {
   const [authMode, setAuthMode] = useState("login");
   const [name, setName] = useState("");
@@ -26,7 +28,7 @@ function App() {
     if (!token) return;
 
     axios
-      .get("http://127.0.0.1:5000/api/auth/me", {
+      .get(`${API_URL}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUser(res.data))
@@ -41,19 +43,21 @@ function App() {
     if (!user) return;
 
     axios
-      .get(`http://127.0.0.1:5000/api/users/${user.id}/balances`)
+      .get(`${API_URL}/api/users/${user.id}/balances`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => setBalances(res.data.balances || []));
-  }, [user]);
+  }, [user, token]);
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:5000/api/investment-plans").then((res) => {
+    axios.get(`${API_URL}/api/investment-plans`).then((res) => {
       setPlans(res.data);
       if (res.data.length > 0) setSelectedPlanId(String(res.data[0].id));
     });
   }, []);
 
   async function register() {
-    const res = await axios.post("http://127.0.0.1:5000/api/auth/register", {
+    const res = await axios.post(`${API_URL}/api/auth/register`, {
       fullName: name,
       email,
       password,
@@ -64,7 +68,7 @@ function App() {
   }
 
   async function login() {
-    const res = await axios.post("http://127.0.0.1:5000/api/auth/login", {
+    const res = await axios.post(`${API_URL}/api/auth/login`, {
       email,
       password,
     });
@@ -81,7 +85,7 @@ function App() {
 
   async function createDeposit() {
     await axios.post(
-      "http://127.0.0.1:5000/api/deposits",
+      `${API_URL}/api/deposits`,
       { currency: "USD", amount: Number(depositAmount) },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -92,7 +96,7 @@ function App() {
 
   async function createWithdrawal() {
     await axios.post(
-      "http://127.0.0.1:5000/api/withdrawals",
+      `${API_URL}/api/withdrawals`,
       {
         currency: "USD",
         amount: Number(withdrawAmount),
@@ -108,7 +112,7 @@ function App() {
 
   async function startInvestment() {
     await axios.post(
-      "http://127.0.0.1:5000/api/investments",
+      `${API_URL}/api/investments`,
       {
         planId: Number(selectedPlanId),
         amount: Number(investmentAmount),
@@ -122,7 +126,7 @@ function App() {
 
   async function processInvestments() {
     const res = await axios.post(
-      "http://127.0.0.1:5000/api/admin/process-investments",
+      `${API_URL}/api/admin/process-investments`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function DashboardPreview({ token, user }) {
   const [ledger, setLedger] = useState([]);
   const [message, setMessage] = useState("Loading transactions...");
@@ -16,7 +18,7 @@ function DashboardPreview({ token, user }) {
   async function loadData() {
     try {
       const res = await axios.get(
-        `http://127.0.0.1:5000/api/users/${user.id}/balances`,
+        `${API_URL}/api/users/${user.id}/balances`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
