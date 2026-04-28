@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { pool } from "./db.js";
+import { sendWelcomeEmail } from "./email.js";
 
 dotenv.config();
 
@@ -175,6 +176,8 @@ app.post("/api/auth/register", async (req, res) => {
 
     const user = result.rows[0];
     const token = createToken(user);
+    
+    sendWelcomeEmail(user.email, user.full_name);
 
     res.status(201).json({
       message: "Registration successful",
