@@ -7,6 +7,10 @@ function AdminPanel({ token }) {
   const [analytics, setAnalytics] = useState(null);
   const [deposits, setDeposits] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [selectedUserData, setSelectedUserData] = useState(null);
+  const [search, setSearch] = useState("");
+  const [message, setMessage] = useState("Loading admin data...");
 
   useEffect(() => {
     loadData();
@@ -14,6 +18,8 @@ function AdminPanel({ token }) {
 
   async function loadData() {
     try {
+      setMessage("Loading admin data...");
+
       const analyticsRes = await axios.get(`${API_URL}/api/admin/analytics`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -22,96 +28,292 @@ function AdminPanel({ token }) {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      const usersRes = await axios.get(`${API_URL}/api/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       setAnalytics(analyticsRes.data);
       setDeposits(pendingRes.data.deposits || []);
       setWithdrawals(pendingRes.data.withdrawals || []);
+      setUsers(usersRes.data || []);
+      setMessage("");
     } catch (error) {
-      console.error("Admin load error", error);
+      setMessage(error.response?.data?.message || "Failed to load admin data");
+    }
+  }
+
+  async function viewUser(userId) {
+    try {
+      const res = await axios.get(`${API_URL}/api/users/${userId}/balances`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setSelectedUserData({
+        userId,
+        balances: res.data.balances || [],
+        ledger: res.data.ledger || [],
+        investments: res.data.investments || [],
+      });
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to load user data");
     }
   }
 
   async function approveDeposit(id) {
-    await axios.post(
-      `${API_URL}/api/admin/deposits/${id}/approve`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    loadData();
+    try {
+      await axios.post(
+        `${API_URL}/api/admin/deposits/${id}/approve`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Deposit approved");
+      loadData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Error approving deposit");
+    }
   }
 
   async function rejectDeposit(id) {
-    await axios.post(
-      `${API_URL}/api/admin/deposits/${id}/reject`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    loadData();
+    try {
+      await axios.post(
+        `${API_URL}/api/admin/deposits/${id}/reject`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Deposit rejected");
+      loadData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Error rejecting deposit");
+    }
   }
 
   async function approveWithdrawal(id) {
-    await axios.post(
-      `${API_URL}/api/admin/withdrawals/${id}/approve`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    loadData();
+    try {
+      await axios.post(
+        `${API_URL}/api/admin/withdrawals/${id}/approve`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Withdrawal approved");
+      loadData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Error approving withdrawal");
+    }
   }
 
   async function rejectWithdrawal(id) {
-    await axios.post(
-      `${API_URL}/api/admin/withdrawals/${id}/reject`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    loadData();
+    try {
+      await axios.post(
+        `${API_URL}/api/admin/withdrawals/${id}/reject`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Withdrawal rejected");
+      loadData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Error rejecting withdrawal");
+    }
   }
+
+  const filteredUsers = users.filter((user) => {
+    const name = user.full_name || "";
+    const email = user.email || "";
+
+    return (
+      name.toLowerCase().includes(search.toLowerCase()) ||
+      email.toLowerCase().includes(search.toLowerCase()) ||
+      String(user.id).includes(search)
+    );
+  });
 
   return (
     <div>
-      <h2>Admin Dashboard</h2>
+      <h2>Admin Control Center</h2>
 
-      {/* 🔥 ANALYTICS */}
+      <button onClick={loadData} style={buttonStyle}>
+        Refresh Admin Data
+      </button>
+
+      {message && <p>{message}</p>}
+
       {analytics && (
         <div style={grid}>
-          <Card title="Total Deposits" value={analytics.totalDeposits} />
-          <Card title="Total Withdrawals" value={analytics.totalWithdrawals} />
-          <Card title="Platform Profit" value={analytics.platformProfit} />
-          <Card title="Active Investments" value={analytics.activeInvestments} />
-          <Card
+          <Stat title="Total Deposits" value={analytics.totalDeposits} />
+          <Stat title="Total Withdrawals" value={analytics.totalWithdrawals} />
+          <Stat title="Platform Profit" value={analytics.platformProfit} />
+          <Stat title="Active Investments" value={analytics.activeInvestments} />
+          <Stat
             title="Completed Investments"
             value={analytics.completedInvestments}
           />
         </div>
       )}
 
+      <h3>All Users</h3>
+
+      <input
+        placeholder="Search by name, email, or ID"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={inputStyle}
+      />
+
+      {filteredUsers.length === 0 ? (
+        <p>No users found</p>
+      ) : (
+        filteredUsers.map((user) => (
+          <div key={user.id} style={cardStyle}>
+            <p>
+              <strong>ID:</strong> {user.id}
+            </p>
+            <p>
+              <strong>Name:</strong> {user.full_name}
+            </p>
+            <p>
+              <strong>Email:</strong> {user.email}
+            </p>
+            <p>
+              <strong>Role:</strong> {user.role}
+            </p>
+
+            <button onClick={() => viewUser(user.id)} style={buttonStyle}>
+              View User Data
+            </button>
+          </div>
+        ))
+      )}
+
+      {selectedUserData && (
+        <div style={sectionStyle}>
+          <h3>Selected User Data — ID {selectedUserData.userId}</h3>
+
+          <h4>Balances</h4>
+          {selectedUserData.balances.length === 0 ? (
+            <p>No balances</p>
+          ) : (
+            selectedUserData.balances.map((balance) => (
+              <div key={balance.id} style={miniCard}>
+                {balance.currency}: {balance.available}
+              </div>
+            ))
+          )}
+
+          <h4>Investments</h4>
+          {selectedUserData.investments.length === 0 ? (
+            <p>No investments</p>
+          ) : (
+            selectedUserData.investments.map((investment) => (
+              <div key={investment.id} style={miniCard}>
+                <p>{investment.plan_name}</p>
+                <p>
+                  {investment.amount} {investment.currency}
+                </p>
+                <p>Status: {investment.status}</p>
+              </div>
+            ))
+          )}
+
+          <h4>Recent Ledger</h4>
+          {selectedUserData.ledger.length === 0 ? (
+            <p>No ledger entries</p>
+          ) : (
+            selectedUserData.ledger.slice(0, 10).map((entry) => (
+              <div key={entry.id} style={miniCard}>
+                <p>
+                  <strong>{entry.type}</strong>
+                </p>
+                <p>
+                  {entry.amount} {entry.currency}
+                </p>
+                <small>{entry.reason}</small>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
       <h3>Pending Deposits</h3>
 
-      {deposits.map((d) => (
-        <div key={d.id} style={card}>
-          <p>{d.full_name} — {d.amount}</p>
+      {deposits.length === 0 ? (
+        <p>No pending deposits</p>
+      ) : (
+        deposits.map((deposit) => (
+          <div key={deposit.id} style={cardStyle}>
+            <p>
+              <strong>User:</strong> {deposit.full_name} ({deposit.email})
+            </p>
+            <p>
+              <strong>Amount:</strong> {deposit.amount} {deposit.currency}
+            </p>
+            <p>
+              <strong>Status:</strong> {deposit.status}
+            </p>
 
-          <button onClick={() => approveDeposit(d.id)}>Approve</button>
-          <button onClick={() => rejectDeposit(d.id)}>Reject</button>
-        </div>
-      ))}
+            <button
+              onClick={() => approveDeposit(deposit.id)}
+              style={approveButton}
+            >
+              Approve Deposit
+            </button>
+
+            <button
+              onClick={() => rejectDeposit(deposit.id)}
+              style={dangerButton}
+            >
+              Reject Deposit
+            </button>
+          </div>
+        ))
+      )}
 
       <h3>Pending Withdrawals</h3>
 
-      {withdrawals.map((w) => (
-        <div key={w.id} style={card}>
-          <p>{w.full_name} — {w.amount}</p>
+      {withdrawals.length === 0 ? (
+        <p>No pending withdrawals</p>
+      ) : (
+        withdrawals.map((withdrawal) => (
+          <div key={withdrawal.id} style={cardStyle}>
+            <p>
+              <strong>User:</strong> {withdrawal.full_name} ({withdrawal.email})
+            </p>
+            <p>
+              <strong>Amount:</strong> {withdrawal.amount}{" "}
+              {withdrawal.currency}
+            </p>
+            <p>
+              <strong>Wallet:</strong> {withdrawal.wallet_address}
+            </p>
+            <p>
+              <strong>Status:</strong> {withdrawal.status}
+            </p>
 
-          <button onClick={() => approveWithdrawal(w.id)}>Approve</button>
-          <button onClick={() => rejectWithdrawal(w.id)}>Reject</button>
-        </div>
-      ))}
+            <button
+              onClick={() => approveWithdrawal(withdrawal.id)}
+              style={approveButton}
+            >
+              Approve Withdrawal
+            </button>
+
+            <button
+              onClick={() => rejectWithdrawal(withdrawal.id)}
+              style={dangerButton}
+            >
+              Reject Withdrawal
+            </button>
+          </div>
+        ))
+      )}
     </div>
   );
 }
 
-function Card({ title, value }) {
+function Stat({ title, value }) {
   return (
-    <div style={cardStat}>
+    <div style={statCard}>
       <p>{title}</p>
       <h2>{value}</h2>
     </div>
@@ -125,17 +327,71 @@ const grid = {
   marginBottom: "25px",
 };
 
-const cardStat = {
+const statCard = {
   background: "#1e293b",
   padding: "20px",
   borderRadius: "12px",
 };
 
-const card = {
+const cardStyle = {
   background: "#1e293b",
-  padding: "15px",
-  marginBottom: "10px",
+  padding: "16px",
+  borderRadius: "12px",
+  marginBottom: "12px",
+};
+
+const sectionStyle = {
+  background: "#020617",
+  padding: "20px",
+  borderRadius: "12px",
+  marginBottom: "25px",
+};
+
+const miniCard = {
+  background: "#1e293b",
+  padding: "12px",
   borderRadius: "10px",
+  marginBottom: "10px",
+};
+
+const inputStyle = {
+  padding: "12px",
+  width: "100%",
+  maxWidth: "400px",
+  marginBottom: "15px",
+  borderRadius: "10px",
+  border: "1px solid #334155",
+  background: "#020617",
+  color: "white",
+};
+
+const buttonStyle = {
+  padding: "10px 14px",
+  background: "#2563eb",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  marginBottom: "10px",
+  cursor: "pointer",
+};
+
+const approveButton = {
+  padding: "10px 14px",
+  background: "#16a34a",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  cursor: "pointer",
+  marginRight: "10px",
+};
+
+const dangerButton = {
+  padding: "10px 14px",
+  background: "#dc2626",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  cursor: "pointer",
 };
 
 export default AdminPanel;
