@@ -102,6 +102,27 @@ function DashboardPreview({ token, user }) {
 
   if (!data) return <p>Loading dashboard...</p>;
 
+  const totalBalance = data.balances.reduce(
+    (sum, b) => sum + Number(b.available || 0),
+    0
+  );
+
+  const activeInvestments = data.investments.filter(
+    (inv) => inv.status === "ACTIVE"
+  );
+
+  const totalActiveInvested = activeInvestments.reduce(
+    (sum, inv) => sum + Number(inv.amount || 0),
+    0
+  );
+
+  const totalCurrentValue = activeInvestments.reduce(
+    (sum, inv) => sum + Number(inv.current_value || inv.amount || 0),
+    0
+  );
+
+  const totalProfit = totalCurrentValue - totalActiveInvested;
+
   const chartData = data.investments.map((inv) => ({
     name: inv.plan_name || "Investment",
     value:
@@ -114,6 +135,19 @@ function DashboardPreview({ token, user }) {
     <div>
       <h2>Dashboard</h2>
 
+      <div style={summaryGrid}>
+        <SummaryCard title="Total Balance" value={`$${totalBalance.toFixed(2)}`} />
+        <SummaryCard
+          title="Active Investment"
+          value={`$${totalActiveInvested.toFixed(2)}`}
+        />
+        <SummaryCard
+          title="Current Value"
+          value={<AnimatedNumber value={totalCurrentValue} />}
+        />
+        <SummaryCard title="Total Profit" value={`$${totalProfit.toFixed(2)}`} />
+      </div>
+
       <h3>Live Forex Market Chart</h3>
       <p style={muted}>
         Real-time market chart powered by TradingView. Users can switch symbols
@@ -122,20 +156,30 @@ function DashboardPreview({ token, user }) {
       <MarketChart />
 
       <h3>Portfolio Growth</h3>
-      <div style={chartBox}>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="value" stroke="#38bdf8" />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      {chartData.length === 0 ? (
+        <EmptyState
+          title="No investment chart yet"
+          text="Start an investment to begin tracking portfolio growth."
+        />
+      ) : (
+        <div style={chartBox}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="value" stroke="#38bdf8" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       <h3>Your Wallet</h3>
       {data.balances.length === 0 ? (
-        <p>No balances yet</p>
+        <EmptyState
+          title="No wallet balance yet"
+          text="Create a deposit request and wait for admin approval."
+        />
       ) : (
         data.balances.map((b) => (
           <div key={b.id} style={card}>
@@ -146,7 +190,10 @@ function DashboardPreview({ token, user }) {
 
       <h3>Your Investments</h3>
       {data.investments.length === 0 ? (
-        <p>No investments yet</p>
+        <EmptyState
+          title="No investments yet"
+          text="Choose a plan and start your first investment."
+        />
       ) : (
         data.investments.map((inv) => (
           <div key={inv.id} style={card}>
@@ -161,6 +208,16 @@ function DashboardPreview({ token, user }) {
             {inv.status === "ACTIVE" && (
               <>
                 <p>Progress: {inv.progress || 0}%</p>
+
+                <div style={progressTrack}>
+                  <div
+                    style={{
+                      ...progressFill,
+                      width: `${Math.min(Number(inv.progress || 0), 100)}%`,
+                    }}
+                  />
+                </div>
+
                 <p>
                   Current Value:{" "}
                   <AnimatedNumber value={inv.current_value || inv.amount} />
@@ -173,7 +230,10 @@ function DashboardPreview({ token, user }) {
 
       <h3>Recent Transactions</h3>
       {data.ledger.length === 0 ? (
-        <p>No transactions yet</p>
+        <EmptyState
+          title="No transactions yet"
+          text="Deposits, withdrawals, and investments will appear here."
+        />
       ) : (
         data.ledger.slice(0, 8).map((entry) => (
           <div key={entry.id} style={card}>
@@ -190,6 +250,38 @@ function DashboardPreview({ token, user }) {
     </div>
   );
 }
+
+function SummaryCard({ title, value }) {
+  return (
+    <div style={summaryCard}>
+      <p style={mutedSmall}>{title}</p>
+      <h2>{value}</h2>
+    </div>
+  );
+}
+
+function EmptyState({ title, text }) {
+  return (
+    <div style={emptyState}>
+      <strong>{title}</strong>
+      <p style={muted}>{text}</p>
+    </div>
+  );
+}
+
+const summaryGrid = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+  gap: "15px",
+  marginBottom: "28px",
+};
+
+const summaryCard = {
+  background: "linear-gradient(180deg, #1e293b, #0f172a)",
+  padding: "20px",
+  borderRadius: "16px",
+  border: "1px solid #334155",
+};
 
 const marketChartBox = {
   height: "420px",
@@ -215,8 +307,35 @@ const card = {
   marginBottom: "10px",
 };
 
+const progressTrack = {
+  height: "10px",
+  background: "#020617",
+  borderRadius: "999px",
+  overflow: "hidden",
+  marginBottom: "10px",
+};
+
+const progressFill = {
+  height: "100%",
+  background: "#38bdf8",
+  borderRadius: "999px",
+};
+
+const emptyState = {
+  background: "#020617",
+  border: "1px dashed #334155",
+  padding: "18px",
+  borderRadius: "12px",
+  marginBottom: "18px",
+};
+
 const muted = {
   color: "#94a3b8",
+};
+
+const mutedSmall = {
+  color: "#94a3b8",
+  fontSize: "14px",
 };
 
 export default DashboardPreview;
