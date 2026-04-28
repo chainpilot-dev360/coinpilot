@@ -206,68 +206,16 @@ function App() {
     }
   }
 
-  if (!user) {
-    return (
-      <div style={authPage}>
-        <Notification message={notification.message} type={notification.type} />
+import LandingPage from "./components/LandingPage";
 
-        <div style={authCard}>
-          <h1 style={{ marginBottom: 5 }}>ChainPilot</h1>
-          <p style={muted}>Crypto investment dashboard</p>
-
-          <div style={{ marginBottom: 20 }}>
-            <button
-              onClick={() => setAuthMode("login")}
-              style={authMode === "login" ? activeButton : secondaryButton}
-            >
-              Login
-            </button>
-
-            <button
-              onClick={() => setAuthMode("register")}
-              style={authMode === "register" ? activeButton : secondaryButton}
-            >
-              Register
-            </button>
-          </div>
-
-          {authMode === "register" && (
-            <input
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={inputStyle}
-            />
-          )}
-
-          <input
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={inputStyle}
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={inputStyle}
-          />
-
-          {authMode === "login" ? (
-            <button onClick={login} style={primaryButton}>
-              Login
-            </button>
-          ) : (
-            <button onClick={register} style={primaryButton}>
-              Register
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
+if (!user && !token) {
+  return (
+    <LandingPage
+      onLoginClick={() => setAuthMode("login")}
+      onRegisterClick={() => setAuthMode("register")}
+    />
+  );
+}
 
   return (
     <div style={layout}>
