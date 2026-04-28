@@ -164,7 +164,7 @@ function DashboardPreview({ token, user }) {
   }));
 
   return (
-    <div>
+    <div style={pageFade}>
       <div style={dashboardHeader}>
         <div>
           <h2>Dashboard</h2>
@@ -226,7 +226,10 @@ function DashboardPreview({ token, user }) {
           title="Current Value"
           value={<AnimatedNumber value={totalCurrentValue} />}
         />
-        <SummaryCard title="Total Profit" value={`$${totalProfit.toFixed(2)}`} />
+        <SummaryCard
+  title="Total Profit"
+  value={`$${totalProfit.toFixed(2)}`}
+/>
       </div>
 
       <h3>Live Forex Market Chart</h3>
@@ -336,7 +339,15 @@ function SummaryCard({ title, value }) {
   return (
     <div style={summaryCard}>
       <p style={mutedSmall}>{title}</p>
-      <h2>{value}</h2>
+      <h2
+  style={{
+    color: typeof value === "string" && value.includes("-")
+      ? "#ef4444"
+      : "#22c55e",
+  }}
+>
+  {value}
+</h2>
     </div>
   );
 }
@@ -414,10 +425,12 @@ const summaryGrid = {
 };
 
 const summaryCard = {
-  background: "linear-gradient(180deg, #1e293b, #0f172a)",
-  padding: "20px",
-  borderRadius: "16px",
-  border: "1px solid #334155",
+  background: "linear-gradient(135deg, #1e293b, #020617)",
+  padding: "22px",
+  borderRadius: "18px",
+  border: "1px solid rgba(255,255,255,0.1)",
+  boxShadow: "0 15px 40px rgba(0,0,0,0.4)",
+  transition: "all 0.3s ease",
 };
 
 const marketChartBox = {
@@ -438,10 +451,13 @@ const chartBox = {
 };
 
 const card = {
-  background: "#1e293b",
-  padding: "15px",
-  borderRadius: "10px",
-  marginBottom: "10px",
+  background: "rgba(30, 41, 59, 0.6)",
+  backdropFilter: "blur(14px)",
+  padding: "16px",
+  borderRadius: "14px",
+  marginBottom: "12px",
+  border: "1px solid rgba(255,255,255,0.08)",
+  transition: "all 0.3s ease",
 };
 
 const progressTrack = {
@@ -468,6 +484,10 @@ const emptyState = {
 
 const muted = {
   color: "#94a3b8",
+};
+
+const pageFade = {
+  animation: "fadeIn 0.6s ease",
 };
 
 const mutedSmall = {
