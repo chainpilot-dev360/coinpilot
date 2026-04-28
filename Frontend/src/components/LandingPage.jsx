@@ -109,6 +109,36 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
       <section style={section}>
         <h2 style={sectionTitle}>Built for Serious Investors</h2>
 
+        <section style={section}>
+  <h2 style={sectionTitle}>How It Works</h2>
+
+  <div style={grid}>
+    <Step
+      number="1"
+      title="Create Account"
+      text="Sign up in seconds and access your dashboard."
+    />
+
+    <Step
+      number="2"
+      title="Fund Wallet"
+      text="Submit a deposit request and wait for approval."
+    />
+
+    <Step
+      number="3"
+      title="Start Investment"
+      text="Choose a plan and begin earning daily returns."
+    />
+
+    <Step
+      number="4"
+      title="Track & Withdraw"
+      text="Monitor growth and request withdrawals anytime."
+    />
+  </div>
+</section>
+
         <div style={grid}>
           <Card
             title="Automated Growth"
@@ -158,6 +188,30 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
           <Trust title="Admin Approval System" />
         </div>
       </section>
+
+      <section style={darkSection}>
+  <h2 style={sectionTitle}>Frequently Asked Questions</h2>
+
+  <FAQItem
+    question="How do I start investing?"
+    answer="Create an account, fund your wallet, and choose an investment plan."
+  />
+
+  <FAQItem
+    question="How long do investments last?"
+    answer="Each plan has a fixed duration. Returns are processed automatically."
+  />
+
+  <FAQItem
+    question="How do withdrawals work?"
+    answer="Submit a withdrawal request and wait for admin approval."
+  />
+
+  <FAQItem
+    question="Is my account secure?"
+    answer="Yes. All user balances and activities are securely tracked."
+  />
+</section>
 
       <section style={cta}>
         <h2>Start Managing Your Portfolio Today</h2>
@@ -489,5 +543,44 @@ const navPrimary = {
   ...primaryButton,
   padding: "10px 16px",
 };
+
+function Step({ number, title, text }) {
+  return (
+    <div style={card}>
+      <h2 style={{ color: "#38bdf8" }}>{number}</h2>
+      <h3>{title}</h3>
+      <p style={cardText}>{text}</p>
+    </div>
+  );
+}
+
+const faqItem = {
+  background: "#1e293b",
+  padding: "16px",
+  borderRadius: "12px",
+  marginBottom: "10px",
+  cursor: "pointer",
+};
+
+const faqHeader = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+};
+
+function FAQItem({ question, answer }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div style={faqItem}>
+      <div style={faqHeader} onClick={() => setOpen(!open)}>
+        <strong>{question}</strong>
+        <span>{open ? "-" : "+"}</span>
+      </div>
+
+      {open && <p style={cardText}>{answer}</p>}
+    </div>
+  );
+}
 
 export default LandingPage;
