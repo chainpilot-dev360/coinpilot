@@ -11,12 +11,44 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+function AnimatedNumber({ value }) {
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const end = Number(value || 0);
+    const duration = 800;
+    const increment = end / (duration / 16);
+
+    const timer = setInterval(() => {
+      start += increment;
+
+      if (start >= end) {
+        start = end;
+        clearInterval(timer);
+      }
+
+      setDisplay(start);
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [value]);
+
+  return <span>{display.toFixed(2)}</span>;
+}
+
 function DashboardPreview({ token, user }) {
   const [data, setData] = useState(null);
 
-  useEffect(() => {
+useEffect(() => {
+  loadDashboard();
+
+  const interval = setInterval(() => {
     loadDashboard();
-  }, [token]);
+  }, 5000);
+
+  return () => clearInterval(interval);
+}, [token]);
 
   async function loadDashboard() {
     try {
@@ -79,7 +111,7 @@ function DashboardPreview({ token, user }) {
           {inv.status === "ACTIVE" && (
             <>
               <p>Progress: {inv.progress}%</p>
-              <p>Current Value: {inv.current_value}</p>
+              <p>Current Value: <AnimatedNumber value={inv.current_value} /></p>
             </>
           )}
         </div>
