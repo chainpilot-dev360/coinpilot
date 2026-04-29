@@ -302,46 +302,7 @@ function App() {
             style={inputStyle}
           />
 
-          {authMode === "login" && (
-  <button
-    onClick={() => {
-      window.location.href = "/forgot-password";
-    }}
-    style={{
-      background: "transparent",
-      color: "#38bdf8",
-      border: "none",
-      cursor: "pointer",
-      marginBottom: "15px",
-      padding: 0,
-      display: "block",
-    }}
-  >
-    Forgot Password?
-  </button>
-)}
-
-
-          {authMode === "login" ? (
-  <>
-    <button onClick={login} style={primaryButton}>
-      Login
-    </button>
-
-    <button
-      onClick={() => {
-        window.location.href = "/forgot-password";
-      }}
-      style={backButton}
-    >
-      Forgot Password?
-    </button>
-  </>
-) : (
-  <button onClick={register} style={primaryButton}>
-    Register
-  </button>
-)}{authMode === "login" ? (
+{authMode === "login" ? (
   <>
     <button onClick={login} style={primaryButton}>
       Login
@@ -355,53 +316,6 @@ function App() {
 >
   Forgot Password?
 </button>
-
-    <button
-      onClick={() => {
-        window.location.href = "/forgot-password";
-      }}
-      style={backButton}
-    >
-      Forgot Password?
-    </button>
-  </>
-) : (
-  <button onClick={register} style={primaryButton}>
-    Register
-  </button>
-)}{authMode === "login" ? (
-  <>
-    <button onClick={login} style={primaryButton}>
-      Login
-    </button>
-
-    <button
-      onClick={() => {
-        window.location.href = "/forgot-password";
-      }}
-      style={backButton}
-    >
-      Forgot Password?
-    </button>
-  </>
-) : (
-  <button onClick={register} style={primaryButton}>
-    Register
-  </button>
-)}{authMode === "login" ? (
-  <>
-    <button onClick={login} style={primaryButton}>
-      Login
-    </button>
-
-    <button
-      onClick={() => {
-        window.location.href = "/forgot-password";
-      }}
-      style={backButton}
-    >
-      Forgot Password?
-    </button>
   </>
 ) : (
   <button onClick={register} style={primaryButton}>
