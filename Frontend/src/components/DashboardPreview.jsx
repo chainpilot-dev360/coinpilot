@@ -135,17 +135,19 @@ function DashboardPreview({ token, user }) {
   const [depositCurrency, setDepositCurrency] = useState("USD");
   const [depositFile, setDepositFile] = useState(null);
   const [previewImage, setPreviewImage] = useState("");
+
   const [depositHistory, setDepositHistory] = useState([]);
+  const [withdrawalHistory, setWithdrawalHistory] = useState([]);
 
   useEffect(() => {
     loadDashboard();
     loadNotifications();
-    loadDepositHistory();
+    loadTransactionHistory();
 
     const interval = setInterval(() => {
       loadDashboard();
       loadNotifications();
-      loadDepositHistory();
+      loadTransactionHistory();
     }, 5000);
 
     return () => clearInterval(interval);
@@ -175,7 +177,7 @@ function DashboardPreview({ token, user }) {
     }
   }
 
-  async function loadDepositHistory() {
+  async function loadTransactionHistory() {
     try {
       const res = await axios.get(
         `${API_URL}/api/users/${user.id}/deposits-withdrawals`,
@@ -185,8 +187,9 @@ function DashboardPreview({ token, user }) {
       );
 
       setDepositHistory(res.data.deposits || []);
+      setWithdrawalHistory(res.data.withdrawals || []);
     } catch (error) {
-      console.error("Deposit history error", error);
+      console.error("Transaction history error", error);
     }
   }
 
@@ -201,6 +204,17 @@ function DashboardPreview({ token, user }) {
       loadNotifications();
     } catch (error) {
       console.error("Mark read error", error);
+    }
+  }
+
+  function handleProofChange(e) {
+    const file = e.target.files[0];
+    setDepositFile(file);
+
+    if (file) {
+      setPreviewImage(URL.createObjectURL(file));
+    } else {
+      setPreviewImage("");
     }
   }
 
@@ -230,8 +244,9 @@ function DashboardPreview({ token, user }) {
       setDepositAmount("");
       setDepositCurrency("USD");
       setDepositFile(null);
+      setPreviewImage("");
       loadDashboard();
-      loadDepositHistory();
+      loadTransactionHistory();
     } catch (error) {
       alert(error.response?.data?.message || "Deposit failed");
     }
@@ -287,12 +302,6 @@ function DashboardPreview({ token, user }) {
               if (!notificationOpen) markNotificationsRead();
             }}
             style={bellButton}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.transform = "scale(1.08)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.transform = "scale(1)")
-            }
           >
             🔔
             {unreadCount > 0 && <span style={badge}>{unreadCount}</span>}
@@ -404,8 +413,7 @@ function DashboardPreview({ token, user }) {
 
         <div style={depositInfoBox}>
           <strong>Company Wallet Address</strong>
-          <p style={walletText}>BTC: bc1qkqwr63l6x3rqskej75sqxvx74eew9w5smfn4p8
-            ETH: 0xd420b9bb7969b6c403e1e774be1d36fdb9c76aa3</p>
+          <p style={walletText}>PASTE_YOUR_WALLET_ADDRESS_HERE</p>
         </div>
 
         <input
@@ -427,33 +435,18 @@ function DashboardPreview({ token, user }) {
         <label style={uploadLabel}>Upload payment proof screenshot</label>
 
         <input
-  type="file"
-  accept="image/*"
-  onChange={(e) => {
-    const file = e.target.files[0];
-    setDepositFile(file);
+          type="file"
+          accept="image/*"
+          onChange={handleProofChange}
+          style={{ marginBottom: "15px", color: "white" }}
+        />
 
-    if (file) {
-      setPreviewImage(URL.createObjectURL(file));
-    }
-  }}
-/>
-
-{previewImage && (
-  <div style={{ marginBottom: "15px" }}>
-    <p style={muted}>Preview:</p>
-    <img
-      src={previewImage}
-      alt="Proof preview"
-      style={{
-        width: "100%",
-        maxWidth: "300px",
-        borderRadius: "10px",
-        border: "1px solid #334155",
-      }}
-    />
-  </div>
-)}
+        {previewImage && (
+          <div style={previewBox}>
+            <p style={muted}>Proof Preview:</p>
+            <img src={previewImage} alt="Proof preview" style={previewImageStyle} />
+          </div>
+        )}
 
         <button onClick={submitDeposit} style={buttonStyle}>
           Submit Deposit for Review
@@ -480,27 +473,45 @@ function DashboardPreview({ token, user }) {
 
             <p>
               <strong>Status:</strong>{" "}
-              <span
-                style={{
-                  ...statusBadge,
-                  background:
-                    deposit.status === "APPROVED"
-                      ? "#16a34a"
-                      : deposit.status === "REJECTED"
-                      ? "#dc2626"
-                      : "#ca8a04",
-                }}
-              >
-                {deposit.status === "APPROVED"
-                  ? "✅ Approved"
-                  : deposit.status === "REJECTED"
-                  ? "❌ Rejected"
-                  : "⏳ Pending"}
-              </span>
+              <StatusBadge status={deposit.status} />
             </p>
 
             <small style={muted}>
               Submitted: {new Date(deposit.created_at).toLocaleString()}
+            </small>
+          </HoverCard>
+        ))
+      )}
+
+      <h3>Withdrawal History</h3>
+
+      {withdrawalHistory.length === 0 ? (
+        <EmptyState
+          title="No withdrawals yet"
+          text="Your withdrawal requests will appear here."
+        />
+      ) : (
+        withdrawalHistory.map((withdrawal) => (
+          <HoverCard key={withdrawal.id}>
+            <p>
+              <strong>Amount:</strong> {withdrawal.amount}{" "}
+              {withdrawal.currency}
+            </p>
+
+            <p>
+              <strong>Status:</strong>{" "}
+              <StatusBadge status={withdrawal.status} />
+            </p>
+
+            {withdrawal.wallet_address && (
+              <p>
+                <strong>Wallet:</strong>{" "}
+                <span style={walletSmall}>{withdrawal.wallet_address}</span>
+              </p>
+            )}
+
+            <small style={muted}>
+              Submitted: {new Date(withdrawal.created_at).toLocaleString()}
             </small>
           </HoverCard>
         ))
@@ -569,19 +580,29 @@ function DashboardPreview({ token, user }) {
   );
 }
 
+function StatusBadge({ status }) {
+  const cleanStatus = String(status || "PENDING").toUpperCase();
+
+  const background =
+    cleanStatus === "APPROVED"
+      ? "#16a34a"
+      : cleanStatus === "REJECTED"
+      ? "#dc2626"
+      : "#ca8a04";
+
+  const label =
+    cleanStatus === "APPROVED"
+      ? "✅ Approved"
+      : cleanStatus === "REJECTED"
+      ? "❌ Rejected"
+      : "⏳ Pending";
+
+  return <span style={{ ...statusBadge, background }}>{label}</span>;
+}
+
 function SummaryCard({ title, value }) {
   return (
-    <div
-      style={summaryCard}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-6px)";
-        e.currentTarget.style.boxShadow = "0 25px 60px rgba(37,99,235,0.25)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "0 15px 40px rgba(0,0,0,0.4)";
-      }}
-    >
+    <div style={summaryCard}>
       <p style={mutedSmall}>{title}</p>
       <h2
         style={{
@@ -690,14 +711,10 @@ const badge = {
 
 const notificationBox = {
   position: "absolute",
-
-  // 👇 THIS IS THE FIX
   right: window.innerWidth < 768 ? "50%" : 0,
   transform: window.innerWidth < 768 ? "translateX(50%)" : "none",
-
   top: "55px",
   width: window.innerWidth < 768 ? "90vw" : "340px",
-
   maxWidth: "90vw",
   background: "rgba(2, 6, 23, 0.96)",
   backdropFilter: "blur(16px)",
@@ -706,6 +723,7 @@ const notificationBox = {
   padding: "15px",
   zIndex: 20,
   boxShadow: "0 20px 50px rgba(0,0,0,0.45)",
+  animation: "fadeIn 0.25s ease",
 };
 
 const notificationItem = {
@@ -798,10 +816,28 @@ const walletText = {
   marginTop: "8px",
 };
 
+const walletSmall = {
+  color: "#38bdf8",
+  wordBreak: "break-all",
+};
+
 const uploadLabel = {
   display: "block",
   color: "#cbd5e1",
   marginBottom: "8px",
+};
+
+const previewBox = {
+  marginBottom: "15px",
+};
+
+const previewImageStyle = {
+  width: "100%",
+  maxWidth: "320px",
+  maxHeight: "240px",
+  objectFit: "cover",
+  borderRadius: "12px",
+  border: "1px solid #334155",
 };
 
 const statusBadge = {
