@@ -58,3 +58,31 @@ export async function sendVerificationEmail(to, name, token) {
     console.error("Verification email failed:", error);
   }
 }
+
+export async function sendPasswordResetEmail(to, name, token) {
+  try {
+    const resend = getResendClient();
+    if (!resend) return;
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+    await resend.emails.send({
+      from: process.env.EMAIL_FROM,
+      to,
+      subject: "Reset your ChainPilot password",
+      html: `
+        <h2>Hello ${name},</h2>
+        <p>You requested to reset your password.</p>
+        <p>
+          <a href="${resetUrl}" style="background:#dc2626;color:white;padding:12px 18px;border-radius:8px;text-decoration:none;">
+            Reset Password
+          </a>
+        </p>
+        <p>If you did not request this, ignore this email.</p>
+        <p>${resetUrl}</p>
+      `,
+    });
+  } catch (error) {
+    console.error("Password reset email failed:", error);
+  }
+}

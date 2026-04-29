@@ -6,7 +6,11 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import rateLimit from "express-rate-limit";
 import { pool } from "./db.js";
-import { sendWelcomeEmail, sendVerificationEmail } from "./email.js";
+import {
+  sendWelcomeEmail,
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+} from "./email.js";
 
 dotenv.config();
 
@@ -1275,6 +1279,110 @@ app.delete("/api/admin/users/:id", requireAuth, requireAdmin, async (req, res) =
   } catch (error) {
     console.error("Delete user error:", error);
     res.status(500).json({ message: "Failed to delete user" });
+  }
+});
+
+app.post("/api/auth/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const result = await pool.query(
+      "SELECT id, full_name, email FROM users WHERE email = $1",
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.json({
+        message: "If this email exists, a reset link has been sent.",
+      });
+    }
+
+    const user = result.rows[0];
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetExpires = new Date(Date.now() + 1000 * 60 * 30);
+
+    await pool.query(
+      `
+      UPDATE users
+      SET reset_password_token = $1,
+          reset_password_expires = $2
+      WHERE id = $3
+      `,
+      [resetToken, resetExpires, user.id]
+    );
+
+    sendPasswordResetEmail(user.email, user.full_name, resetToken);
+
+    res.json({
+      message: "If this email exists, a reset link has been sent.",
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ message: "Failed to request password reset" });
+  }
+});
+
+app.post("/api/auth/reset-password", async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({
+        message: "Token and new password are required",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM users
+      WHERE reset_password_token = $1
+      AND reset_password_expires > CURRENT_TIMESTAMP
+      `,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({
+        message: "Invalid or expired reset link",
+      });
+    }
+
+    const user = result.rows[0];
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    await pool.query(
+      `
+      UPDATE users
+      SET password_hash = $1,
+          reset_password_token = NULL,
+          reset_password_expires = NULL
+      WHERE id = $2
+      `,
+      [passwordHash, user.id]
+    );
+
+    await createNotification(
+      user.id,
+      "Password Updated",
+      "Your password was reset successfully.",
+      "SUCCESS"
+    );
+
+    res.json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({ message: "Failed to reset password" });
   }
 });
 
