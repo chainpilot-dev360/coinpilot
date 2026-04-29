@@ -205,6 +205,16 @@ function AdminPanel({ token }) {
     }
   }
 
+  function getProofUrl(proofUrl) {
+    if (!proofUrl) return null;
+
+    if (proofUrl.startsWith("http")) {
+      return proofUrl;
+    }
+
+    return `${API_URL}${proofUrl}`;
+  }
+
   const filteredUsers = users.filter((user) => {
     const name = user.full_name || "";
     const email = user.email || "";
@@ -374,33 +384,64 @@ function AdminPanel({ token }) {
       {deposits.length === 0 ? (
         <p>No pending deposits</p>
       ) : (
-        deposits.map((deposit) => (
-          <div key={deposit.id} style={cardStyle}>
-            <p>
-              <strong>User:</strong> {deposit.full_name} ({deposit.email})
-            </p>
-            <p>
-              <strong>Amount:</strong> {deposit.amount} {deposit.currency}
-            </p>
-            <p>
-              <strong>Status:</strong> {deposit.status}
-            </p>
+        deposits.map((deposit) => {
+          const proofLink = getProofUrl(deposit.proof_url);
 
-            <button
-              onClick={() => approveDeposit(deposit.id)}
-              style={approveButton}
-            >
-              Approve Deposit
-            </button>
+          return (
+            <div key={deposit.id} style={cardStyle}>
+              <p>
+                <strong>User:</strong> {deposit.full_name} ({deposit.email})
+              </p>
+              <p>
+                <strong>Amount:</strong> {deposit.amount} {deposit.currency}
+              </p>
+              <p>
+                <strong>Status:</strong> {deposit.status}
+              </p>
 
-            <button
-              onClick={() => rejectDeposit(deposit.id)}
-              style={dangerButton}
-            >
-              Reject Deposit
-            </button>
-          </div>
-        ))
+              <div style={proofBox}>
+                <p>
+                  <strong>Payment Proof:</strong>
+                </p>
+
+                {proofLink ? (
+                  <>
+                    <a
+                      href={proofLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={proofLinkStyle}
+                    >
+                      Open Proof in New Tab
+                    </a>
+
+                    <img
+                      src={proofLink}
+                      alt="Deposit proof"
+                      style={proofImage}
+                    />
+                  </>
+                ) : (
+                  <p style={muted}>No proof uploaded</p>
+                )}
+              </div>
+
+              <button
+                onClick={() => approveDeposit(deposit.id)}
+                style={approveButton}
+              >
+                Approve Deposit
+              </button>
+
+              <button
+                onClick={() => rejectDeposit(deposit.id)}
+                style={dangerButton}
+              >
+                Reject Deposit
+              </button>
+            </div>
+          );
+        })
       )}
 
       <h3>Pending Withdrawals</h3>
@@ -485,6 +526,31 @@ const miniCard = {
   padding: "12px",
   borderRadius: "10px",
   marginBottom: "10px",
+};
+
+const proofBox = {
+  background: "#020617",
+  padding: "12px",
+  borderRadius: "10px",
+  marginBottom: "12px",
+  border: "1px solid #334155",
+};
+
+const proofLinkStyle = {
+  display: "inline-block",
+  color: "#38bdf8",
+  marginBottom: "10px",
+  textDecoration: "none",
+};
+
+const proofImage = {
+  display: "block",
+  width: "100%",
+  maxWidth: "320px",
+  maxHeight: "220px",
+  objectFit: "cover",
+  borderRadius: "10px",
+  border: "1px solid #334155",
 };
 
 const inputStyle = {
