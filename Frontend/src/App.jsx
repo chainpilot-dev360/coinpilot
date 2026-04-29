@@ -12,7 +12,6 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const isVerifyPage = window.location.pathname === "/verify-email";
-
   const isForgotPasswordPage = window.location.pathname === "/forgot-password";
   const isResetPasswordPage = window.location.pathname === "/reset-password";
 
@@ -108,7 +107,10 @@ function App() {
       setToken(res.data.token);
       showNotification("Registration successful", "success");
     } catch (error) {
-      showNotification(error.response?.data?.message || "Registration failed", "error");
+      showNotification(
+        error.response?.data?.message || "Registration failed",
+        "error"
+      );
     }
   }
 
@@ -191,7 +193,10 @@ function App() {
       setWithdrawAmount("");
       setWalletAddress("");
     } catch (error) {
-      showNotification(error.response?.data?.message || "Withdrawal failed", "error");
+      showNotification(
+        error.response?.data?.message || "Withdrawal failed",
+        "error"
+      );
     }
   }
 
@@ -210,7 +215,10 @@ function App() {
       setInvestmentAmount("");
       refreshBalances();
     } catch (error) {
-      showNotification(error.response?.data?.message || "Investment failed", "error");
+      showNotification(
+        error.response?.data?.message || "Investment failed",
+        "error"
+      );
     }
   }
 
@@ -222,22 +230,28 @@ function App() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      showNotification(`Processed ${res.data.count} matured investments`, "success");
+      showNotification(
+        `Processed ${res.data.count} matured investments`,
+        "success"
+      );
     } catch (error) {
-      showNotification(error.response?.data?.message || "Processing failed", "error");
+      showNotification(
+        error.response?.data?.message || "Processing failed",
+        "error"
+      );
     }
   }
-  
+
   if (isVerifyPage) {
-  return <VerifyEmail onLoginClick={openLogin} />;
+    return <VerifyEmail onLoginClick={openLogin} />;
   }
 
   if (isForgotPasswordPage) {
-  return <ForgotPassword />;
+    return <ForgotPassword />;
   }
 
   if (isResetPasswordPage) {
-  return <ResetPassword />;
+    return <ResetPassword />;
   }
 
   if (!user && !showAuth) {
@@ -302,26 +316,26 @@ function App() {
             style={input}
           />
 
-{authMode === "login" ? (
-  <>
-    <button onClick={login} style={primaryButton}>
-      Login
-    </button>
+          {authMode === "login" && (
+            <button
+              onClick={() => {
+                window.location.href = "/forgot-password";
+              }}
+              style={forgotPasswordButton}
+            >
+              Forgot Password?
+            </button>
+          )}
 
-    <button
-  onClick={() => {
-    window.location.href = "/forgot-password";
-  }}
-  style={backButton}
->
-  Forgot Password?
-</button>
-  </>
-) : (
-  <button onClick={register} style={primaryButton}>
-    Register
-  </button>
-)}
+          {authMode === "login" ? (
+            <button onClick={login} style={primaryButton}>
+              Login
+            </button>
+          ) : (
+            <button onClick={register} style={primaryButton}>
+              Register
+            </button>
+          )}
         </div>
       </div>
     );
@@ -661,7 +675,7 @@ const activeMenu = {
   color: "white",
 };
 
-const inputStyle = {
+const input = {
   display: "block",
   width: "100%",
   maxWidth: "360px",
@@ -722,6 +736,16 @@ const backButton = {
   border: "none",
   marginBottom: "16px",
   cursor: "pointer",
+};
+
+const forgotPasswordButton = {
+  background: "transparent",
+  color: "#38bdf8",
+  border: "none",
+  marginBottom: "16px",
+  cursor: "pointer",
+  display: "block",
+  padding: 0,
 };
 
 const authPage = {
