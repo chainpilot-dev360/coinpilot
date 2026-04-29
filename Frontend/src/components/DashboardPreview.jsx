@@ -134,14 +134,17 @@ function DashboardPreview({ token, user }) {
   const [depositAmount, setDepositAmount] = useState("");
   const [depositCurrency, setDepositCurrency] = useState("USD");
   const [depositFile, setDepositFile] = useState(null);
+  const [depositHistory, setDepositHistory] = useState([]);
 
   useEffect(() => {
     loadDashboard();
     loadNotifications();
+    loadDepositHistory();
 
     const interval = setInterval(() => {
       loadDashboard();
       loadNotifications();
+      loadDepositHistory();
     }, 5000);
 
     return () => clearInterval(interval);
@@ -171,36 +174,20 @@ function DashboardPreview({ token, user }) {
     }
   }
 
-  async function submitDeposit() {
-  if (!depositAmount || !depositCurrency) {
-    alert("Enter amount and currency");
-    return;
+  async function loadDepositHistory() {
+    try {
+      const res = await axios.get(
+        `${API_URL}/api/users/${user.id}/deposits-withdrawals`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setDepositHistory(res.data.deposits || []);
+    } catch (error) {
+      console.error("Deposit history error", error);
+    }
   }
-
-  const formData = new FormData();
-  formData.append("amount", depositAmount);
-  formData.append("currency", depositCurrency);
-
-  if (depositFile) {
-    formData.append("proof", depositFile);
-  }
-
-  try {
-    await axios.post(`${API_URL}/api/deposits`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    alert("Deposit submitted");
-    setDepositAmount("");
-    setDepositFile(null);
-    loadDashboard();
-  } catch (error) {
-    alert(error.response?.data?.message || "Deposit failed");
-  }
-}
 
   async function markNotificationsRead() {
     try {
@@ -213,6 +200,39 @@ function DashboardPreview({ token, user }) {
       loadNotifications();
     } catch (error) {
       console.error("Mark read error", error);
+    }
+  }
+
+  async function submitDeposit() {
+    if (!depositAmount || !depositCurrency) {
+      alert("Enter amount and currency");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("amount", depositAmount);
+    formData.append("currency", depositCurrency);
+
+    if (depositFile) {
+      formData.append("proof", depositFile);
+    }
+
+    try {
+      await axios.post(`${API_URL}/api/deposits`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      alert("Deposit submitted successfully. Awaiting admin approval.");
+      setDepositAmount("");
+      setDepositCurrency("USD");
+      setDepositFile(null);
+      loadDashboard();
+      loadDepositHistory();
+    } catch (error) {
+      alert(error.response?.data?.message || "Deposit failed");
     }
   }
 
@@ -365,59 +385,103 @@ function DashboardPreview({ token, user }) {
 
       <h3>Submit Deposit</h3>
 
-<div style={card}>
-  <h4>Deposit Instructions</h4>
+      <div style={card}>
+        <h4>Deposit Instructions</h4>
 
-  <p style={muted}>
-    Please follow these steps carefully before submitting your deposit request.
-  </p>
+        <p style={muted}>
+          Please follow these steps carefully before submitting your deposit
+          request.
+        </p>
 
-  <ol style={{ color: "#cbd5e1", lineHeight: "1.8" }}>
-    <li>Enter the amount you want to deposit.</li>
-    <li>Send payment to the company wallet address below.</li>
-    <li>Take a screenshot of your payment confirmation.</li>
-    <li>Upload the screenshot as proof of payment.</li>
-    <li>Submit your deposit request for admin approval.</li>
-  </ol>
+        <ol style={{ color: "#cbd5e1", lineHeight: "1.8" }}>
+          <li>Enter the amount you want to deposit.</li>
+          <li>Send payment to the company wallet address below.</li>
+          <li>Take a screenshot of your payment confirmation.</li>
+          <li>Upload the screenshot as proof of payment.</li>
+          <li>Submit your deposit request for admin approval.</li>
+        </ol>
 
-  <div style={depositInfoBox}>
-    <strong>Company Wallet Address</strong>
-    <p style={walletText}>bc1qkqwr63l6x3rqskej75sqxvx74eew9w5smfn4p8</p>
-  </div>
+        <div style={depositInfoBox}>
+          <strong>Company Wallet Address</strong>
+          <p style={walletText}>BTC: bc1qkqwr63l6x3rqskej75sqxvx74eew9w5smfn4p8
+            ETH: 0xd420b9bb7969b6c403e1e774be1d36fdb9c76aa3</p>
+        </div>
 
-  <input
-    type="number"
-    placeholder="Enter deposit amount"
-    value={depositAmount}
-    onChange={(e) => setDepositAmount(e.target.value)}
-    style={input}
-  />
+        <input
+          type="number"
+          placeholder="Enter deposit amount"
+          value={depositAmount}
+          onChange={(e) => setDepositAmount(e.target.value)}
+          style={input}
+        />
 
-  <input
-    type="text"
-    placeholder="Currency e.g. USD"
-    value={depositCurrency}
-    onChange={(e) => setDepositCurrency(e.target.value)}
-    style={input}
-  />
+        <input
+          type="text"
+          placeholder="Currency e.g. USD"
+          value={depositCurrency}
+          onChange={(e) => setDepositCurrency(e.target.value)}
+          style={input}
+        />
 
-  <label style={uploadLabel}>Upload payment proof screenshot</label>
+        <label style={uploadLabel}>Upload payment proof screenshot</label>
 
-  <input
-    type="file"
-    accept="image/*"
-    onChange={(e) => setDepositFile(e.target.files[0])}
-    style={{ marginBottom: "15px", color: "white" }}
-  />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setDepositFile(e.target.files[0])}
+          style={{ marginBottom: "15px", color: "white" }}
+        />
 
-  <button onClick={submitDeposit} style={buttonStyle}>
-    Submit Deposit for Review
-  </button>
+        <button onClick={submitDeposit} style={buttonStyle}>
+          Submit Deposit for Review
+        </button>
 
-  <p style={muted}>
-    Your balance will be updated after admin confirms your payment proof.
-  </p>
-</div>
+        <p style={muted}>
+          Your balance will be updated after admin confirms your payment proof.
+        </p>
+      </div>
+
+      <h3>Deposit History</h3>
+
+      {depositHistory.length === 0 ? (
+        <EmptyState
+          title="No deposits yet"
+          text="Your submitted deposits will appear here."
+        />
+      ) : (
+        depositHistory.map((deposit) => (
+          <HoverCard key={deposit.id}>
+            <p>
+              <strong>Amount:</strong> {deposit.amount} {deposit.currency}
+            </p>
+
+            <p>
+              <strong>Status:</strong>{" "}
+              <span
+                style={{
+                  ...statusBadge,
+                  background:
+                    deposit.status === "APPROVED"
+                      ? "#16a34a"
+                      : deposit.status === "REJECTED"
+                      ? "#dc2626"
+                      : "#ca8a04",
+                }}
+              >
+                {deposit.status === "APPROVED"
+                  ? "✅ Approved"
+                  : deposit.status === "REJECTED"
+                  ? "❌ Rejected"
+                  : "⏳ Pending"}
+              </span>
+            </p>
+
+            <small style={muted}>
+              Submitted: {new Date(deposit.created_at).toLocaleString()}
+            </small>
+          </HoverCard>
+        ))
+      )}
 
       <h3>Your Investments</h3>
       {data.investments.length === 0 ? (
@@ -669,6 +733,58 @@ const card = {
   transition: "all 0.3s ease",
 };
 
+const input = {
+  display: "block",
+  width: "100%",
+  maxWidth: "360px",
+  padding: "12px",
+  marginBottom: "12px",
+  borderRadius: "10px",
+  border: "1px solid #334155",
+  background: "#020617",
+  color: "white",
+  boxSizing: "border-box",
+};
+
+const buttonStyle = {
+  padding: "12px 16px",
+  background: "#2563eb",
+  color: "white",
+  border: "none",
+  borderRadius: "10px",
+  cursor: "pointer",
+  marginRight: "10px",
+  marginBottom: "10px",
+};
+
+const depositInfoBox = {
+  background: "#020617",
+  border: "1px solid #334155",
+  padding: "14px",
+  borderRadius: "12px",
+  marginBottom: "15px",
+};
+
+const walletText = {
+  color: "#38bdf8",
+  wordBreak: "break-all",
+  marginTop: "8px",
+};
+
+const uploadLabel = {
+  display: "block",
+  color: "#cbd5e1",
+  marginBottom: "8px",
+};
+
+const statusBadge = {
+  color: "white",
+  padding: "4px 9px",
+  borderRadius: "999px",
+  fontSize: "12px",
+  fontWeight: "bold",
+};
+
 const progressTrack = {
   height: "10px",
   background: "#020617",
@@ -723,50 +839,6 @@ const muted = {
 const mutedSmall = {
   color: "#94a3b8",
   fontSize: "14px",
-};
-
-const input = {
-  display: "block",
-  width: "100%",
-  maxWidth: "360px",
-  padding: "12px",
-  marginBottom: "12px",
-  borderRadius: "10px",
-  border: "1px solid #334155",
-  background: "#020617",
-  color: "white",
-  boxSizing: "border-box",
-};
-
-const buttonStyle = {
-  padding: "12px 16px",
-  background: "#2563eb",
-  color: "white",
-  border: "none",
-  borderRadius: "10px",
-  cursor: "pointer",
-  marginRight: "10px",
-  marginBottom: "10px",
-};
-
-const depositInfoBox = {
-  background: "#020617",
-  border: "1px solid #334155",
-  padding: "14px",
-  borderRadius: "12px",
-  marginBottom: "15px",
-};
-
-const walletText = {
-  color: "#38bdf8",
-  wordBreak: "break-all",
-  marginTop: "8px",
-};
-
-const uploadLabel = {
-  display: "block",
-  color: "#cbd5e1",
-  marginBottom: "8px",
 };
 
 export default DashboardPreview;
