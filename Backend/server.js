@@ -1245,6 +1245,39 @@ app.get("/api/auth/verify-email", async (req, res) => {
   }
 });
 
+app.delete("/api/admin/users/:id", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const userId = Number(req.params.id);
+
+    if (!userId) {
+      return res.status(400).json({ message: "Valid user ID is required" });
+    }
+
+    if (userId === req.user.userId) {
+      return res.status(400).json({
+        message: "You cannot delete your own admin account",
+      });
+    }
+
+    const result = await pool.query(
+      "DELETE FROM users WHERE id = $1 RETURNING id, full_name, email",
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      message: "User account deleted successfully",
+      deletedUser: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Delete user error:", error);
+    res.status(500).json({ message: "Failed to delete user" });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
