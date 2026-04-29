@@ -65,6 +65,31 @@ function AdminPanel({ token }) {
     }
   }
 
+  async function deleteUser(userId) {
+    const confirmDelete = confirm(
+      "Are you sure you want to permanently delete this user account?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`${API_URL}/api/admin/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      alert("User deleted successfully");
+
+      if (selectedUserId === userId) {
+        setSelectedUserId(null);
+        setSelectedUserData(null);
+      }
+
+      loadData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to delete user");
+    }
+  }
+
   async function adjustBalance() {
     if (!selectedUserId) {
       alert("Select a user first");
@@ -248,6 +273,10 @@ function AdminPanel({ token }) {
 
             <button onClick={() => viewUser(user.id)} style={buttonStyle}>
               View / Manage User
+            </button>
+
+            <button onClick={() => deleteUser(user.id)} style={dangerButton}>
+              Delete User
             </button>
           </div>
         ))
@@ -476,6 +505,7 @@ const buttonStyle = {
   border: "none",
   borderRadius: "8px",
   marginBottom: "10px",
+  marginRight: "10px",
   cursor: "pointer",
 };
 
@@ -497,6 +527,7 @@ const dangerButton = {
   border: "none",
   borderRadius: "8px",
   cursor: "pointer",
+  marginRight: "10px",
   marginBottom: "10px",
 };
 
