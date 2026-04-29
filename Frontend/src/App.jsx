@@ -788,4 +788,15 @@ const mutedSmall = {
   fontSize: "14px",
 };
 
+const forgotWrapper = {
+  marginTop: "10px",
+  textAlign: "center",
+};
+
+const forgotLink = {
+  color: "#38bdf8",
+  cursor: "pointer",
+  fontSize: "14px",
+};
+
 export default App;
