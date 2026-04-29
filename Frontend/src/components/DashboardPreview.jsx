@@ -371,7 +371,7 @@ function DashboardPreview({ token, user }) {
     placeholder="Amount"
     value={depositAmount}
     onChange={(e) => setDepositAmount(e.target.value)}
-    style={inputStyle}
+    style={input}
   />
 
   <input
@@ -379,7 +379,7 @@ function DashboardPreview({ token, user }) {
     placeholder="Currency (e.g. USD)"
     value={depositCurrency}
     onChange={(e) => setDepositCurrency(e.target.value)}
-    style={inputStyle}
+    style={input}
   />
 
   <input
@@ -697,6 +697,30 @@ const muted = {
 const mutedSmall = {
   color: "#94a3b8",
   fontSize: "14px",
+};
+
+const input = {
+  display: "block",
+  width: "100%",
+  maxWidth: "360px",
+  padding: "12px",
+  marginBottom: "12px",
+  borderRadius: "10px",
+  border: "1px solid #334155",
+  background: "#020617",
+  color: "white",
+  boxSizing: "border-box",
+};
+
+const buttonStyle = {
+  padding: "12px 16px",
+  background: "#2563eb",
+  color: "white",
+  border: "none",
+  borderRadius: "10px",
+  cursor: "pointer",
+  marginRight: "10px",
+  marginBottom: "10px",
 };
 
 export default DashboardPreview;
