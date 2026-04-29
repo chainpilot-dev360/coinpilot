@@ -134,6 +134,7 @@ function DashboardPreview({ token, user }) {
   const [depositAmount, setDepositAmount] = useState("");
   const [depositCurrency, setDepositCurrency] = useState("USD");
   const [depositFile, setDepositFile] = useState(null);
+  const [previewImage, setPreviewImage] = useState("");
   const [depositHistory, setDepositHistory] = useState([]);
 
   useEffect(() => {
@@ -426,11 +427,33 @@ function DashboardPreview({ token, user }) {
         <label style={uploadLabel}>Upload payment proof screenshot</label>
 
         <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setDepositFile(e.target.files[0])}
-          style={{ marginBottom: "15px", color: "white" }}
-        />
+  type="file"
+  accept="image/*"
+  onChange={(e) => {
+    const file = e.target.files[0];
+    setDepositFile(file);
+
+    if (file) {
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  }}
+/>
+
+{previewImage && (
+  <div style={{ marginBottom: "15px" }}>
+    <p style={muted}>Preview:</p>
+    <img
+      src={previewImage}
+      alt="Proof preview"
+      style={{
+        width: "100%",
+        maxWidth: "300px",
+        borderRadius: "10px",
+        border: "1px solid #334155",
+      }}
+    />
+  </div>
+)}
 
         <button onClick={submitDeposit} style={buttonStyle}>
           Submit Deposit for Review
