@@ -667,9 +667,14 @@ const badge = {
 
 const notificationBox = {
   position: "absolute",
-  right: 0,
+
+  // 👇 THIS IS THE FIX
+  right: window.innerWidth < 768 ? "50%" : 0,
+  transform: window.innerWidth < 768 ? "translateX(50%)" : "none",
+
   top: "55px",
-  width: "340px",
+  width: window.innerWidth < 768 ? "90vw" : "340px",
+
   maxWidth: "90vw",
   background: "rgba(2, 6, 23, 0.96)",
   backdropFilter: "blur(16px)",
@@ -678,7 +683,6 @@ const notificationBox = {
   padding: "15px",
   zIndex: 20,
   boxShadow: "0 20px 50px rgba(0,0,0,0.45)",
-  animation: "fadeIn 0.25s ease",
 };
 
 const notificationItem = {

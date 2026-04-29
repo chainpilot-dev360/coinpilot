@@ -324,26 +324,28 @@ function App() {
             style={input}
           />
 
-          {authMode === "login" && (
-            <button
-              onClick={() => {
-                window.location.href = "/forgot-password";
-              }}
-              style={forgotPasswordButton}
-            >
-              Forgot Password?
-            </button>
-          )}
+{authMode === "login" ? (
+  <>
+    <button onClick={login} style={primaryButton}>
+      Login
+    </button>
 
-          {authMode === "login" ? (
-            <button onClick={login} style={primaryButton}>
-              Login
-            </button>
-          ) : (
-            <button onClick={register} style={primaryButton}>
-              Register
-            </button>
-          )}
+    <p style={forgotWrapper}>
+      <span
+        onClick={() => {
+          window.location.href = "/forgot-password";
+        }}
+        style={forgotLink}
+      >
+        Forgot Password?
+      </span>
+    </p>
+  </>
+) : (
+  <button onClick={register} style={primaryButton}>
+    Register
+  </button>
+)}
         </div>
       </div>
     );
