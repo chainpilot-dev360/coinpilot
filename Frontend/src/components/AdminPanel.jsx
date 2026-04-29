@@ -47,6 +47,12 @@ function AdminPanel({ token }) {
     }
   }
 
+  function getProofUrl(proofUrl) {
+    if (!proofUrl) return null;
+    if (proofUrl.startsWith("http")) return proofUrl;
+    return `${API_URL}${proofUrl}`;
+  }
+
   async function viewUser(userId) {
     try {
       const res = await axios.get(`${API_URL}/api/users/${userId}/balances`, {
@@ -66,11 +72,7 @@ function AdminPanel({ token }) {
   }
 
   async function deleteUser(userId) {
-    const confirmDelete = confirm(
-      "Are you sure you want to permanently delete this user account?"
-    );
-
-    if (!confirmDelete) return;
+    if (!confirm("Are you sure you want to permanently delete this user?")) return;
 
     try {
       await axios.delete(`${API_URL}/api/admin/users/${userId}`, {
@@ -91,15 +93,8 @@ function AdminPanel({ token }) {
   }
 
   async function adjustBalance() {
-    if (!selectedUserId) {
-      alert("Select a user first");
-      return;
-    }
-
-    if (!balanceAmount) {
-      alert("Enter amount");
-      return;
-    }
+    if (!selectedUserId) return alert("Select a user first");
+    if (!balanceAmount) return alert("Enter amount");
 
     try {
       await axios.post(
@@ -124,11 +119,7 @@ function AdminPanel({ token }) {
   }
 
   async function stopInvestment(investmentId) {
-    const confirmStop = confirm(
-      "Are you sure you want to stop this investment and return the principal?"
-    );
-
-    if (!confirmStop) return;
+    if (!confirm("Stop this investment and return the principal?")) return;
 
     try {
       await axios.post(
@@ -205,16 +196,6 @@ function AdminPanel({ token }) {
     }
   }
 
-  function getProofUrl(proofUrl) {
-    if (!proofUrl) return null;
-
-    if (proofUrl.startsWith("http")) {
-      return proofUrl;
-    }
-
-    return `${API_URL}${proofUrl}`;
-  }
-
   const filteredUsers = users.filter((user) => {
     const name = user.full_name || "";
     const email = user.email || "";
@@ -244,10 +225,7 @@ function AdminPanel({ token }) {
           <Stat title="Total Withdrawals" value={analytics.totalWithdrawals} />
           <Stat title="Platform Profit" value={analytics.platformProfit} />
           <Stat title="Active Investments" value={analytics.activeInvestments} />
-          <Stat
-            title="Completed Investments"
-            value={analytics.completedInvestments}
-          />
+          <Stat title="Completed Investments" value={analytics.completedInvestments} />
         </div>
       )}
 
@@ -265,21 +243,11 @@ function AdminPanel({ token }) {
       ) : (
         filteredUsers.map((user) => (
           <div key={user.id} style={cardStyle}>
-            <p>
-              <strong>ID:</strong> {user.id}
-            </p>
-            <p>
-              <strong>Name:</strong> {user.full_name}
-            </p>
-            <p>
-              <strong>Email:</strong> {user.email}
-            </p>
-            <p>
-              <strong>Password:</strong> Protected / Not visible for security
-            </p>
-            <p>
-              <strong>Role:</strong> {user.role}
-            </p>
+            <p><strong>ID:</strong> {user.id}</p>
+            <p><strong>Name:</strong> {user.full_name}</p>
+            <p><strong>Email:</strong> {user.email}</p>
+            <p><strong>Password:</strong> Protected / Not visible for security</p>
+            <p><strong>Role:</strong> {user.role}</p>
 
             <button onClick={() => viewUser(user.id)} style={buttonStyle}>
               View / Manage User
@@ -339,12 +307,8 @@ function AdminPanel({ token }) {
           ) : (
             selectedUserData.investments.map((investment) => (
               <div key={investment.id} style={miniCard}>
-                <p>
-                  <strong>{investment.plan_name}</strong>
-                </p>
-                <p>
-                  Amount: {investment.amount} {investment.currency}
-                </p>
+                <p><strong>{investment.plan_name}</strong></p>
+                <p>Amount: {investment.amount} {investment.currency}</p>
                 <p>Expected Return: {investment.expected_return}</p>
                 <p>Status: {investment.status}</p>
 
@@ -366,12 +330,8 @@ function AdminPanel({ token }) {
           ) : (
             selectedUserData.ledger.slice(0, 10).map((entry) => (
               <div key={entry.id} style={miniCard}>
-                <p>
-                  <strong>{entry.type}</strong>
-                </p>
-                <p>
-                  {entry.amount} {entry.currency}
-                </p>
+                <p><strong>{entry.type}</strong></p>
+                <p>{entry.amount} {entry.currency}</p>
                 <small>{entry.reason}</small>
               </div>
             ))
@@ -388,57 +348,71 @@ function AdminPanel({ token }) {
           const proofLink = getProofUrl(deposit.proof_url);
 
           return (
-            <div key={deposit.id} style={cardStyle}>
+            <div key={deposit.id} style={depositReviewCard}>
+              <div style={depositHeader}>
+                <div>
+                  <p style={mutedSmall}>Deposit Request</p>
+                  <h3 style={{ margin: "4px 0" }}>
+                    {deposit.amount} {deposit.currency}
+                  </h3>
+                </div>
+
+                <span style={pendingBadge}>Pending Review</span>
+              </div>
+
               <p>
                 <strong>User:</strong> {deposit.full_name} ({deposit.email})
               </p>
-              <p>
-                <strong>Amount:</strong> {deposit.amount} {deposit.currency}
-              </p>
+
               <p>
                 <strong>Status:</strong> {deposit.status}
               </p>
 
               <div style={proofBox}>
-                <p>
-                  <strong>Payment Proof:</strong>
-                </p>
+                <h4 style={{ marginTop: 0 }}>Payment Proof</h4>
 
                 {proofLink ? (
-                  <>
-                    <a
-                      href={proofLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={proofLinkStyle}
-                    >
-                      Open Proof in New Tab
-                    </a>
+                  <div style={proofGrid}>
+                    <img src={proofLink} alt="Deposit proof" style={proofImage} />
 
-                    <img
-                      src={proofLink}
-                      alt="Deposit proof"
-                      style={proofImage}
-                    />
-                  </>
+                    <div>
+                      <p style={muted}>
+                        Review the uploaded payment screenshot before approving
+                        this deposit.
+                      </p>
+
+                      <a
+                        href={proofLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={proofLinkStyle}
+                      >
+                        Open Full Proof
+                      </a>
+                    </div>
+                  </div>
                 ) : (
-                  <p style={muted}>No proof uploaded</p>
+                  <div style={noProofBox}>
+                    <p style={{ margin: 0 }}>No proof uploaded for this deposit.</p>
+                  </div>
                 )}
               </div>
 
-              <button
-                onClick={() => approveDeposit(deposit.id)}
-                style={approveButton}
-              >
-                Approve Deposit
-              </button>
+              <div style={actionRow}>
+                <button
+                  onClick={() => approveDeposit(deposit.id)}
+                  style={approveButton}
+                >
+                  Approve Deposit
+                </button>
 
-              <button
-                onClick={() => rejectDeposit(deposit.id)}
-                style={dangerButton}
-              >
-                Reject Deposit
-              </button>
+                <button
+                  onClick={() => rejectDeposit(deposit.id)}
+                  style={dangerButton}
+                >
+                  Reject Deposit
+                </button>
+              </div>
             </div>
           );
         })
@@ -451,31 +425,16 @@ function AdminPanel({ token }) {
       ) : (
         withdrawals.map((withdrawal) => (
           <div key={withdrawal.id} style={cardStyle}>
-            <p>
-              <strong>User:</strong> {withdrawal.full_name} ({withdrawal.email})
-            </p>
-            <p>
-              <strong>Amount:</strong> {withdrawal.amount}{" "}
-              {withdrawal.currency}
-            </p>
-            <p>
-              <strong>Wallet:</strong> {withdrawal.wallet_address}
-            </p>
-            <p>
-              <strong>Status:</strong> {withdrawal.status}
-            </p>
+            <p><strong>User:</strong> {withdrawal.full_name} ({withdrawal.email})</p>
+            <p><strong>Amount:</strong> {withdrawal.amount} {withdrawal.currency}</p>
+            <p><strong>Wallet:</strong> {withdrawal.wallet_address}</p>
+            <p><strong>Status:</strong> {withdrawal.status}</p>
 
-            <button
-              onClick={() => approveWithdrawal(withdrawal.id)}
-              style={approveButton}
-            >
+            <button onClick={() => approveWithdrawal(withdrawal.id)} style={approveButton}>
               Approve Withdrawal
             </button>
 
-            <button
-              onClick={() => rejectWithdrawal(withdrawal.id)}
-              style={dangerButton}
-            >
+            <button onClick={() => rejectWithdrawal(withdrawal.id)} style={dangerButton}>
               Reject Withdrawal
             </button>
           </div>
@@ -514,6 +473,32 @@ const cardStyle = {
   marginBottom: "12px",
 };
 
+const depositReviewCard = {
+  background: "linear-gradient(180deg, #1e293b, #0f172a)",
+  padding: "18px",
+  borderRadius: "16px",
+  marginBottom: "18px",
+  border: "1px solid #334155",
+  boxShadow: "0 18px 45px rgba(0,0,0,0.28)",
+};
+
+const depositHeader = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: "12px",
+  flexWrap: "wrap",
+};
+
+const pendingBadge = {
+  background: "#ca8a04",
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: "999px",
+  fontSize: "12px",
+  fontWeight: "bold",
+};
+
 const sectionStyle = {
   background: "#020617",
   padding: "20px",
@@ -530,27 +515,49 @@ const miniCard = {
 
 const proofBox = {
   background: "#020617",
-  padding: "12px",
-  borderRadius: "10px",
-  marginBottom: "12px",
+  padding: "14px",
+  borderRadius: "12px",
+  marginBottom: "14px",
+  border: "1px solid #334155",
+};
+
+const proofGrid = {
+  display: "grid",
+  gridTemplateColumns: "minmax(160px, 320px) 1fr",
+  gap: "16px",
+  alignItems: "start",
+};
+
+const proofImage = {
+  width: "100%",
+  maxHeight: "260px",
+  objectFit: "cover",
+  borderRadius: "12px",
   border: "1px solid #334155",
 };
 
 const proofLinkStyle = {
   display: "inline-block",
-  color: "#38bdf8",
-  marginBottom: "10px",
+  color: "white",
+  background: "#2563eb",
+  padding: "10px 14px",
+  borderRadius: "10px",
   textDecoration: "none",
+  marginTop: "8px",
 };
 
-const proofImage = {
-  display: "block",
-  width: "100%",
-  maxWidth: "320px",
-  maxHeight: "220px",
-  objectFit: "cover",
+const noProofBox = {
+  background: "#111827",
+  border: "1px dashed #64748b",
+  padding: "14px",
   borderRadius: "10px",
-  border: "1px solid #334155",
+  color: "#94a3b8",
+};
+
+const actionRow = {
+  display: "flex",
+  gap: "10px",
+  flexWrap: "wrap",
 };
 
 const inputStyle = {
@@ -599,6 +606,12 @@ const dangerButton = {
 
 const muted = {
   color: "#94a3b8",
+};
+
+const mutedSmall = {
+  color: "#94a3b8",
+  fontSize: "14px",
+  margin: 0,
 };
 
 export default AdminPanel;
