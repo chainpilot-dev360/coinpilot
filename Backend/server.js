@@ -1,4 +1,6 @@
 import express from "express";
+import multer from "multer";
+import path from "path";
 import cors from "cors";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
@@ -14,10 +16,23 @@ import {
 
 dotenv.config();
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + "-" + file.originalname;
+    cb(null, uniqueName);
+  },
+});
+
+const upload = multer({ storage });
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -1385,6 +1400,46 @@ app.post("/api/auth/reset-password", async (req, res) => {
     res.status(500).json({ message: "Failed to reset password" });
   }
 });
+
+app.post(
+  "/api/deposits",
+  requireAuth,
+  upload.single("proof"),
+  async (req, res) => {
+    try {
+      const { amount, currency } = req.body;
+
+      if (!amount || !currency) {
+        return res.status(400).json({
+          message: "Amount and currency are required",
+        });
+      }
+
+      let proofUrl = null;
+
+      if (req.file) {
+        proofUrl = `/uploads/${req.file.filename}`;
+      }
+
+      const result = await pool.query(
+        `
+        INSERT INTO deposits (user_id, amount, currency, status, proof_url)
+        VALUES ($1, $2, $3, 'PENDING', $4)
+        RETURNING *
+        `,
+        [req.user.userId, amount, currency, proofUrl]
+      );
+
+      res.json({
+        message: "Deposit submitted successfully",
+        deposit: result.rows[0],
+      });
+    } catch (error) {
+      console.error("Deposit upload error:", error);
+      res.status(500).json({ message: "Failed to submit deposit" });
+    }
+  }
+);
 
 const PORT = process.env.PORT || 5000;
 

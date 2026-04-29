@@ -131,6 +131,10 @@ function DashboardPreview({ token, user }) {
   const [notifications, setNotifications] = useState([]);
   const [notificationOpen, setNotificationOpen] = useState(false);
 
+  const [depositAmount, setDepositAmount] = useState("");
+  const [depositCurrency, setDepositCurrency] = useState("USD");
+  const [depositFile, setDepositFile] = useState(null);
+
   useEffect(() => {
     loadDashboard();
     loadNotifications();
@@ -166,6 +170,37 @@ function DashboardPreview({ token, user }) {
       console.error("Notifications load error", error);
     }
   }
+
+  async function submitDeposit() {
+  if (!depositAmount || !depositCurrency) {
+    alert("Enter amount and currency");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("amount", depositAmount);
+  formData.append("currency", depositCurrency);
+
+  if (depositFile) {
+    formData.append("proof", depositFile);
+  }
+
+  try {
+    await axios.post(`${API_URL}/api/deposits`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    alert("Deposit submitted");
+    setDepositAmount("");
+    setDepositFile(null);
+    loadDashboard();
+  } catch (error) {
+    alert(error.response?.data?.message || "Deposit failed");
+  }
+}
 
   async function markNotificationsRead() {
     try {
@@ -327,6 +362,36 @@ function DashboardPreview({ token, user }) {
           </HoverCard>
         ))
       )}
+
+      <h3>Submit Deposit</h3>
+
+<div style={card}>
+  <input
+    type="number"
+    placeholder="Amount"
+    value={depositAmount}
+    onChange={(e) => setDepositAmount(e.target.value)}
+    style={inputStyle}
+  />
+
+  <input
+    type="text"
+    placeholder="Currency (e.g. USD)"
+    value={depositCurrency}
+    onChange={(e) => setDepositCurrency(e.target.value)}
+    style={inputStyle}
+  />
+
+  <input
+    type="file"
+    onChange={(e) => setDepositFile(e.target.files[0])}
+    style={{ marginBottom: "10px" }}
+  />
+
+  <button onClick={submitDeposit} style={buttonStyle}>
+    Submit Deposit
+  </button>
+</div>
 
       <h3>Your Investments</h3>
       {data.investments.length === 0 ? (
