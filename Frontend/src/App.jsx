@@ -283,7 +283,7 @@ function App() {
               placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              style={inputStyle}
+              style={input}
             />
           )}
 
@@ -291,7 +291,7 @@ function App() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={inputStyle}
+            style={input}
           />
 
           <input
@@ -299,7 +299,7 @@ function App() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={inputStyle}
+            style={input}
           />
 
 {authMode === "login" ? (
@@ -442,7 +442,7 @@ function App() {
                   placeholder="Deposit Amount"
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(e.target.value)}
-                  style={inputStyle}
+                  style={input}
                 />
                 <button onClick={createDeposit} style={primaryButton}>
                   Create Deposit
@@ -455,13 +455,13 @@ function App() {
                   placeholder="Withdrawal Amount"
                   value={withdrawAmount}
                   onChange={(e) => setWithdrawAmount(e.target.value)}
-                  style={inputStyle}
+                  style={input}
                 />
                 <input
                   placeholder="Wallet Address"
                   value={walletAddress}
                   onChange={(e) => setWalletAddress(e.target.value)}
-                  style={inputStyle}
+                  style={input}
                 />
                 <button onClick={createWithdrawal} style={dangerButton}>
                   Create Withdrawal
@@ -502,7 +502,7 @@ function App() {
               <select
                 value={selectedPlanId}
                 onChange={(e) => setSelectedPlanId(e.target.value)}
-                style={inputStyle}
+                style={input}
               >
                 {plans.map((plan) => (
                   <option key={plan.id} value={plan.id}>
@@ -515,7 +515,7 @@ function App() {
                 placeholder="Enter Amount"
                 value={investmentAmount}
                 onChange={(e) => setInvestmentAmount(e.target.value)}
-                style={inputStyle}
+                style={input}
               />
 
               <button onClick={startInvestment} style={primaryButton}>
