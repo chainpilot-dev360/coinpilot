@@ -366,9 +366,28 @@ function DashboardPreview({ token, user }) {
       <h3>Submit Deposit</h3>
 
 <div style={card}>
+  <h4>Deposit Instructions</h4>
+
+  <p style={muted}>
+    Please follow these steps carefully before submitting your deposit request.
+  </p>
+
+  <ol style={{ color: "#cbd5e1", lineHeight: "1.8" }}>
+    <li>Enter the amount you want to deposit.</li>
+    <li>Send payment to the company wallet address below.</li>
+    <li>Take a screenshot of your payment confirmation.</li>
+    <li>Upload the screenshot as proof of payment.</li>
+    <li>Submit your deposit request for admin approval.</li>
+  </ol>
+
+  <div style={depositInfoBox}>
+    <strong>Company Wallet Address</strong>
+    <p style={walletText}>bc1qkqwr63l6x3rqskej75sqxvx74eew9w5smfn4p8</p>
+  </div>
+
   <input
     type="number"
-    placeholder="Amount"
+    placeholder="Enter deposit amount"
     value={depositAmount}
     onChange={(e) => setDepositAmount(e.target.value)}
     style={input}
@@ -376,21 +395,28 @@ function DashboardPreview({ token, user }) {
 
   <input
     type="text"
-    placeholder="Currency (e.g. USD)"
+    placeholder="Currency e.g. USD"
     value={depositCurrency}
     onChange={(e) => setDepositCurrency(e.target.value)}
     style={input}
   />
 
+  <label style={uploadLabel}>Upload payment proof screenshot</label>
+
   <input
     type="file"
+    accept="image/*"
     onChange={(e) => setDepositFile(e.target.files[0])}
-    style={{ marginBottom: "10px" }}
+    style={{ marginBottom: "15px", color: "white" }}
   />
 
   <button onClick={submitDeposit} style={buttonStyle}>
-    Submit Deposit
+    Submit Deposit for Review
   </button>
+
+  <p style={muted}>
+    Your balance will be updated after admin confirms your payment proof.
+  </p>
 </div>
 
       <h3>Your Investments</h3>
@@ -721,6 +747,26 @@ const buttonStyle = {
   cursor: "pointer",
   marginRight: "10px",
   marginBottom: "10px",
+};
+
+const depositInfoBox = {
+  background: "#020617",
+  border: "1px solid #334155",
+  padding: "14px",
+  borderRadius: "12px",
+  marginBottom: "15px",
+};
+
+const walletText = {
+  color: "#38bdf8",
+  wordBreak: "break-all",
+  marginTop: "8px",
+};
+
+const uploadLabel = {
+  display: "block",
+  color: "#cbd5e1",
+  marginBottom: "8px",
 };
 
 export default DashboardPreview;
