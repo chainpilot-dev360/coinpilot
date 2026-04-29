@@ -5,11 +5,16 @@ import AdminPanel from "./components/AdminPanel";
 import Notification from "./components/Notification";
 import LandingPage from "./components/LandingPage";
 import VerifyEmail from "./components/VerifyEmail";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const isVerifyPage = window.location.pathname === "/verify-email";
+
+  const isForgotPasswordPage = window.location.pathname === "/forgot-password";
+  const isResetPasswordPage = window.location.pathname === "/reset-password";
 
   const [authMode, setAuthMode] = useState("login");
   const [showAuth, setShowAuth] = useState(false);
@@ -226,7 +231,15 @@ function App() {
   if (isVerifyPage) {
   return <VerifyEmail onLoginClick={openLogin} />;
   }
-  
+
+  if (isForgotPasswordPage) {
+  return <ForgotPassword />;
+  }
+
+  if (isResetPasswordPage) {
+  return <ResetPassword />;
+  }
+
   if (!user && !showAuth) {
     return (
       <>
@@ -290,14 +303,91 @@ function App() {
           />
 
           {authMode === "login" ? (
-            <button onClick={login} style={primaryButton}>
-              Login
-            </button>
-          ) : (
-            <button onClick={register} style={primaryButton}>
-              Register
-            </button>
-          )}
+  <>
+    <button onClick={login} style={primaryButton}>
+      Login
+    </button>
+
+    <button
+      onClick={() => {
+        window.location.href = "/forgot-password";
+      }}
+      style={backButton}
+    >
+      Forgot Password?
+    </button>
+  </>
+) : (
+  <button onClick={register} style={primaryButton}>
+    Register
+  </button>
+)}{authMode === "login" ? (
+  <>
+    <button onClick={login} style={primaryButton}>
+      Login
+    </button>
+    
+    <button
+  onClick={() => {
+    window.location.href = "/forgot-password";
+  }}
+  style={backButton}
+>
+  Forgot Password?
+</button>
+
+    <button
+      onClick={() => {
+        window.location.href = "/forgot-password";
+      }}
+      style={backButton}
+    >
+      Forgot Password?
+    </button>
+  </>
+) : (
+  <button onClick={register} style={primaryButton}>
+    Register
+  </button>
+)}{authMode === "login" ? (
+  <>
+    <button onClick={login} style={primaryButton}>
+      Login
+    </button>
+
+    <button
+      onClick={() => {
+        window.location.href = "/forgot-password";
+      }}
+      style={backButton}
+    >
+      Forgot Password?
+    </button>
+  </>
+) : (
+  <button onClick={register} style={primaryButton}>
+    Register
+  </button>
+)}{authMode === "login" ? (
+  <>
+    <button onClick={login} style={primaryButton}>
+      Login
+    </button>
+
+    <button
+      onClick={() => {
+        window.location.href = "/forgot-password";
+      }}
+      style={backButton}
+    >
+      Forgot Password?
+    </button>
+  </>
+) : (
+  <button onClick={register} style={primaryButton}>
+    Register
+  </button>
+)}
         </div>
       </div>
     );
