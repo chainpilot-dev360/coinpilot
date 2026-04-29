@@ -413,7 +413,9 @@ function DashboardPreview({ token, user }) {
 
         <div style={depositInfoBox}>
           <strong>Company Wallet Address</strong>
-          <p style={walletText}>PASTE_YOUR_WALLET_ADDRESS_HERE</p>
+          <p style={walletText}>BTC: bc1qkqwr63l6x3rqskej75sqxvx74eew9w5smfn4p8
+ETH:
+0xd420b9bb7969b6c403e1e774be1d36fdb9c76aa3</p>
         </div>
 
         <input
