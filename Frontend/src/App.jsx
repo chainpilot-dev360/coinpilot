@@ -82,17 +82,21 @@ function App() {
       .get(`${API_URL}/api/users/${user.id}/balances`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setBalances(res.data.balances || []));
+      .then((res) => setBalances(res.data.balances || []))
+      .catch(() => {});
   }, [user, token]);
 
   useEffect(() => {
-    axios.get(`${API_URL}/api/investment-plans`).then((res) => {
-      setPlans(res.data);
+    axios
+      .get(`${API_URL}/api/investment-plans`)
+      .then((res) => {
+        setPlans(res.data || []);
 
-      if (res.data.length > 0) {
-        setSelectedPlanId(String(res.data[0].id));
-      }
-    });
+        if (res.data && res.data.length > 0) {
+          setSelectedPlanId(String(res.data[0].id));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   async function register() {
@@ -155,11 +159,15 @@ function App() {
   async function refreshBalances() {
     if (!user) return;
 
-    const res = await axios.get(`${API_URL}/api/users/${user.id}/balances`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      const res = await axios.get(`${API_URL}/api/users/${user.id}/balances`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    setBalances(res.data.balances || []);
+      setBalances(res.data.balances || []);
+    } catch {
+      showNotification("Failed to refresh balances", "error");
+    }
   }
 
   async function createDeposit() {
