@@ -39,9 +39,14 @@ function VerifyEmail({ onLoginClick }) {
 
         <p style={text}>{message}</p>
 
-        <button onClick={onLoginClick} style={button}>
-          Go to Login
-        </button>
+        <button
+  onClick={() => {
+    window.location.href = "/";
+  }}
+  style={button}
+>
+  Go to Login
+</button>
       </div>
     </div>
   );
