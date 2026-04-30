@@ -137,6 +137,10 @@ function DashboardPreview({ token, user }) {
   const [depositHistory, setDepositHistory] = useState([]);
   const [withdrawalHistory, setWithdrawalHistory] = useState([]);
 
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   useEffect(() => {
     loadDashboard();
     loadNotifications();
@@ -221,6 +225,39 @@ function DashboardPreview({ token, user }) {
       alert("Enter amount and currency");
       return;
     }
+
+    async function changePassword() {
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    alert("All fields are required");
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    alert("New passwords do not match");
+    return;
+  }
+
+  try {
+    await axios.post(
+      `${API_URL}/api/auth/change-password`,
+      {
+        currentPassword,
+        newPassword,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    alert("Password changed successfully");
+
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+  } catch (error) {
+    alert(error.response?.data?.message || "Failed to change password");
+  }
+}
 
     const formData = new FormData();
     formData.append("amount", depositAmount);
@@ -605,6 +642,40 @@ function DashboardPreview({ token, user }) {
           </HoverCard>
         ))
       )}
+      
+      <h3>Security Settings</h3>
+
+<div style={card}>
+  <h4>Change Password</h4>
+
+  <input
+    type="password"
+    placeholder="Current Password"
+    value={currentPassword}
+    onChange={(e) => setCurrentPassword(e.target.value)}
+    style={input}
+  />
+
+  <input
+    type="password"
+    placeholder="New Password"
+    value={newPassword}
+    onChange={(e) => setNewPassword(e.target.value)}
+    style={input}
+  />
+
+  <input
+    type="password"
+    placeholder="Confirm New Password"
+    value={confirmPassword}
+    onChange={(e) => setConfirmPassword(e.target.value)}
+    style={input}
+  />
+
+  <button onClick={changePassword} style={buttonStyle}>
+    Update Password
+  </button>
+</div>
     </div>
   );
 }
