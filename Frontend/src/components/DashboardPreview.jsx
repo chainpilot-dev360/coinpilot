@@ -678,37 +678,37 @@ function DashboardPreview({ token, user }) {
       
       <h3>Security Settings</h3>
 
-<div style={card}>
-  <h4>Change Password</h4>
+      <div style={card}>
+        <h4>Change Password</h4>
 
-  <input
-    type="password"
-    placeholder="Current Password"
-    value={currentPassword}
-    onChange={(e) => setCurrentPassword(e.target.value)}
-    style={input}
-  />
+        <input
+          type="password"
+          placeholder="Current Password"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          style={input}
+        />
 
-  <input
-    type="password"
-    placeholder="New Password"
-    value={newPassword}
-    onChange={(e) => setNewPassword(e.target.value)}
-    style={input}
-  />
+        <input
+          type="password"
+          placeholder="New Password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          style={input}
+        />
 
-  <input
-    type="password"
-    placeholder="Confirm New Password"
-    value={confirmPassword}
-    onChange={(e) => setConfirmPassword(e.target.value)}
-    style={input}
-  />
+        <input
+          type="password"
+          placeholder="Confirm New Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          style={input}
+        />
 
-  <button onClick={changePassword} style={buttonStyle}>
-    Update Password
-  </button>
-</div>
+        <button onClick={changePassword} style={buttonStyle}>
+          Update Password
+        </button>
+      </div>
     </div>
   );
 }
