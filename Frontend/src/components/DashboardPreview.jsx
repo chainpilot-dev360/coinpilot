@@ -53,12 +53,10 @@ function AnimatedNumber({ value }) {
 
     const timer = setInterval(() => {
       start += increment;
-
       if (start >= end) {
         start = end;
         clearInterval(timer);
       }
-
       setDisplay(start);
     }, 16);
 
@@ -340,6 +338,38 @@ function DashboardPreview({ token, user }) {
         </div>
       </div>
 
+      <div style={profileCard}>
+        <div style={avatarCircle}>
+          {(user.full_name || user.email || "U").charAt(0).toUpperCase()}
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <h3 style={{ margin: "0 0 6px" }}>{user.full_name}</h3>
+          <p style={mutedSmall}>{user.email}</p>
+
+          <div style={profileBadges}>
+            <span style={roleBadge}>{user.role}</span>
+            <span
+              style={{
+                ...verifiedBadge,
+                background: user.email_verified ? "#16a34a" : "#ca8a04",
+              }}
+            >
+              {user.email_verified ? "Verified Email" : "Email Pending"}
+            </span>
+          </div>
+        </div>
+
+        <div style={profileMeta}>
+          <small style={mutedSmall}>Member since</small>
+          <strong>
+            {user.created_at
+              ? new Date(user.created_at).toLocaleDateString()
+              : "N/A"}
+          </strong>
+        </div>
+      </div>
+
       <div style={summaryGrid}>
         <SummaryCard title="Total Balance" value={`$${totalBalance.toFixed(2)}`} />
         <SummaryCard
@@ -414,8 +444,7 @@ function DashboardPreview({ token, user }) {
         <div style={depositInfoBox}>
           <strong>Company Wallet Address</strong>
           <p style={walletText}>BTC: bc1qkqwr63l6x3rqskej75sqxvx74eew9w5smfn4p8
-ETH:
-0xd420b9bb7969b6c403e1e774be1d36fdb9c76aa3</p>
+            ETH: 0xd420b9bb7969b6c403e1e774be1d36fdb9c76aa3</p>
         </div>
 
         <input
@@ -474,8 +503,7 @@ ETH:
             </p>
 
             <p>
-              <strong>Status:</strong>{" "}
-              <StatusBadge status={deposit.status} />
+              <strong>Status:</strong> <StatusBadge status={deposit.status} />
             </p>
 
             <small style={muted}>
@@ -501,8 +529,7 @@ ETH:
             </p>
 
             <p>
-              <strong>Status:</strong>{" "}
-              <StatusBadge status={withdrawal.status} />
+              <strong>Status:</strong> <StatusBadge status={withdrawal.status} />
             </p>
 
             {withdrawal.wallet_address && (
@@ -646,6 +673,60 @@ function SkeletonDashboard() {
 
 const pageFade = {
   animation: "fadeIn 0.6s ease",
+};
+
+const profileCard = {
+  display: "flex",
+  alignItems: "center",
+  gap: "16px",
+  background: "linear-gradient(135deg, rgba(30,41,59,0.9), rgba(2,6,23,0.9))",
+  border: "1px solid rgba(255,255,255,0.1)",
+  borderRadius: "18px",
+  padding: "18px",
+  marginBottom: "24px",
+  flexWrap: "wrap",
+  boxShadow: "0 18px 45px rgba(0,0,0,0.3)",
+};
+
+const avatarCircle = {
+  width: "58px",
+  height: "58px",
+  borderRadius: "50%",
+  background: "linear-gradient(135deg, #2563eb, #38bdf8)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "24px",
+  fontWeight: "bold",
+};
+
+const profileBadges = {
+  display: "flex",
+  gap: "8px",
+  flexWrap: "wrap",
+  marginTop: "10px",
+};
+
+const roleBadge = {
+  background: "#2563eb",
+  color: "white",
+  padding: "5px 10px",
+  borderRadius: "999px",
+  fontSize: "12px",
+  fontWeight: "bold",
+};
+
+const verifiedBadge = {
+  color: "white",
+  padding: "5px 10px",
+  borderRadius: "999px",
+  fontSize: "12px",
+  fontWeight: "bold",
+};
+
+const profileMeta = {
+  textAlign: "right",
+  marginLeft: "auto",
 };
 
 const tickerWrap = {
