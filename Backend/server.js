@@ -250,7 +250,7 @@ app.post("/api/auth/register", authLimiter, async (req, res) => {
     );
 
     res.status(201).json({
-      message: "Registration successful. Please check your email inbox or spam folder for the link to verify your account before logging in.",
+      message: "Registration successful. Please check your email to verify your account before logging in.",
       token,
       user,
     });
