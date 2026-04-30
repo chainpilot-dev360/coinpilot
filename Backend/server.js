@@ -13,6 +13,7 @@ import {
   sendVerificationEmail,
   sendPasswordResetEmail,
 } from "./email.js";
+import { logAdminAction } from "./utils/adminLogger.js";
 
 dotenv.config();
 
@@ -654,6 +655,15 @@ app.post(
 
       await client.query("COMMIT");
 
+      await logAdminAction(
+        pool,
+        req.user.id,
+        "ADJUST_BALANCE",
+        "user",
+        userId,
+        `Adjusted ${currency} balance by ${amount}. Reason: ${reason}`
+      );
+
       res.json({
         message: "Balance adjusted successfully",
         balance: balanceResult.rows[0],
@@ -740,6 +750,24 @@ app.post(
 
       await client.query("COMMIT");
 
+      await logAdminAction(
+        pool,
+        req.user.id,
+        "APPROVE_DEPOSIT",
+        "deposit",
+        depositId,
+        `Approved deposit ID ${depositId}`
+      );
+
+      await logAdminAction(
+        pool,
+        req.user.id,
+        "APPROVE_WITHDRAWAL",
+        "withdrawal",
+        withdrawalId,
+        `Approved withdrawal ID ${withdrawalId}`
+      );
+
       res.json({
         message: "Deposit approved and balance updated",
         balance: balanceResult.rows[0],
@@ -781,11 +809,29 @@ app.post(
 
       const deposit = result.rows[0];
 
+      await logAdminAction(
+        pool,
+        req.user.id,
+        "REJECT_DEPOSIT",
+        "deposit",
+        depositId,
+        `Rejected deposit ID ${depositId}`
+      );
+
       await createNotification(
         deposit.user_id,
         "Deposit Rejected",
         `Your deposit of ${deposit.amount} ${deposit.currency} was rejected.`,
         "ERROR"
+      );
+
+      await logAdminAction(
+        pool,
+        req.user.id,
+        "REJECT_WITHDRAWAL",
+        "withdrawal",
+        withdrawalId,
+        `Rejected withdrawal ID ${withdrawalId}`
       );
 
       res.json({
