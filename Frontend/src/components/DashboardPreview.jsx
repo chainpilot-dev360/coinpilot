@@ -227,6 +227,39 @@ function DashboardPreview({ token, user }) {
     }
 
     async function changePassword() {
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        alert("All fields are required");
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        alert("New passwords do not match");
+        return;
+      }
+
+      try {
+        await axios.post(
+          `${API_URL}/api/auth/change-password`,
+          {
+            currentPassword,
+            newPassword,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        alert("Password changed successfully");
+
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } catch (error) {
+        alert(error.response?.data?.message || "Failed to change password");
+      }
+   }
+
+    async function changePassword() {
   if (!currentPassword || !newPassword || !confirmPassword) {
     alert("All fields are required");
     return;
