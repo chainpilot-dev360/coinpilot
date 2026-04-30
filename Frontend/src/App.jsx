@@ -100,23 +100,24 @@ function App() {
   }, []);
 
   async function register() {
-    try {
-      const res = await axios.post(`${API_URL}/api/auth/register`, {
-        fullName: name,
-        email,
-        password,
-      });
+  try {
+    const res = await axios.post(`${API_URL}/api/auth/register`, {
+      fullName: name,
+      email,
+      password,
+    });
 
-      localStorage.setItem("token", res.data.token);
-      setToken(res.data.token);
-      showNotification("Registration successful", "success");
-    } catch (error) {
-      showNotification(
-        error.response?.data?.message || "Registration failed",
-        "error"
-      );
-    }
+    showNotification(res.data.message || "Registration successful. Please verify your email.", "success");
+
+    setAuthMode("login");
+    setPassword("");
+  } catch (error) {
+    showNotification(
+      error.response?.data?.message || "Registration failed",
+      "error"
+    );
   }
+}
 
   async function login() {
     try {

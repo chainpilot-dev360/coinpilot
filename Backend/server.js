@@ -200,15 +200,7 @@ app.post("/api/auth/register", authLimiter, async (req, res) => {
     const { fullName, email, password } = req.body;
 
     if (!fullName || !email || !password) {
-      return res.status(400).json({
-        message: "Full name, email, and password are required",
-      });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({
-        message: "Password must be at least 6 characters",
-      });
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     const existingUser = await pool.query(
@@ -217,46 +209,61 @@ app.post("/api/auth/register", authLimiter, async (req, res) => {
     );
 
     if (existingUser.rows.length > 0) {
-      return res.status(409).json({
-        message: "Email already exists",
-      });
+      return res.status(400).json({ message: "Email already registered" });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-
     const verificationToken = crypto.randomBytes(32).toString("hex");
-    const verificationExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
 
     const result = await pool.query(
       `
-      INSERT INTO users (full_name, email, password_hash, role, verification_token, verification_token_expires)
-      VALUES ($1, $2, $3, 'USER', $4, $5)
-      RETURNING id, full_name, email, role, created_at
+      INSERT INTO users (full_name, email, password_hash, role, email_verified, verification_token)
+      VALUES ($1, $2, $3, 'USER', false, $4)
+      RETURNING id, full_name, email, role, email_verified, created_at
       `,
-      [fullName, email, passwordHash, verificationToken, verificationExpires]
+      [fullName, email, passwordHash, verificationToken]
     );
 
     const user = result.rows[0];
-    const token = createToken(user);
 
-    sendWelcomeEmail(user.email, user.full_name);
-    sendVerificationEmail(user.email, user.full_name, verificationToken);
-
-    await createNotification(
-      user.id,
-      "Welcome to ChainPilot",
-      "Your ChainPilot account has been created successfully.",
-      "SUCCESS"
-    );
+    await sendVerificationEmail(user.email, user.full_name, verificationToken);
 
     res.status(201).json({
-      message: "Registration successful. Please check your email to verify your account before logging in.",
-      token,
-      user,
+      message:
+        "Registration successful. Please check your email to verify your account before logging in.",
     });
   } catch (error) {
     console.error("Register error:", error);
     res.status(500).json({ message: "Registration failed" });
+  }
+});
+
+app.get("/api/auth/verify-email", async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({ message: "Verification token is required" });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE users
+      SET email_verified = true, verification_token = NULL
+      WHERE verification_token = $1
+      RETURNING id, full_name, email, role, email_verified
+      `,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({ message: "Invalid or expired verification link" });
+    }
+
+    res.json({ message: "Email verified successfully" });
+  } catch (error) {
+    console.error("Verify email error:", error);
+    res.status(500).json({ message: "Email verification failed" });
   }
 });
 
@@ -270,31 +277,21 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
       });
     }
 
-    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
 
     if (result.rows.length === 0) {
-      return res.status(401).json({
-        message: "Invalid email or password",
-      });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     const user = result.rows[0];
 
-    if (!user.password_hash) {
-      return res.status(400).json({
-        message:
-          "This user does not have a password yet. Please register a new account.",
-      });
-    }
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
 
-    const passwordMatches = await bcrypt.compare(password, user.password_hash);
-
-    if (!passwordMatches) {
-      return res.status(401).json({
-        message: "Invalid email or password",
-      });
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     if (!user.email_verified) {
@@ -313,6 +310,8 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
         full_name: user.full_name,
         email: user.email,
         role: user.role,
+        email_verified: user.email_verified,
+        created_at: user.created_at,
       },
     });
   } catch (error) {
