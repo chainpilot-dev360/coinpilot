@@ -8,6 +8,8 @@ function AdminPanel({ token }) {
   const [deposits, setDeposits] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
   const [users, setUsers] = useState([]);
+  const [adminLogs, setAdminLogs] = useState([]);
+
   const [selectedUserData, setSelectedUserData] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
@@ -37,10 +39,15 @@ function AdminPanel({ token }) {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      const logsRes = await axios.get(`${API_URL}/api/admin/logs`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       setAnalytics(analyticsRes.data);
       setDeposits(pendingRes.data.deposits || []);
       setWithdrawals(pendingRes.data.withdrawals || []);
       setUsers(usersRes.data || []);
+      setAdminLogs(logsRes.data || []);
       setMessage("");
     } catch (error) {
       setMessage(error.response?.data?.message || "Failed to load admin data");
@@ -377,8 +384,7 @@ function AdminPanel({ token }) {
 
                     <div>
                       <p style={muted}>
-                        Review the uploaded payment screenshot before approving
-                        this deposit.
+                        Review the uploaded payment screenshot before approving this deposit.
                       </p>
 
                       <a
@@ -399,17 +405,11 @@ function AdminPanel({ token }) {
               </div>
 
               <div style={actionRow}>
-                <button
-                  onClick={() => approveDeposit(deposit.id)}
-                  style={approveButton}
-                >
+                <button onClick={() => approveDeposit(deposit.id)} style={approveButton}>
                   Approve Deposit
                 </button>
 
-                <button
-                  onClick={() => rejectDeposit(deposit.id)}
-                  style={dangerButton}
-                >
+                <button onClick={() => rejectDeposit(deposit.id)} style={dangerButton}>
                   Reject Deposit
                 </button>
               </div>
@@ -437,6 +437,29 @@ function AdminPanel({ token }) {
             <button onClick={() => rejectWithdrawal(withdrawal.id)} style={dangerButton}>
               Reject Withdrawal
             </button>
+          </div>
+        ))
+      )}
+
+      <h3>Admin Activity Log</h3>
+
+      {adminLogs.length === 0 ? (
+        <p>No admin activity yet</p>
+      ) : (
+        adminLogs.map((log) => (
+          <div key={log.id} style={logCard}>
+            <div style={logHeader}>
+              <strong>{log.action}</strong>
+              <span style={logBadge}>{log.target_type || "system"}</span>
+            </div>
+
+            <p>{log.details}</p>
+
+            <small style={muted}>
+              Admin ID: {log.admin_id || "N/A"} • Target ID:{" "}
+              {log.target_id || "N/A"} •{" "}
+              {new Date(log.created_at).toLocaleString()}
+            </small>
           </div>
         ))
       )}
@@ -558,6 +581,30 @@ const actionRow = {
   display: "flex",
   gap: "10px",
   flexWrap: "wrap",
+};
+
+const logCard = {
+  background: "#020617",
+  padding: "14px",
+  borderRadius: "12px",
+  border: "1px solid #334155",
+  marginBottom: "10px",
+};
+
+const logHeader = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: "10px",
+  flexWrap: "wrap",
+};
+
+const logBadge = {
+  background: "#334155",
+  color: "white",
+  padding: "4px 8px",
+  borderRadius: "999px",
+  fontSize: "12px",
 };
 
 const inputStyle = {

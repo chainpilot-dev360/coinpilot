@@ -1333,6 +1333,15 @@ app.delete("/api/admin/users/:id", requireAuth, requireAdmin, async (req, res) =
       return res.status(404).json({ message: "User not found" });
     }
 
+    await logAdminAction(
+      pool,
+      req.user.id,
+      "DELETE_USER",
+      "user",
+      userId,
+      `Deleted user ID ${userId}`
+    );
+
     res.json({
       message: "User account deleted successfully",
       deletedUser: result.rows[0],
@@ -1486,6 +1495,19 @@ app.post(
     }
   }
 );
+
+app.get("/api/admin/logs", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM admin_logs ORDER BY created_at DESC LIMIT 50"
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Admin logs error:", error);
+    res.status(500).json({ message: "Failed to fetch admin logs" });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 
