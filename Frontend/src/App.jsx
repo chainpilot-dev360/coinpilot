@@ -365,30 +365,58 @@ function App() {
 {authMode === "register" && (
   <>
     <select
-      value={country}
-      onChange={(e) => setCountry(e.target.value)}
-      style={input}
-    >
-      <option value="">--Select Country *--</option>
-      <option value="Nigeria">Nigeria</option>
-      <option value="Ghana">Ghana</option>
-      <option value="Kenya">Kenya</option>
-      <option value="South Africa">South Africa</option>
-      <option value="United States">United States</option>
-      <option value="United Kingdom">United Kingdom</option>
-      <option value="Canada">Canada</option>
-    </select>
+  value={country}
+  onChange={(e) => setCountry(e.target.value)}
+  style={input}
+>
+  <option value="">--Select Country *--</option>
+
+  <option value="United States">United States</option>
+  <option value="United Kingdom">United Kingdom</option>
+  <option value="Canada">Canada</option>
+  <option value="Australia">Australia</option>
+  <option value="Germany">Germany</option>
+  <option value="France">France</option>
+  <option value="Netherlands">Netherlands</option>
+  <option value="Switzerland">Switzerland</option>
+
+  <option value="Nigeria">Nigeria</option>
+  <option value="Ghana">Ghana</option>
+  <option value="Kenya">Kenya</option>
+  <option value="South Africa">South Africa</option>
+
+  <option value="India">India</option>
+  <option value="China">China</option>
+  <option value="Japan">Japan</option>
+  <option value="Singapore">Singapore</option>
+
+  <option value="Brazil">Brazil</option>
+  <option value="Mexico">Mexico</option>
+
+  <option value="United Arab Emirates">United Arab Emirates</option>
+  <option value="Saudi Arabia">Saudi Arabia</option>
+</select>
 
     <select
-      value={accountCurrency}
-      onChange={(e) => setAccountCurrency(e.target.value)}
-      style={input}
-    >
-      <option value="USD">United States Dollars</option>
-      <option value="EUR">Euro</option>
-      <option value="GBP">British Pounds</option>
-      <option value="NGN">Nigerian Naira</option>
-    </select>
+  value={accountCurrency}
+  onChange={(e) => setAccountCurrency(e.target.value)}
+  style={input}
+>
+  <option value="USD">USD - United States Dollar</option>
+  <option value="EUR">EUR - Euro</option>
+  <option value="GBP">GBP - British Pound</option>
+  <option value="NGN">NGN - Nigerian Naira</option>
+  <option value="CAD">CAD - Canadian Dollar</option>
+  <option value="AUD">AUD - Australian Dollar</option>
+  <option value="CHF">CHF - Swiss Franc</option>
+  <option value="JPY">JPY - Japanese Yen</option>
+  <option value="CNY">CNY - Chinese Yuan</option>
+  <option value="INR">INR - Indian Rupee</option>
+  <option value="ZAR">ZAR - South African Rand</option>
+  <option value="SGD">SGD - Singapore Dollar</option>
+  <option value="AED">AED - UAE Dirham</option>
+  <option value="SAR">SAR - Saudi Riyal</option>
+</select>
   </>
 )}
 
