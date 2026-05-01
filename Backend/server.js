@@ -197,34 +197,110 @@ app.get("/api/message", (req, res) => {
 
 app.post("/api/auth/register", authLimiter, async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
+    const {
+      username,
+      firstName,
+      lastName,
+      sex,
+      email,
+      country,
+      accountCurrency,
+      password,
+      confirmPassword,
+      referral,
+    } = req.body;
 
-    if (!fullName || !email || !password) {
+    if (
+      !username ||
+      !firstName ||
+      !lastName ||
+      !sex ||
+      !email ||
+      !country ||
+      !accountCurrency ||
+      !password ||
+      !confirmPassword
+    ) {
       return res.status(400).json({
-        message: "Full name, email and password are required",
+        message: "Please fill all required fields",
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        message: "Passwords do not match",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters",
       });
     }
 
     const existingUser = await pool.query(
-      "SELECT id FROM users WHERE email = $1",
-      [email]
+      `
+      SELECT id FROM users
+      WHERE LOWER(email) = LOWER($1)
+         OR LOWER(username) = LOWER($2)
+      `,
+      [email, username]
     );
 
     if (existingUser.rows.length > 0) {
       return res.status(400).json({
-        message: "Email already registered",
+        message: "Email or username already registered",
       });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
+    const fullName = `${firstName} ${lastName}`;
 
     const result = await pool.query(
       `
-      INSERT INTO users (full_name, email, password_hash, role, email_verified, verification_token)
-      VALUES ($1, $2, $3, 'USER', true, NULL)
-      RETURNING id, full_name, email, role, email_verified, created_at
+      INSERT INTO users (
+        username,
+        first_name,
+        last_name,
+        full_name,
+        sex,
+        email,
+        country,
+        account_currency,
+        referral,
+        password_hash,
+        role,
+        email_verified,
+        verification_token
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'USER', true, NULL)
+      RETURNING
+        id,
+        username,
+        first_name,
+        last_name,
+        full_name,
+        sex,
+        email,
+        country,
+        account_currency,
+        referral,
+        role,
+        email_verified,
+        created_at
       `,
-      [fullName, email, passwordHash]
+      [
+        username,
+        firstName,
+        lastName,
+        fullName,
+        sex,
+        email,
+        country,
+        accountCurrency,
+        referral || null,
+        passwordHash,
+      ]
     );
 
     const user = result.rows[0];
@@ -246,6 +322,72 @@ app.post("/api/auth/register", authLimiter, async (req, res) => {
     console.error("Register error:", error);
     res.status(500).json({
       message: "Registration failed",
+    });
+  }
+});
+
+app.post("/api/auth/login", authLimiter, async (req, res) => {
+  try {
+    const { loginId, email, password } = req.body;
+
+    const identifier = loginId || email;
+
+    if (!identifier || !password) {
+      return res.status(400).json({
+        message: "Username/email and password are required",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT * FROM users
+      WHERE LOWER(email) = LOWER($1)
+         OR LOWER(username) = LOWER($1)
+      `,
+      [identifier]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        message: "Invalid username/email or password",
+      });
+    }
+
+    const user = result.rows[0];
+
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        message: "Invalid username/email or password",
+      });
+    }
+
+    const token = createToken(user);
+
+    res.json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        full_name: user.full_name,
+        sex: user.sex,
+        email: user.email,
+        country: user.country,
+        account_currency: user.account_currency,
+        referral: user.referral,
+        role: user.role,
+        email_verified: user.email_verified,
+        created_at: user.created_at,
+      },
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({
+      message: "Login failed",
     });
   }
 });
