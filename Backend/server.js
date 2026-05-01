@@ -1,6 +1,7 @@
 import express from "express";
 import multer from "multer";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cors from "cors";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
@@ -17,15 +18,21 @@ import { logAdminAction } from "./utils/adminLogger.js";
 
 dotenv.config();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueName);
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "chainpilot_uploads",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
   },
 });
+
+const upload = multer({ storage });
 
 const upload = multer({ storage });
 
@@ -1639,7 +1646,7 @@ app.post(
       let proofUrl = null;
 
       if (req.file) {
-        proofUrl = `/uploads/${req.file.filename}`;
+        proofUrl = req.file.path;
       }
 
       const result = await pool.query(
@@ -1741,7 +1748,7 @@ app.post("/api/kyc/submit", requireAuth, upload.single("document"), async (req, 
 let documentUrl = null;
 
 if (req.file) {
-  documentUrl = `/uploads/${req.file.filename}`;
+  documentUrl = req.file.path;
 }
 
     if (!fullName || !country || !idType || !idNumber) {
