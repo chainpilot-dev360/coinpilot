@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import KycPanel from "./KycPanel";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -511,7 +512,7 @@ function DashboardPreview({ token, user }) {
           </ResponsiveContainer>
         </div>
       )}
-
+      <KycPanel token={token} user={user} />
       <h3>Your Wallet</h3>
       {data.balances.length === 0 ? (
         <EmptyState
