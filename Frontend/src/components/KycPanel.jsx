@@ -9,7 +9,8 @@ function KycPanel({ token, user }) {
   const [country, setCountry] = useState(user?.country || "");
   const [idType, setIdType] = useState("");
   const [idNumber, setIdNumber] = useState("");
-  const [documentUrl, setDocumentUrl] = useState("");
+  const [documentFile, setDocumentFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -21,19 +22,44 @@ function KycPanel({ token, user }) {
       const res = await axios.get(`${API_URL}/api/kyc/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setKyc(res.data);
     } catch {
       setMessage("Failed to load KYC status");
     }
   }
 
+  function handleDocumentChange(e) {
+    const file = e.target.files[0];
+
+    setDocumentFile(file);
+
+    if (file) {
+      setPreviewUrl(URL.createObjectURL(file));
+    } else {
+      setPreviewUrl("");
+    }
+  }
+
   async function submitKyc() {
     try {
-      const res = await axios.post(
-        `${API_URL}/api/kyc/submit`,
-        { fullName, country, idType, idNumber, documentUrl },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const formData = new FormData();
+
+      formData.append("fullName", fullName);
+      formData.append("country", country);
+      formData.append("idType", idType);
+      formData.append("idNumber", idNumber);
+
+      if (documentFile) {
+        formData.append("document", documentFile);
+      }
+
+      const res = await axios.post(`${API_URL}/api/kyc/submit`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       setMessage(res.data.message);
       loadKyc();
@@ -42,9 +68,16 @@ function KycPanel({ token, user }) {
     }
   }
 
+  function getDocumentUrl(url) {
+    if (!url) return null;
+    if (url.startsWith("http")) return url;
+    return `${API_URL}${url}`;
+  }
+
   if (kyc) {
     const approved = kyc.status === "APPROVED";
     const rejected = kyc.status === "REJECTED";
+    const documentLink = getDocumentUrl(kyc.document_url);
 
     return (
       <div style={card}>
@@ -71,6 +104,27 @@ function KycPanel({ token, user }) {
           <Info label="ID Type" value={kyc.id_type} />
           <Info label="ID Number" value={kyc.id_number} />
         </div>
+
+        {documentLink && (
+          <div style={documentBox}>
+            <strong>Submitted Document</strong>
+
+            <a
+              href={documentLink}
+              target="_blank"
+              rel="noreferrer"
+              style={documentLinkStyle}
+            >
+              Open Document
+            </a>
+
+            <img
+              src={documentLink}
+              alt="KYC document"
+              style={submittedImage}
+            />
+          </div>
+        )}
 
         {kyc.admin_note && (
           <div style={noteBox}>
@@ -109,7 +163,11 @@ function KycPanel({ token, user }) {
         style={input}
       />
 
-      <select value={idType} onChange={(e) => setIdType(e.target.value)} style={input}>
+      <select
+        value={idType}
+        onChange={(e) => setIdType(e.target.value)}
+        style={input}
+      >
         <option value="">-- Select ID Type * --</option>
         <option value="Passport">Passport</option>
         <option value="National ID">National ID</option>
@@ -124,12 +182,21 @@ function KycPanel({ token, user }) {
         style={input}
       />
 
+      <label style={uploadLabel}>Upload ID Document *</label>
+
       <input
-        placeholder="Document URL / uploaded file link"
-        value={documentUrl}
-        onChange={(e) => setDocumentUrl(e.target.value)}
-        style={input}
+        type="file"
+        accept="image/*"
+        onChange={handleDocumentChange}
+        style={{ marginBottom: "12px", color: "white" }}
       />
+
+      {previewUrl && (
+        <div style={previewBox}>
+          <p style={muted}>Document Preview:</p>
+          <img src={previewUrl} alt="Document preview" style={submittedImage} />
+        </div>
+      )}
 
       <button onClick={submitKyc} style={button}>
         Submit KYC for Review
@@ -202,6 +269,32 @@ const infoBox = {
   border: "1px solid #334155",
 };
 
+const documentBox = {
+  background: "#020617",
+  padding: "12px",
+  borderRadius: "12px",
+  border: "1px solid #334155",
+  marginTop: "14px",
+};
+
+const documentLinkStyle = {
+  display: "inline-block",
+  marginTop: "10px",
+  marginBottom: "10px",
+  color: "#38bdf8",
+  textDecoration: "none",
+};
+
+const submittedImage = {
+  display: "block",
+  width: "100%",
+  maxWidth: "320px",
+  maxHeight: "240px",
+  objectFit: "cover",
+  borderRadius: "12px",
+  border: "1px solid #334155",
+};
+
 const noteBox = {
   background: "#020617",
   padding: "12px",
@@ -220,6 +313,16 @@ const input = {
   border: "1px solid #334155",
   background: "#020617",
   color: "white",
+};
+
+const uploadLabel = {
+  display: "block",
+  color: "#cbd5e1",
+  marginBottom: "8px",
+};
+
+const previewBox = {
+  marginBottom: "14px",
 };
 
 const button = {
