@@ -34,13 +34,10 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
-const upload = multer({ storage });
-
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
