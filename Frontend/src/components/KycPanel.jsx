@@ -43,26 +43,71 @@ function KycPanel({ token, user }) {
   }
 
   if (kyc) {
+    const approved = kyc.status === "APPROVED";
+    const rejected = kyc.status === "REJECTED";
+
     return (
       <div style={card}>
-        <h3>KYC Verification</h3>
-        <p><strong>Status:</strong> <span style={badge(kyc.status)}>{kyc.status}</span></p>
-        <p><strong>Full Name:</strong> {kyc.full_name}</p>
-        <p><strong>Country:</strong> {kyc.country}</p>
-        <p><strong>ID Type:</strong> {kyc.id_type}</p>
-        <p><strong>ID Number:</strong> {kyc.id_number}</p>
-        {kyc.admin_note && <p><strong>Admin Note:</strong> {kyc.admin_note}</p>}
+        <div style={headerRow}>
+          <div>
+            <h3 style={{ marginBottom: 4 }}>Identity Verification</h3>
+            <p style={muted}>
+              {approved
+                ? "Your account is verified. Withdrawals are unlocked."
+                : rejected
+                ? "Your KYC was rejected. Please contact support or resubmit when enabled."
+                : "Your KYC is under review. Withdrawals remain locked until approval."}
+            </p>
+          </div>
+
+          <span style={badge(kyc.status)}>
+            {approved ? "✅ Approved" : rejected ? "❌ Rejected" : "⏳ Pending"}
+          </span>
+        </div>
+
+        <div style={infoGrid}>
+          <Info label="Full Name" value={kyc.full_name} />
+          <Info label="Country" value={kyc.country} />
+          <Info label="ID Type" value={kyc.id_type} />
+          <Info label="ID Number" value={kyc.id_number} />
+        </div>
+
+        {kyc.admin_note && (
+          <div style={noteBox}>
+            <strong>Admin Note</strong>
+            <p>{kyc.admin_note}</p>
+          </div>
+        )}
       </div>
     );
   }
 
   return (
     <div style={card}>
-      <h3>KYC Verification</h3>
-      <p style={muted}>Submit your identity details for account verification.</p>
+      <div style={headerRow}>
+        <div>
+          <h3 style={{ marginBottom: 4 }}>Identity Verification</h3>
+          <p style={muted}>
+            Complete KYC to unlock withdrawals and improve account trust.
+          </p>
+        </div>
 
-      <input placeholder="Full Name *" value={fullName} onChange={(e) => setFullName(e.target.value)} style={input} />
-      <input placeholder="Country *" value={country} onChange={(e) => setCountry(e.target.value)} style={input} />
+        <span style={badge("NOT_SUBMITTED")}>Not Submitted</span>
+      </div>
+
+      <input
+        placeholder="Full Name *"
+        value={fullName}
+        onChange={(e) => setFullName(e.target.value)}
+        style={input}
+      />
+
+      <input
+        placeholder="Country *"
+        value={country}
+        onChange={(e) => setCountry(e.target.value)}
+        style={input}
+      />
 
       <select value={idType} onChange={(e) => setIdType(e.target.value)} style={input}>
         <option value="">-- Select ID Type * --</option>
@@ -72,31 +117,97 @@ function KycPanel({ token, user }) {
         <option value="Voter Card">Voter Card</option>
       </select>
 
-      <input placeholder="ID Number *" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} style={input} />
-      <input placeholder="Document URL / uploaded file link" value={documentUrl} onChange={(e) => setDocumentUrl(e.target.value)} style={input} />
+      <input
+        placeholder="ID Number *"
+        value={idNumber}
+        onChange={(e) => setIdNumber(e.target.value)}
+        style={input}
+      />
 
-      <button onClick={submitKyc} style={button}>Submit KYC</button>
+      <input
+        placeholder="Document URL / uploaded file link"
+        value={documentUrl}
+        onChange={(e) => setDocumentUrl(e.target.value)}
+        style={input}
+      />
+
+      <button onClick={submitKyc} style={button}>
+        Submit KYC for Review
+      </button>
 
       {message && <p style={muted}>{message}</p>}
     </div>
   );
 }
 
-const badge = (status) => ({
-  background: status === "APPROVED" ? "#16a34a" : status === "REJECTED" ? "#dc2626" : "#ca8a04",
-  color: "white",
-  padding: "5px 10px",
-  borderRadius: "999px",
-  fontSize: "12px",
-  fontWeight: "bold",
-});
+function Info({ label, value }) {
+  return (
+    <div style={infoBox}>
+      <small>{label}</small>
+      <strong>{value || "N/A"}</strong>
+    </div>
+  );
+}
+
+const badge = (status) => {
+  const clean = String(status || "").toUpperCase();
+
+  const background =
+    clean === "APPROVED"
+      ? "#16a34a"
+      : clean === "REJECTED"
+      ? "#dc2626"
+      : clean === "PENDING"
+      ? "#ca8a04"
+      : "#334155";
+
+  return {
+    background,
+    color: "white",
+    padding: "7px 11px",
+    borderRadius: "999px",
+    fontSize: "12px",
+    fontWeight: "bold",
+    whiteSpace: "nowrap",
+  };
+};
 
 const card = {
-  background: "rgba(30, 41, 59, 0.65)",
-  padding: "16px",
-  borderRadius: "14px",
-  marginBottom: "18px",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: "linear-gradient(135deg, rgba(30,41,59,0.85), rgba(2,6,23,0.9))",
+  padding: "18px",
+  borderRadius: "16px",
+  marginBottom: "22px",
+  border: "1px solid rgba(255,255,255,0.1)",
+};
+
+const headerRow = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "14px",
+  alignItems: "flex-start",
+  flexWrap: "wrap",
+  marginBottom: "16px",
+};
+
+const infoGrid = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+  gap: "12px",
+};
+
+const infoBox = {
+  background: "#020617",
+  padding: "12px",
+  borderRadius: "12px",
+  border: "1px solid #334155",
+};
+
+const noteBox = {
+  background: "#020617",
+  padding: "12px",
+  borderRadius: "12px",
+  border: "1px solid #334155",
+  marginTop: "14px",
 };
 
 const input = {
