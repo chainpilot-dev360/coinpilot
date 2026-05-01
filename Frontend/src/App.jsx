@@ -18,9 +18,18 @@ function App() {
   const [authMode, setAuthMode] = useState("login");
   const [showAuth, setShowAuth] = useState(false);
 
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [sex, setSex] = useState("");
   const [email, setEmail] = useState("");
+  const [country, setCountry] = useState("");
+  const [accountCurrency, setAccountCurrency] = useState("USD");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [referral, setReferral] = useState("");
+  const [loginId, setLoginId] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [user, setUser] = useState(null);
@@ -102,15 +111,21 @@ function App() {
   async function register() {
   try {
     const res = await axios.post(`${API_URL}/api/auth/register`, {
-      fullName: name,
+      username,
+      firstName,
+      lastName,
+      sex,
       email,
+      country,
+      accountCurrency,
       password,
+      confirmPassword,
+      referral,
     });
 
-    showNotification(res.data.message || "Registration successful. Please verify your email.", "success");
-
-    setAuthMode("login");
-    setPassword("");
+    localStorage.setItem("token", res.data.token);
+    setToken(res.data.token);
+    showNotification("Registration successful", "success");
   } catch (error) {
     showNotification(
       error.response?.data?.message || "Registration failed",
@@ -120,19 +135,19 @@ function App() {
 }
 
   async function login() {
-    try {
-      const res = await axios.post(`${API_URL}/api/auth/login`, {
-        email,
-        password,
-      });
+  try {
+    const res = await axios.post(`${API_URL}/api/auth/login`, {
+      loginId,
+      password,
+    });
 
-      localStorage.setItem("token", res.data.token);
-      setToken(res.data.token);
-      showNotification("Login successful", "success");
-    } catch (error) {
-      showNotification(error.response?.data?.message || "Login failed", "error");
-    }
+    localStorage.setItem("token", res.data.token);
+    setToken(res.data.token);
+    showNotification("Login successful", "success");
+  } catch (error) {
+    showNotification(error.response?.data?.message || "Login failed", "error");
   }
+}
 
   function logout() {
     localStorage.removeItem("token");
@@ -302,28 +317,107 @@ function App() {
           </div>
 
           {authMode === "register" && (
-            <input
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={input}
-            />
-          )}
+  <>
+    <input
+      placeholder="Username *"
+      value={username}
+      onChange={(e) => setUsername(e.target.value)}
+      style={input}
+    />
 
-          <input
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={input}
-          />
+    <input
+      placeholder="First Name *"
+      value={firstName}
+      onChange={(e) => setFirstName(e.target.value)}
+      style={input}
+    />
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={input}
-          />
+    <input
+      placeholder="Last Name *"
+      value={lastName}
+      onChange={(e) => setLastName(e.target.value)}
+      style={input}
+    />
+
+    <select
+      value={sex}
+      onChange={(e) => setSex(e.target.value)}
+      style={input}
+    >
+      <option value="">--Select Sex *--</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+  </>
+)}
+
+<input
+  placeholder={authMode === "login" ? "Username or Email *" : "Email *"}
+  value={authMode === "login" ? loginId : email}
+  onChange={(e) =>
+    authMode === "login"
+      ? setLoginId(e.target.value)
+      : setEmail(e.target.value)
+  }
+  style={input}
+/>
+
+{authMode === "register" && (
+  <>
+    <select
+      value={country}
+      onChange={(e) => setCountry(e.target.value)}
+      style={input}
+    >
+      <option value="">--Select Country *--</option>
+      <option value="Nigeria">Nigeria</option>
+      <option value="Ghana">Ghana</option>
+      <option value="Kenya">Kenya</option>
+      <option value="South Africa">South Africa</option>
+      <option value="United States">United States</option>
+      <option value="United Kingdom">United Kingdom</option>
+      <option value="Canada">Canada</option>
+    </select>
+
+    <select
+      value={accountCurrency}
+      onChange={(e) => setAccountCurrency(e.target.value)}
+      style={input}
+    >
+      <option value="USD">United States Dollars</option>
+      <option value="EUR">Euro</option>
+      <option value="GBP">British Pounds</option>
+      <option value="NGN">Nigerian Naira</option>
+    </select>
+  </>
+)}
+
+<input
+  type="password"
+  placeholder="Password *"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  style={input}
+/>
+
+{authMode === "register" && (
+  <>
+    <input
+      type="password"
+      placeholder="Confirm Password *"
+      value={confirmPassword}
+      onChange={(e) => setConfirmPassword(e.target.value)}
+      style={input}
+    />
+
+    <input
+      placeholder="Referral Username or Email Address"
+      value={referral}
+      onChange={(e) => setReferral(e.target.value)}
+      style={input}
+    />
+  </>
+)}
 
 {authMode === "login" ? (
   <>
