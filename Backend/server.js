@@ -200,7 +200,9 @@ app.post("/api/auth/register", authLimiter, async (req, res) => {
     const { fullName, email, password } = req.body;
 
     if (!fullName || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res.status(400).json({
+        message: "Full name, email and password are required",
+      });
     }
 
     const existingUser = await pool.query(
@@ -209,32 +211,42 @@ app.post("/api/auth/register", authLimiter, async (req, res) => {
     );
 
     if (existingUser.rows.length > 0) {
-      return res.status(400).json({ message: "Email already registered" });
+      return res.status(400).json({
+        message: "Email already registered",
+      });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const verificationToken = crypto.randomBytes(32).toString("hex");
 
     const result = await pool.query(
       `
       INSERT INTO users (full_name, email, password_hash, role, email_verified, verification_token)
-      VALUES ($1, $2, $3, 'USER', false, $4)
+      VALUES ($1, $2, $3, 'USER', true, NULL)
       RETURNING id, full_name, email, role, email_verified, created_at
       `,
-      [fullName, email, passwordHash, verificationToken]
+      [fullName, email, passwordHash]
     );
 
     const user = result.rows[0];
+    const token = createToken(user);
 
-    await sendVerificationEmail(user.email, user.full_name, verificationToken);
+    await createNotification(
+      user.id,
+      "Welcome to ChainPilot",
+      "Your ChainPilot account has been created successfully.",
+      "SUCCESS"
+    );
 
     res.status(201).json({
-      message:
-        "Registration successful. Please check your email to verify your account before logging in.",
+      message: "Registration successful",
+      token,
+      user,
     });
   } catch (error) {
     console.error("Register error:", error);
-    res.status(500).json({ message: "Registration failed" });
+    res.status(500).json({
+      message: "Registration failed",
+    });
   }
 });
 
@@ -292,12 +304,6 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
 
     if (!passwordMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
-    }
-
-    if (!user.email_verified) {
-      return res.status(403).json({
-        message: "Please verify your email before logging in.",
-      });
     }
 
     const token = createToken(user);
