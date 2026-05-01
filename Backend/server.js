@@ -1720,6 +1720,111 @@ app.post("/api/auth/change-password", requireAuth, async (req, res) => {
   }
 });
 
+// Submit KYC
+app.post("/api/kyc/submit", requireAuth, async (req, res) => {
+  try {
+    const { fullName, country, idType, idNumber, documentUrl } = req.body;
+
+    if (!fullName || !country || !idType || !idNumber) {
+      return res.status(400).json({
+        message: "All required fields must be filled",
+      });
+    }
+
+    const existing = await pool.query(
+      "SELECT id FROM kyc_requests WHERE user_id = $1",
+      [req.user.userId]
+    );
+
+    if (existing.rows.length > 0) {
+      return res.status(400).json({
+        message: "KYC already submitted",
+      });
+    }
+
+    await pool.query(
+      `
+      INSERT INTO kyc_requests (user_id, full_name, country, id_type, id_number, document_url)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      `,
+      [
+        req.user.userId,
+        fullName,
+        country,
+        idType,
+        idNumber,
+        documentUrl || null,
+      ]
+    );
+
+    res.json({ message: "KYC submitted successfully" });
+  } catch (error) {
+    console.error("KYC submit error:", error);
+    res.status(500).json({ message: "Failed to submit KYC" });
+  }
+});
+
+// Get user KYC
+app.get("/api/kyc/me", requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM kyc_requests WHERE user_id = $1",
+      [req.user.userId]
+    );
+
+    res.json(result.rows[0] || null);
+  } catch (error) {
+    console.error("Fetch KYC error:", error);
+    res.status(500).json({ message: "Failed to fetch KYC" });
+  }
+});
+
+// Admin: get all KYC
+app.get("/api/admin/kyc", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT k.*, u.email
+      FROM kyc_requests k
+      JOIN users u ON u.id = k.user_id
+      ORDER BY k.created_at DESC
+      `
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Admin KYC fetch error:", error);
+    res.status(500).json({ message: "Failed to fetch KYC list" });
+  }
+});
+
+// Admin: update KYC status
+app.post("/api/admin/kyc/update", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { id, status, adminNote } = req.body;
+
+    if (!id || !status) {
+      return res.status(400).json({
+        message: "ID and status are required",
+      });
+    }
+
+    await pool.query(
+      `
+      UPDATE kyc_requests
+      SET status = $1, admin_note = $2, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $3
+      `,
+      [status, adminNote || null, id]
+    );
+
+    res.json({ message: "KYC status updated" });
+  } catch (error) {
+    console.error("KYC update error:", error);
+    res.status(500).json({ message: "Failed to update KYC" });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
