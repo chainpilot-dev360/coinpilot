@@ -19,8 +19,11 @@ function AdminPanel({ token }) {
   const [balanceAmount, setBalanceAmount] = useState("");
   const [balanceReason, setBalanceReason] = useState("");
 
+  const [kycList, setKycList] = useState([]);
+
   useEffect(() => {
     loadData();
+    loadKyc();
   }, [token]);
 
   async function loadData() {
@@ -203,6 +206,32 @@ function AdminPanel({ token }) {
     }
   }
 
+  async function loadKyc() {
+  try {
+    const res = await axios.get(`${API_URL}/api/admin/kyc`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setKycList(res.data);
+  } catch {
+    alert("Failed to load KYC");
+  }
+}
+
+async function updateKyc(id, status) {
+  try {
+    await axios.post(
+      `${API_URL}/api/admin/kyc/update`,
+      { id, status },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    alert("KYC updated");
+    loadKyc();
+  } catch {
+    alert("Failed to update KYC");
+  }
+}
+
   const filteredUsers = users.filter((user) => {
     const name = user.full_name || "";
     const email = user.email || "";
@@ -345,6 +374,58 @@ function AdminPanel({ token }) {
           )}
         </div>
       )}
+
+      <h3>KYC Requests</h3>
+
+<div style={cardStyle}>
+  {kycList.length === 0 ? (
+    <p>No KYC requests</p>
+  ) : (
+    kycList.map((k) => (
+      <div key={k.id} style={kycRow}>
+        <div>
+          <p>
+            <strong>{k.full_name}</strong> ({k.email})
+          </p>
+          <p>
+            <strong>Country:</strong> {k.country}
+          </p>
+          <p>
+            <strong>ID Type:</strong> {k.id_type}
+          </p>
+          <p>
+            <strong>ID Number:</strong> {k.id_number}
+          </p>
+          <p>
+            <strong>Status:</strong> {k.status}
+          </p>
+
+          {k.document_url && (
+            <a href={k.document_url} target="_blank" rel="noreferrer">
+              View Document
+            </a>
+          )}
+        </div>
+
+        <div>
+          <button
+            onClick={() => updateKyc(k.id, "APPROVED")}
+            style={approveButton}
+          >
+            Approve
+          </button>
+
+          <button
+            onClick={() => updateKyc(k.id, "REJECTED")}
+            style={dangerButton}
+          >
+            Reject
+          </button>
+        </div>
+      </div>
+    ))
+  )}
+</div>
 
       <h3>Pending Deposits</h3>
 
@@ -659,6 +740,15 @@ const mutedSmall = {
   color: "#94a3b8",
   fontSize: "14px",
   margin: 0,
+};
+
+const kycRow = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "12px",
+  padding: "14px",
+  borderBottom: "1px solid #334155",
+  flexWrap: "wrap",
 };
 
 export default AdminPanel;
