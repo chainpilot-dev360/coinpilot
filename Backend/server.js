@@ -1734,9 +1734,15 @@ app.post("/api/auth/change-password", requireAuth, async (req, res) => {
 });
 
 // Submit KYC
-app.post("/api/kyc/submit", requireAuth, async (req, res) => {
+app.post("/api/kyc/submit", requireAuth, upload.single("document"), async (req, res) => {
   try {
-    const { fullName, country, idType, idNumber, documentUrl } = req.body;
+    const { fullName, country, idType, idNumber } = req.body;
+
+let documentUrl = null;
+
+if (req.file) {
+  documentUrl = `/uploads/${req.file.filename}`;
+}
 
     if (!fullName || !country || !idType || !idNumber) {
       return res.status(400).json({
