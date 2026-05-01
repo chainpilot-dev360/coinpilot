@@ -255,11 +255,40 @@ function DashboardPreview({ token, user }) {
   }
 
   async function submitDeposit() {
-    if (!depositAmount || !depositCurrency) {
-      alert("Enter amount and currency");
-      return;
+  if (!depositAmount || !depositCurrency) {
+    alert("Enter amount and currency");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+
+    formData.append("currency", depositCurrency);
+    formData.append("amount", depositAmount);
+
+    if (depositFile) {
+      formData.append("proof", depositFile);
     }
 
+    await axios.post(`${API_URL}/api/deposits`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    alert("Deposit submitted successfully");
+
+    setDepositAmount("");
+    setDepositFile(null);
+    setPreviewImage("");
+
+    loadTransactionHistory();
+    loadDashboard();
+  } catch (error) {
+    alert(error.response?.data?.message || "Failed to create deposit request");
+  }
+}
     async function changePassword() {
       if (!currentPassword || !newPassword || !confirmPassword) {
         alert("All fields are required");
