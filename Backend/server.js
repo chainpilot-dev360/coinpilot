@@ -1751,15 +1751,53 @@ if (req.file) {
     }
 
     const existing = await pool.query(
-      "SELECT id FROM kyc_requests WHERE user_id = $1",
-      [req.user.userId]
+  "SELECT id, status FROM kyc_requests WHERE user_id = $1",
+  [req.user.userId]
+);
+
+if (existing.rows.length > 0) {
+  const current = existing.rows[0];
+
+  if (current.status === "PENDING") {
+    return res.status(400).json({
+      message: "Your KYC is still under review.",
+    });
+  }
+
+  if (current.status === "APPROVED") {
+    return res.status(400).json({
+      message: "Your account is already verified.",
+    });
+  }
+
+  // If REJECTED → allow resubmission by updating
+  if (current.status === "REJECTED") {
+    await pool.query(
+      `
+      UPDATE kyc_requests
+      SET full_name = $1,
+          country = $2,
+          id_type = $3,
+          id_number = $4,
+          document_url = $5,
+          status = 'PENDING',
+          admin_note = NULL,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE user_id = $6
+      `,
+      [
+        fullName,
+        country,
+        idType,
+        idNumber,
+        documentUrl,
+        req.user.userId,
+      ]
     );
 
-    if (existing.rows.length > 0) {
-      return res.status(400).json({
-        message: "KYC already submitted",
-      });
-    }
+    return res.json({ message: "KYC resubmitted successfully" });
+  }
+}
 
     await pool.query(
       `
