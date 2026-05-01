@@ -594,7 +594,8 @@ app.get("/api/users/:id/deposits-withdrawals", requireAuth, async (req, res) => 
 
 app.post("/api/deposits", requireAuth, upload.single("proof"), async (req, res) => {
   try {
-    const { currency, amount } = req.body;
+    const currency = req.body?.currency;
+    const amount = req.body?.amount;
     const userId = req.user.userId;
     const numericAmount = Number(amount);
 
