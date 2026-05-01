@@ -12,6 +12,7 @@ function KycPanel({ token, user }) {
   const [documentFile, setDocumentFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [message, setMessage] = useState("");
+  const [resubmitting, setResubmitting] = useState(false);
 
   useEffect(() => {
     loadKyc();
@@ -24,6 +25,13 @@ function KycPanel({ token, user }) {
       });
 
       setKyc(res.data);
+
+      if (res.data?.status === "REJECTED") {
+        setFullName(res.data.full_name || user?.full_name || "");
+        setCountry(res.data.country || user?.country || "");
+        setIdType(res.data.id_type || "");
+        setIdNumber(res.data.id_number || "");
+      }
     } catch {
       setMessage("Failed to load KYC status");
     }
@@ -31,7 +39,6 @@ function KycPanel({ token, user }) {
 
   function handleDocumentChange(e) {
     const file = e.target.files[0];
-
     setDocumentFile(file);
 
     if (file) {
@@ -62,6 +69,9 @@ function KycPanel({ token, user }) {
       });
 
       setMessage(res.data.message);
+      setResubmitting(false);
+      setDocumentFile(null);
+      setPreviewUrl("");
       loadKyc();
     } catch (error) {
       setMessage(error.response?.data?.message || "KYC submission failed");
@@ -74,9 +84,73 @@ function KycPanel({ token, user }) {
     return `${API_URL}${url}`;
   }
 
+  function renderForm(isResubmit = false) {
+    return (
+      <>
+        <input
+          placeholder="Full Name *"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          style={input}
+        />
+
+        <input
+          placeholder="Country *"
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          style={input}
+        />
+
+        <select
+          value={idType}
+          onChange={(e) => setIdType(e.target.value)}
+          style={input}
+        >
+          <option value="">-- Select ID Type * --</option>
+          <option value="Passport">Passport</option>
+          <option value="National ID">National ID</option>
+          <option value="Driver License">Driver License</option>
+          <option value="Voter Card">Voter Card</option>
+        </select>
+
+        <input
+          placeholder="ID Number *"
+          value={idNumber}
+          onChange={(e) => setIdNumber(e.target.value)}
+          style={input}
+        />
+
+        <label style={uploadLabel}>
+          {isResubmit ? "Upload New ID Document *" : "Upload ID Document *"}
+        </label>
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleDocumentChange}
+          style={{ marginBottom: "12px", color: "white" }}
+        />
+
+        {previewUrl && (
+          <div style={previewBox}>
+            <p style={muted}>Document Preview:</p>
+            <img src={previewUrl} alt="Document preview" style={submittedImage} />
+          </div>
+        )}
+
+        <button onClick={submitKyc} style={button}>
+          {isResubmit ? "Resubmit KYC for Review" : "Submit KYC for Review"}
+        </button>
+
+        {message && <p style={muted}>{message}</p>}
+      </>
+    );
+  }
+
   if (kyc) {
     const approved = kyc.status === "APPROVED";
     const rejected = kyc.status === "REJECTED";
+    const pending = kyc.status === "PENDING";
     const documentLink = getDocumentUrl(kyc.document_url);
 
     return (
@@ -88,7 +162,7 @@ function KycPanel({ token, user }) {
               {approved
                 ? "Your account is verified. Withdrawals are unlocked."
                 : rejected
-                ? "Your KYC was rejected. Please contact support or resubmit when enabled."
+                ? "Your KYC was rejected. Please review the note and resubmit."
                 : "Your KYC is under review. Withdrawals remain locked until approval."}
             </p>
           </div>
@@ -118,11 +192,7 @@ function KycPanel({ token, user }) {
               Open Document
             </a>
 
-            <img
-              src={documentLink}
-              alt="KYC document"
-              style={submittedImage}
-            />
+            <img src={documentLink} alt="KYC document" style={submittedImage} />
           </div>
         )}
 
@@ -131,6 +201,29 @@ function KycPanel({ token, user }) {
             <strong>Admin Note</strong>
             <p>{kyc.admin_note}</p>
           </div>
+        )}
+
+        {rejected && !resubmitting && (
+          <button onClick={() => setResubmitting(true)} style={dangerButton}>
+            Resubmit KYC
+          </button>
+        )}
+
+        {rejected && resubmitting && (
+          <div style={resubmitBox}>
+            <h4>Resubmit KYC</h4>
+            <p style={muted}>
+              Upload corrected information and a new document for admin review.
+            </p>
+
+            {renderForm(true)}
+          </div>
+        )}
+
+        {pending && (
+          <p style={warningText}>
+            Withdrawals are locked until your KYC is approved.
+          </p>
         )}
       </div>
     );
@@ -149,60 +242,7 @@ function KycPanel({ token, user }) {
         <span style={badge("NOT_SUBMITTED")}>Not Submitted</span>
       </div>
 
-      <input
-        placeholder="Full Name *"
-        value={fullName}
-        onChange={(e) => setFullName(e.target.value)}
-        style={input}
-      />
-
-      <input
-        placeholder="Country *"
-        value={country}
-        onChange={(e) => setCountry(e.target.value)}
-        style={input}
-      />
-
-      <select
-        value={idType}
-        onChange={(e) => setIdType(e.target.value)}
-        style={input}
-      >
-        <option value="">-- Select ID Type * --</option>
-        <option value="Passport">Passport</option>
-        <option value="National ID">National ID</option>
-        <option value="Driver License">Driver License</option>
-        <option value="Voter Card">Voter Card</option>
-      </select>
-
-      <input
-        placeholder="ID Number *"
-        value={idNumber}
-        onChange={(e) => setIdNumber(e.target.value)}
-        style={input}
-      />
-
-      <label style={uploadLabel}>Upload ID Document *</label>
-
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleDocumentChange}
-        style={{ marginBottom: "12px", color: "white" }}
-      />
-
-      {previewUrl && (
-        <div style={previewBox}>
-          <p style={muted}>Document Preview:</p>
-          <img src={previewUrl} alt="Document preview" style={submittedImage} />
-        </div>
-      )}
-
-      <button onClick={submitKyc} style={button}>
-        Submit KYC for Review
-      </button>
-
-      {message && <p style={muted}>{message}</p>}
+      {renderForm(false)}
     </div>
   );
 }
@@ -303,6 +343,14 @@ const noteBox = {
   marginTop: "14px",
 };
 
+const resubmitBox = {
+  background: "#020617",
+  padding: "14px",
+  borderRadius: "14px",
+  border: "1px solid #334155",
+  marginTop: "16px",
+};
+
 const input = {
   display: "block",
   width: "100%",
@@ -332,6 +380,21 @@ const button = {
   border: "none",
   borderRadius: "10px",
   cursor: "pointer",
+};
+
+const dangerButton = {
+  padding: "12px 16px",
+  background: "#dc2626",
+  color: "white",
+  border: "none",
+  borderRadius: "10px",
+  cursor: "pointer",
+  marginTop: "14px",
+};
+
+const warningText = {
+  color: "#facc15",
+  marginTop: "14px",
 };
 
 const muted = { color: "#94a3b8" };
