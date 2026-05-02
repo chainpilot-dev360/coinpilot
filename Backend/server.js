@@ -665,6 +665,19 @@ if (!kyc.rows.length || kyc.rows[0].status !== "APPROVED") {
       });
     }
 
+    const balanceResult = await pool.query(
+      "SELECT available FROM balances WHERE user_id = $1 AND currency = $2",
+      [req.user.userId, currency]
+    );
+
+    const availableBalance = Number(balanceResult.rows[0]?.available || 0);
+
+    if (Number(amount) > availableBalance) {
+      return res.status(400).json({
+        message: "Insufficient balance for this withdrawal",
+      });
+    }
+
     const result = await pool.query(
       `
       INSERT INTO withdrawals (user_id, currency, amount, wallet_address, status)
