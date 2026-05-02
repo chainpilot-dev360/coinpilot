@@ -665,6 +665,31 @@ if (!kyc.rows.length || kyc.rows[0].status !== "APPROVED") {
       });
     }
 
+    if (numericAmount < 50) {
+      return res.status(400).json({
+        message: "Minimum withdrawal amount is $50",
+      });
+    }
+
+    const dailyTotal = await pool.query(
+      `
+      SELECT COALESCE(SUM(amount), 0) AS total
+      FROM withdrawals
+      WHERE user_id = $1
+      AND status IN ('PENDING', 'APPROVED')
+      AND created_at >= NOW() - INTERVAL '1 day'
+      `,
+      [req.user.userId]
+    );
+
+    const totalWithdrawnToday = Number(dailyTotal.rows[0].total);
+
+    if (totalWithdrawnToday + numericAmount > 5000) {
+      return res.status(400).json({
+        message: "Daily withdrawal limit of $5000 exceeded",
+      });
+    }
+
     const balanceResult = await pool.query(
       "SELECT available FROM balances WHERE user_id = $1 AND currency = $2",
       [req.user.userId, currency]
