@@ -632,6 +632,16 @@ app.post("/api/deposits", requireAuth, upload.single("proof"), async (req, res) 
 
 app.post("/api/withdrawals", requireAuth, async (req, res) => {
   try {
+    const kyc = await pool.query(
+      "SELECT status FROM kyc_requests WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1",
+      [req.user.userId]
+);
+
+if (!kyc.rows.length || kyc.rows[0].status !== "APPROVED") {
+  return res.status(403).json({
+    message: "You must complete KYC verification before making withdrawals",
+  });
+}
     const kycResult = await pool.query(
       "SELECT status FROM kyc_requests WHERE user_id = $1",
       [req.user.userId]
