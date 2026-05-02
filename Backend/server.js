@@ -594,30 +594,29 @@ app.get("/api/users/:id/deposits-withdrawals", requireAuth, async (req, res) => 
 
 app.post("/api/deposits", requireAuth, upload.single("proof"), async (req, res) => {
   try {
-    const currency = req.body?.currency;
-    const amount = req.body?.amount;
+    const currency = req.body?.currency || "USD";
+    const amount = Number(req.body?.amount);
     const userId = req.user.userId;
-    const numericAmount = Number(amount);
 
-    if (!currency || Number.isNaN(numericAmount) || numericAmount <= 0) {
-      return res.status(400).json({
-        message: "Valid currency and amount are required",
-      });
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ message: "Valid deposit amount is required" });
     }
+
+    const proofUrl = req.file?.path || null;
 
     const result = await pool.query(
       `
-      INSERT INTO deposits (user_id, currency, amount, status)
-      VALUES ($1, $2, $3, 'PENDING')
+      INSERT INTO deposits (user_id, currency, amount, status, proof_url)
+      VALUES ($1, $2, $3, 'PENDING', $4)
       RETURNING *
       `,
-      [userId, currency, numericAmount]
+      [userId, currency, amount, proofUrl]
     );
 
     await createNotification(
       userId,
-      "Deposit Request Created",
-      `Your deposit request of ${numericAmount} ${currency} has been submitted.`,
+      "Deposit Request Submitted",
+      `Your deposit request of ${amount} ${currency} has been submitted.`,
       "INFO"
     );
 
@@ -930,17 +929,21 @@ app.post(
         `Approved deposit ID ${depositId}`
       );
 
-      await logAdminAction(
-        pool,
-        req.user.id,
-        "APPROVE_WITHDRAWAL",
-        "withdrawal",
-        withdrawalId,
-        `Approved withdrawal ID ${withdrawalId}`
-      );
+      try {
+        await logAdminAction(
+          pool,
+          req.user.userId,
+          "APPROVE_DEPOSIT",
+          "deposit",
+          depositId,
+          `Approved deposit ID ${depositId}`
+        );
+      } catch (logError) {
+        console.error("Admin log failed after deposit approval:", logError);
+      }
 
       res.json({
-        message: "Deposit approved and balance updated",
+       message: "Deposit approved and balance updated",
         balance: balanceResult.rows[0],
         ledger: ledgerResult.rows[0],
       });
