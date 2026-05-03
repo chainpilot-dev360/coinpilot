@@ -691,7 +691,7 @@ if (!kyc.rows.length || kyc.rows[0].status !== "APPROVED") {
     }
 
     const balanceResult = await pool.query(
-      "SELECT amount FROM account_balances WHERE user_id = $1 AND currency = $2",
+      "SELECT available FROM account_balances WHERE user_id = $1 AND currency = $2",
       [req.user.userId, currency]
     );
 
@@ -1093,7 +1093,7 @@ app.post(
       await client.query(
         `
         UPDATE account_balances
-        SET amount = amount - $1
+        SET available = available - $1
         WHERE user_id = $2 AND currency = $3
         `,
         [withdrawal.amount, withdrawal.user_id, withdrawal.currency]
