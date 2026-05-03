@@ -691,8 +691,8 @@ if (!kyc.rows.length || kyc.rows[0].status !== "APPROVED") {
     }
 
     const balanceResult = await pool.query(
-      "SELECT balance FROM users WHERE id = $1",
-      [req.user.userId]
+      "SELECT amount FROM account_balances WHERE user_id = $1 AND currency = $2",
+      [req.user.userId, currency]
     );
 
     const availableBalance = Number(balanceResult.rows[0]?.available || 0);
@@ -1090,6 +1090,14 @@ app.post(
       }
 
       const withdrawal = withdrawalResult.rows[0];
+      await client.query(
+        `
+        UPDATE account_balances
+        SET amount = amount - $1
+        WHERE user_id = $2 AND currency = $3
+        `,
+        [withdrawal.amount, withdrawal.user_id, withdrawal.currency]
+      );
 
       if (withdrawal.status !== "PENDING") {
         await client.query("ROLLBACK");
@@ -1097,11 +1105,6 @@ app.post(
           .status(400)
           .json({ message: "Withdrawal has already been processed" });
       }
-
-      await client.query(
-         "UPDATE balances SET available = available - $1 WHERE user_id = $2 AND currency = $3",
-         [withdrawal.amount, withdrawal.user_id, withdrawal.currency]
-      );
 
       const balanceResult = await client.query(
         `
