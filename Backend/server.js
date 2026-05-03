@@ -1090,14 +1090,6 @@ app.post(
       }
 
       const withdrawal = withdrawalResult.rows[0];
-      await client.query(
-        `
-        UPDATE account_balances
-        SET available = available - $1
-        WHERE user_id = $2 AND currency = $3
-        `,
-        [withdrawal.amount, withdrawal.user_id, withdrawal.currency]
-      );
 
       if (withdrawal.status !== "PENDING") {
         await client.query("ROLLBACK");
