@@ -691,8 +691,8 @@ if (!kyc.rows.length || kyc.rows[0].status !== "APPROVED") {
     }
 
     const balanceResult = await pool.query(
-      "SELECT available FROM balances WHERE user_id = $1 AND currency = $2",
-      [req.user.userId, currency]
+      "SELECT balance FROM users WHERE id = $1",
+      [req.user.userId]
     );
 
     const availableBalance = Number(balanceResult.rows[0]?.available || 0);
@@ -1097,6 +1097,11 @@ app.post(
           .status(400)
           .json({ message: "Withdrawal has already been processed" });
       }
+
+      await client.query(
+         "UPDATE balances SET available = available - $1 WHERE user_id = $2 AND currency = $3",
+         [withdrawal.amount, withdrawal.user_id, withdrawal.currency]
+      );
 
       const balanceResult = await client.query(
         `
