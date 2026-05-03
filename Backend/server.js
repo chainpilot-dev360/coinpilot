@@ -396,6 +396,9 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
   }
 });
 
+app.post("/api/auth/forgot-password", async (req, res) => {
+app.post("/api/auth/reset-password/:token", async (req, res) => { 
+
 app.get("/api/auth/verify-email", async (req, res) => {
   try {
     const { token } = req.query;
@@ -670,6 +673,16 @@ if (!kyc.rows.length || kyc.rows[0].status !== "APPROVED") {
         message: "Minimum withdrawal amount is $50",
       });
     }
+
+    await pool.query(
+      `
+      UPDATE account_balances
+      SET available = available - $1,
+          locked = locked + $1
+      WHERE user_id = $2 AND currency = $3
+      `,
+      [numericAmount, userId, currency]
+    );
 
     const dailyTotal = await pool.query(
       `
@@ -1073,6 +1086,7 @@ app.post(
   requireAdmin,
   async (req, res) => {
     const client = await pool.connect();
+    const { reference, admin_note } = req.body;
 
     try {
       const withdrawalId = Number(req.params.id);
@@ -1121,19 +1135,27 @@ app.post(
         return res.status(400).json({ message: "Insufficient balance" });
       }
 
-      await client.query("UPDATE withdrawals SET status = 'APPROVED' WHERE id = $1", [
-        withdrawalId,
-      ]);
+      await client.query(
+        `
+       UPDATE withdrawals
+       SET status = 'APPROVED',
+           reference = $1,
+           admin_note = $2
+       WHERE id = $3
+       `,
+       [reference || null, admin_note || null, withdrawalId]
+      );
 
       const updatedBalance = await client.query(
         `
         UPDATE account_balances
-        SET available = available - $1,
+        SET locked = locked - $1,
             updated_at = CURRENT_TIMESTAMP
         WHERE user_id = $2 AND currency = $3
         RETURNING *
         `,
-        [withdrawal.amount, withdrawal.user_id, withdrawal.currency]
+       [withdrawal.amount, withdrawal.user_id, withdrawal.currency]
+      
       );
 
       const ledgerResult = await client.query(
@@ -1199,6 +1221,16 @@ app.post(
       }
 
       const withdrawal = result.rows[0];
+
+      await client.query(
+        `
+        UPDATE account_balances
+        SET available = available + $1,
+            locked = locked - $1
+        WHERE user_id = $2 AND currency = $3
+        `,
+        [withdrawal.amount, withdrawal.user_id, withdrawal.currency]
+      );
 
       await createNotification(
         withdrawal.user_id,
