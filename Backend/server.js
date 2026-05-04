@@ -766,16 +766,6 @@ if (!kyc.rows.length || kyc.rows[0].status !== "APPROVED") {
       });
     }
 
-    await pool.query(
-      `
-      UPDATE account_balances
-      SET available = available - $1,
-          locked = locked + $1
-      WHERE user_id = $2 AND currency = $3
-      `,
-      [numericAmount, userId, currency]
-    );
-
     const dailyTotal = await pool.query(
       `
       SELECT COALESCE(SUM(amount), 0) AS total
@@ -1258,7 +1248,6 @@ app.post(
         RETURNING *
         `,
        [withdrawal.amount, withdrawal.user_id, withdrawal.currency]
-      
       );
 
       const ledgerResult = await client.query(
