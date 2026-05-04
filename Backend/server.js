@@ -397,7 +397,99 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
 });
 
 app.post("/api/auth/forgot-password", async (req, res) => {
-app.post("/api/auth/reset-password/:token", async (req, res) => { 
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const userResult = await pool.query(
+      "SELECT id, full_name, email FROM users WHERE email = $1",
+      [email]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.json({
+        message: "If this email exists, a reset link has been sent.",
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    const { randomBytes } = await import("crypto");
+    const token = randomBytes(32).toString("hex");
+    const expires = new Date(Date.now() + 30 * 60 * 1000);
+
+    await pool.query(
+      `
+      UPDATE users
+      SET verification_token = $1,
+          verification_token_expires = $2
+      WHERE id = $3
+      `,
+      [token, expires, user.id]
+    );
+
+    try {
+      await sendPasswordResetEmail(user.email, user.full_name, token);
+    } catch (emailError) {
+      console.error("Password reset email failed:", emailError);
+    }
+
+    res.json({
+      message: "If this email exists, a reset link has been sent.",
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ message: "Failed to process password reset request" });
+  }
+});
+
+app.post("/api/auth/reset-password/:token", async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ message: "New password is required" });
+    }
+
+    const userResult = await pool.query(
+      `
+      SELECT id
+      FROM users
+      WHERE verification_token = $1
+      AND verification_token_expires > NOW()
+      `,
+      [token]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(400).json({
+        message: "Invalid or expired reset link",
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    await pool.query(
+      `
+      UPDATE users
+      SET password_hash = $1,
+          verification_token = NULL,
+          verification_token_expires = NULL
+      WHERE id = $2
+      `,
+      [passwordHash, userResult.rows[0].id]
+    );
+
+    res.json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({ message: "Failed to reset password" });
+  }
+}); 
 
 app.get("/api/auth/verify-email", async (req, res) => {
   try {
