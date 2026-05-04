@@ -19,6 +19,9 @@ function AdminPanel({ token }) {
   const [balanceAmount, setBalanceAmount] = useState("");
   const [balanceReason, setBalanceReason] = useState("");
 
+  const [reference, setReference] = useState("");
+  const [adminNote, setAdminNote] = useState("");
+
   const [kycList, setKycList] = useState([]);
 
   useEffect(() => {
@@ -178,11 +181,10 @@ function AdminPanel({ token }) {
 
   async function approveWithdrawal(id) {
     try {
-      await axios.post(
-        `${API_URL}/api/admin/withdrawals/${id}/approve`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.post(`/api/admin/withdrawals/${id}/approve`, {
+        reference,
+        admin_note: adminNote,
+      });
 
       alert("Withdrawal approved");
       loadData();
@@ -514,6 +516,18 @@ async function updateKyc(id, status) {
             <button onClick={() => approveWithdrawal(withdrawal.id)} style={approveButton}>
               Approve Withdrawal
             </button>
+
+            <input
+              placeholder="Transaction Reference"
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+            />
+
+            <textarea
+              placeholder="Admin Note"
+              value={adminNote}
+              onChange={(e) => setAdminNote(e.target.value)}
+            />
 
             <button onClick={() => rejectWithdrawal(withdrawal.id)} style={dangerButton}>
               Reject Withdrawal
