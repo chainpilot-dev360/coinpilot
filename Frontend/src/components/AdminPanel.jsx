@@ -19,8 +19,7 @@ function AdminPanel({ token }) {
   const [balanceAmount, setBalanceAmount] = useState("");
   const [balanceReason, setBalanceReason] = useState("");
 
-  const [reference, setReference] = useState("");
-  const [adminNote, setAdminNote] = useState("");
+  const [inputs, setInputs] = useState({});
 
   const [kycList, setKycList] = useState([]);
 
@@ -182,8 +181,8 @@ function AdminPanel({ token }) {
   async function approveWithdrawal(id) {
     try {
       await axios.post(`/api/admin/withdrawals/${id}/approve`, {
-        reference,
-        admin_note: adminNote,
+        reference: inputs[id]?.reference,
+        admin_note: inputs[id]?.adminNote,
       });
 
       alert("Withdrawal approved");
@@ -513,21 +512,37 @@ async function updateKyc(id, status) {
             <p><strong>Wallet:</strong> {withdrawal.wallet_address}</p>
             <p><strong>Status:</strong> {withdrawal.status}</p>
 
-            <button onClick={() => approveWithdrawal(withdrawal.id)} style={approveButton}>
-              Approve Withdrawal
-            </button>
-
-            <input
-              placeholder="Transaction Reference"
-              value={reference}
-              onChange={(e) => setReference(e.target.value)}
-            />
+           <input
+             placeholder="Transaction Reference"
+             value={inputs[withdrawal.id]?.reference || ""}
+             onChange={(e) =>
+               setInputs({
+                 ...inputs,
+                 [withdrawal.id]: {
+                  ...inputs[withdrawal.id],
+                  reference: e.target.value,
+                 },
+               })
+            }
+        />
 
             <textarea
               placeholder="Admin Note"
-              value={adminNote}
-              onChange={(e) => setAdminNote(e.target.value)}
+              value={inputs[withdrawal.id]?.adminNote || ""}
+              onChange={(e) =>
+                setInputs({
+                  ...inputs,
+                  [withdrawal.id]: {
+                    ...inputs[withdrawal.id],
+                    adminNote: e.target.value,
+                  },
+                })
+               }
             />
+
+            <button onClick={() => approveWithdrawal(withdrawal.id)} style={approveButton}>
+              Approve Withdrawal
+            </button>
 
             <button onClick={() => rejectWithdrawal(withdrawal.id)} style={dangerButton}>
               Reject Withdrawal
