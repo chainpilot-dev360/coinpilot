@@ -3,7 +3,9 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function AdminPanel({ token }) {
+function AdminPanel() {
+  const token = localStorage.getItem("token");
+  
   const [analytics, setAnalytics] = useState(null);
   const [deposits, setDeposits] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
@@ -523,8 +525,8 @@ async function updateKyc(id, status) {
                   reference: e.target.value,
                  },
                })
-            }
-        />
+              }
+           />
 
             <textarea
               placeholder="Admin Note"
