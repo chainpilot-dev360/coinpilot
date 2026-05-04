@@ -1288,59 +1288,62 @@ app.post(
   }
 );
 
-app.post(
-  "/api/admin/withdrawals/:id/reject",
-  requireAuth,
-  requireAdmin,
-  async (req, res) => {
-    try {
-      const withdrawalId = Number(req.params.id);
+app.post("/api/admin/withdrawals/:id/reject", requireAuth, requireAdmin, async (req, res) => {
+  const client = await pool.connect();
 
-      const result = await pool.query(
-        `
-        UPDATE withdrawals
-        SET status = 'REJECTED'
-        WHERE id = $1 AND status = 'PENDING'
-        RETURNING *
-        `,
-        [withdrawalId]
-      );
+  try {
+    const withdrawalId = Number(req.params.id);
 
-      if (result.rows.length === 0) {
-        return res.status(404).json({
-          message: "Pending withdrawal not found",
-        });
-      }
+    await client.query("BEGIN");
 
-      const withdrawal = result.rows[0];
+    const withdrawalResult = await client.query(
+      "SELECT * FROM withdrawals WHERE id = $1 FOR UPDATE",
+      [withdrawalId]
+    );
 
-      await client.query(
-        `
-        UPDATE account_balances
-        SET available = available + $1,
-            locked = locked - $1
-        WHERE user_id = $2 AND currency = $3
-        `,
-        [withdrawal.amount, withdrawal.user_id, withdrawal.currency]
-      );
-
-      await createNotification(
-        withdrawal.user_id,
-        "Withdrawal Rejected",
-        `Your withdrawal of ${withdrawal.amount} ${withdrawal.currency} was rejected.`,
-        "ERROR"
-      );
-
-      res.json({
-        message: "Withdrawal rejected",
-        withdrawal,
-      });
-    } catch (error) {
-      console.error("Reject withdrawal error:", error);
-      res.status(500).json({ message: "Failed to reject withdrawal" });
+    if (withdrawalResult.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ message: "Withdrawal not found" });
     }
+
+    const withdrawal = withdrawalResult.rows[0];
+
+    if (withdrawal.status !== "PENDING") {
+      await client.query("ROLLBACK");
+      return res.status(400).json({
+        message: "Withdrawal already processed",
+      });
+    }
+
+    await client.query(
+      `
+      UPDATE account_balances
+      SET available = available + $1,
+          locked = locked - $1,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE user_id = $2 AND currency = $3
+      `,
+      [withdrawal.amount, withdrawal.user_id, withdrawal.currency]
+    );
+
+    await client.query(
+      "UPDATE withdrawals SET status = 'REJECTED' WHERE id = $1",
+      [withdrawalId]
+    );
+
+    await client.query("COMMIT");
+
+    res.json({
+      message: "Withdrawal rejected and funds returned",
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Reject withdrawal error:", error);
+    res.status(500).json({ message: "Failed to reject withdrawal" });
+  } finally {
+    client.release();
   }
-);
+});
 
 app.get("/api/investment-plans", async (req, res) => {
   try {
