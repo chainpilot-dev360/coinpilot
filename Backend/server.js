@@ -808,6 +808,17 @@ if (!kyc.rows.length || kyc.rows[0].status !== "APPROVED") {
       });
     }
 
+    await pool.query(
+      `
+      UPDATE account_balances
+      SET available = available - $1,
+          locked = locked + $1,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE user_id = $2 AND currency = $3
+      `,
+      [numericAmount, req.user.userId, currency]
+    );
+
     const result = await pool.query(
       `
       INSERT INTO withdrawals (user_id, currency, amount, wallet_address, status)
