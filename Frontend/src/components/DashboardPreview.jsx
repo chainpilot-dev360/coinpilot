@@ -2205,8 +2205,4 @@ const mutedSmall = {
   fontSize: "14px",
 };
 
-export default DashboardPreview;: "#94a3b8",
-  fontSize: "14px",
-};
-
 export default DashboardPreview;
