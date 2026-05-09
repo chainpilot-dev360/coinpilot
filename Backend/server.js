@@ -1223,7 +1223,7 @@ app.post(
 
       const balance = balanceResult.rows[0];
 
-      if (Number(balance.available) < Number(withdrawal.amount)) {
+      if (Number(balance.locked) < Number(withdrawal.amount)) {
         await client.query("ROLLBACK");
         return res.status(400).json({ message: "Insufficient locked balance" });
       }
