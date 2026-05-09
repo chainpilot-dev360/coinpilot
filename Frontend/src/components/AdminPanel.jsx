@@ -181,18 +181,26 @@ function AdminPanel() {
   }
 
   async function approveWithdrawal(id) {
-    try {
-      await axios.post(`/api/admin/withdrawals/${id}/approve`, {
+  try {
+    await axios.post(
+      `${API_URL}/api/admin/withdrawals/${id}/approve`,
+      {
         reference: inputs[id]?.reference,
         admin_note: inputs[id]?.adminNote,
-      });
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      alert("Withdrawal approved");
-      loadData();
-    } catch (error) {
-      alert(error.response?.data?.message || "Error approving withdrawal");
-    }
+    alert("Withdrawal approved");
+    loadData();
+  } catch (error) {
+    alert(error.response?.data?.message || "Error approving withdrawal");
   }
+}
 
   async function rejectWithdrawal(id) {
     try {
