@@ -2067,12 +2067,9 @@ app.post("/api/admin/kyc/update", requireAuth, requireAdmin, async (req, res) =>
 
 const PORT = process.env.PORT || 5000;
 
-app.get("/api/admin/stats", authenticateToken, async (req, res) => {
+app.get("/api/admin/stats", requireAuth, requireAdmin, async (req, res) => {
   try {
-    if (req.user.role !== "ADMIN") {
-      return res.status(403).json({ message: "Access denied" });
-    }
-
+    
     const totalUsers = await pool.query(
       `SELECT COUNT(*) FROM users`
     );
