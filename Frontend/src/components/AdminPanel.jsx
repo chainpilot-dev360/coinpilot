@@ -22,14 +22,38 @@ function AdminPanel() {
   const [balanceReason, setBalanceReason] = useState("");
 
   const [inputs, setInputs] = useState({});
+  const [stats, setStats] = useState(null);
 
   const [kycList, setKycList] = useState([]);
 
   useEffect(() => {
-    loadData();
-    loadKyc();
-  }, [token]);
+  loadData();
+  loadStats();
+  loadKyc();
 
+  const interval = setInterval(() => {
+    loadData();
+    loadStats();
+    loadKyc();
+  }, 30000);
+
+  return () => clearInterval(interval);
+}, [token]);
+
+async function loadStats() {
+  try {
+    const res = await axios.get(`${API_URL}/api/admin/stats`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    setStats(res.data);
+  } catch (error) {
+    console.error("Failed to load stats", error);
+  }
+}
+  
   async function loadData() {
     try {
       setMessage("Loading admin data...");
@@ -265,6 +289,45 @@ async function updateKyc(id, status) {
       </button>
 
       {message && <p>{message}</p>}
+
+      {stats && (
+        <div style={statsGrid}>
+          <div style={statsCard}>
+            <h4>Total Users</h4>
+            <h2>{stats.totalUsers}</h2>
+          </div>
+
+          <div style={statsCard}>
+            <h4>Total Deposits</h4>
+            <h2>${stats.totalDeposits.toFixed(2)}</h2>
+          </div>
+
+         <div style={statsCard}>
+           <h4>Total Withdrawals</h4>
+           <h2>${stats.totalWithdrawals.toFixed(2)}</h2>
+         </div>
+
+         <div style={statsCard}>
+           <h4>Pending Deposits</h4>
+           <h2>{stats.pendingDeposits}</h2>
+         </div>
+
+         <div style={statsCard}>
+           <h4>Pending Withdrawals</h4>
+           <h2>{stats.pendingWithdrawals}</h2>
+         </div>
+
+         <div style={statsCard}>
+           <h4>Active Investments</h4>
+           <h2>{stats.activeInvestments}</h2>
+         </div>
+
+         <div style={statsCard}>
+           <h4>Platform Balance</h4>
+           <h2>${stats.platformBalance.toFixed(2)}</h2>
+         </div>
+       </div>
+     )}
 
       {analytics && (
         <div style={grid}>
@@ -788,6 +851,22 @@ const kycRow = {
   padding: "14px",
   borderBottom: "1px solid #334155",
   flexWrap: "wrap",
+};
+
+const statsGrid = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: "16px",
+  marginBottom: "30px",
+};
+
+const statsCard = {
+  background: "rgba(15,23,42,0.85)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: "16px",
+  padding: "20px",
+  color: "white",
+  boxShadow: "0 12px 35px rgba(0,0,0,0.3)",
 };
 
 export default AdminPanel;
