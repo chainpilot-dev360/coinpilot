@@ -571,9 +571,21 @@ async function changePassword() {
               </p>
             )}
 
-            <small style={muted}>
-              Submitted: {new Date(withdrawal.created_at).toLocaleString()}
-            </small>
+            {withdrawal.reference && (
+              <p>
+                <strong>Reference:</strong> {withdrawal.reference}
+              </p>
+            )}
+
+            {withdrawal.admin_note && (
+             <p>
+               <strong>Admin Note:</strong> {withdrawal.admin_note}
+             </p>
+             )}
+
+             <small style={muted}>
+               Submitted: {new Date(withdrawal.created_at).toLocaleString()}
+             </small>
           </HoverCard>
         ))
       )}
