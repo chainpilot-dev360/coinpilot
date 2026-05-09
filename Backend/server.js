@@ -2067,6 +2067,55 @@ app.post("/api/admin/kyc/update", requireAuth, requireAdmin, async (req, res) =>
 
 const PORT = process.env.PORT || 5000;
 
+app.get("/api/admin/stats", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const totalUsers = await pool.query(
+      `SELECT COUNT(*) FROM users`
+    );
+
+    const totalDeposits = await pool.query(
+      `SELECT COALESCE(SUM(amount),0) AS total FROM deposits WHERE status = 'APPROVED'`
+    );
+
+    const totalWithdrawals = await pool.query(
+      `SELECT COALESCE(SUM(amount),0) AS total FROM withdrawals WHERE status = 'APPROVED'`
+    );
+
+    const pendingDeposits = await pool.query(
+      `SELECT COUNT(*) FROM deposits WHERE status = 'PENDING'`
+    );
+
+    const pendingWithdrawals = await pool.query(
+      `SELECT COUNT(*) FROM withdrawals WHERE status = 'PENDING'`
+    );
+
+    const activeInvestments = await pool.query(
+      `SELECT COUNT(*) FROM investments WHERE status = 'ACTIVE'`
+    );
+
+    const platformBalance = await pool.query(
+      `SELECT COALESCE(SUM(available + locked),0) AS total FROM account_balances`
+    );
+
+    res.json({
+      totalUsers: Number(totalUsers.rows[0].count || 0),
+      totalDeposits: Number(totalDeposits.rows[0].total || 0),
+      totalWithdrawals: Number(totalWithdrawals.rows[0].total || 0),
+      pendingDeposits: Number(pendingDeposits.rows[0].count || 0),
+      pendingWithdrawals: Number(pendingWithdrawals.rows[0].count || 0),
+      activeInvestments: Number(activeInvestments.rows[0].count || 0),
+      platformBalance: Number(platformBalance.rows[0].total || 0),
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to load admin statistics" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://127.0.0.1:${PORT}`);
 });
