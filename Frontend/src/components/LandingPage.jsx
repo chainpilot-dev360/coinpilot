@@ -24,6 +24,7 @@ const slides = [
 function LandingPage({ onLoginClick, onRegisterClick }) {
   const [activeSlide, setActiveSlide] = useState(0);
   const slide = slides[activeSlide];
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -50,34 +51,58 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
             </div>
           </div>
 
-          <div>
-            <button
-              onClick={() => (window.location.href = "/")}
-              style={navButton}
-            >
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            style={mobileMenuButton}
+          >
+            ☰
+          </button>
+
+          <div style={desktopNav}>
+            <button onClick={() => (window.location.href = "/")} style={navButton}>
               Home
             </button>
 
-            <button
-              onClick={() => (window.location.href = "/about")}
-              style={navButton}
-            >
+            <button onClick={() => (window.location.href = "/about")} style={navButton}>
               About
             </button>
 
-            <button
-              onClick={() => (window.location.href = "/services")}
-              style={navButton}
-            >
+            <button onClick={() => (window.location.href = "/services")} style={navButton}>
               Services
             </button>
+
             <button onClick={onLoginClick} style={navButton}>
               Login
             </button>
+
             <button onClick={onRegisterClick} style={navPrimary}>
               Get Started
             </button>
           </div>
+
+          {menuOpen && (
+            <div style={mobileDropdown}>
+              <button onClick={() => (window.location.href = "/")} style={mobileNavItem}>
+                Home
+              </button>
+
+              <button onClick={() => (window.location.href = "/about")} style={mobileNavItem}>
+                About
+              </button>
+
+              <button onClick={() => (window.location.href = "/services")} style={mobileNavItem}>
+                Services
+              </button>
+
+              <button onClick={onLoginClick} style={mobileNavItem}>
+                 Login
+              </button>
+
+              <button onClick={onRegisterClick} style={mobileNavPrimary}>
+                 Get Started
+              </button>
+            </div>
+          )}
         </nav>
 
         <div style={heroCard}>
