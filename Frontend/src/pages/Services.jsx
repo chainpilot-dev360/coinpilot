@@ -1,45 +1,103 @@
 export default function Services() {
   return (
     <div style={styles.page}>
-      <div style={styles.container}>
-        <h1 style={styles.title}>Our Services</h1>
+      <div style={styles.overlay}>
+        <nav style={styles.nav}>
+          <h2 style={styles.logo}>ChainPilot</h2>
 
-        <div style={styles.grid}>
+          <div>
+            <button
+              onClick={() => (window.location.href = "/")}
+              style={styles.navButton}
+            >
+              Home
+            </button>
+
+            <button
+              onClick={() => (window.location.href = "/about")}
+              style={styles.navButton}
+            >
+              About
+            </button>
+          </div>
+        </nav>
+
+        <section style={styles.hero}>
+          <h1 style={styles.title}>Our Services</h1>
+
+          <p style={styles.subtitle}>
+            ChainPilot provides advanced digital investment solutions designed
+            for modern investors seeking secure portfolio growth and financial
+            technology innovation.
+          </p>
+        </section>
+
+        <section style={styles.grid}>
           <div style={styles.card}>
-            <h3>Crypto Investments</h3>
-
+            <h2>Crypto Investment Plans</h2>
             <p>
-              Flexible digital investment plans with monitored portfolio growth
-              and analytics.
+              Access professionally managed cryptocurrency investment plans with
+              structured returns and long-term portfolio growth strategies.
             </p>
           </div>
 
           <div style={styles.card}>
-            <h3>Portfolio Management</h3>
-
+            <h2>Portfolio Analytics</h2>
             <p>
-              Track deposits, withdrawals, balances, profits, and investments in
-              real time.
+              Monitor account performance, asset growth, deposits,
+              withdrawals, and investment history through real-time analytics.
             </p>
           </div>
 
           <div style={styles.card}>
-            <h3>KYC Verification</h3>
-
+            <h2>Automated Investment System</h2>
             <p>
-              Secure identity verification system for safer platform operations.
+              Our automated infrastructure processes investment cycles,
+              maturity tracking, and balance management securely and efficiently.
             </p>
           </div>
 
           <div style={styles.card}>
-            <h3>Fast Withdrawals</h3>
-
+            <h2>Secure Wallet Infrastructure</h2>
             <p>
-              Withdrawal approval system with transaction references and admin
-              monitoring.
+              ChainPilot provides secure wallet architecture with protected
+              transaction processing and advanced account management systems.
             </p>
           </div>
-        </div>
+
+          <div style={styles.card}>
+            <h2>Fast Withdrawal Processing</h2>
+            <p>
+              Investors benefit from transparent withdrawal systems with
+              transaction references and real-time administrative processing.
+            </p>
+          </div>
+
+          <div style={styles.card}>
+            <h2>24/7 Client Support</h2>
+            <p>
+              Our support infrastructure helps investors receive assistance
+              quickly while maintaining smooth investment operations globally.
+            </p>
+          </div>
+
+          <div style={styles.card}>
+            <h2>Investment Security</h2>
+            <p>
+              We implement secure authentication systems, encrypted APIs, and
+              protected account structures to maintain investor safety.
+            </p>
+          </div>
+
+          <div style={styles.card}>
+            <h2>Financial Growth Solutions</h2>
+            <p>
+              ChainPilot helps users build long-term digital asset wealth
+              through strategic investment management and scalable financial
+              technology systems.
+            </p>
+          </div>
+        </section>
       </div>
     </div>
   );
@@ -48,32 +106,73 @@ export default function Services() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "#050816",
+    backgroundImage:
+      "linear-gradient(rgba(2,6,23,0.88), rgba(2,6,23,0.95)), url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
     color: "white",
-    padding: "60px 20px",
+    fontFamily: "Arial, sans-serif",
   },
 
-  container: {
-    maxWidth: "1100px",
+  overlay: {
+    minHeight: "100vh",
+    paddingBottom: "60px",
+  },
+
+  nav: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "24px",
+    flexWrap: "wrap",
+  },
+
+  logo: {
+    margin: 0,
+  },
+
+  navButton: {
+    background: "transparent",
+    border: "none",
+    color: "white",
+    cursor: "pointer",
+    marginLeft: "14px",
+    fontSize: "15px",
+  },
+
+  hero: {
+    textAlign: "center",
+    padding: "70px 20px 40px",
+    maxWidth: "900px",
     margin: "0 auto",
   },
 
   title: {
-    fontSize: "48px",
-    textAlign: "center",
-    marginBottom: "50px",
+    fontSize: "52px",
+    marginBottom: "20px",
+  },
+
+  subtitle: {
+    color: "#cbd5e1",
+    fontSize: "18px",
+    lineHeight: 1.8,
   },
 
   grid: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "20px",
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-    gap: "20px",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "24px",
   },
 
   card: {
-    background: "#111827",
-    padding: "30px",
-    borderRadius: "16px",
-    border: "1px solid #1f2937",
+    background: "rgba(15,23,42,0.82)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: "18px",
+    padding: "28px",
+    lineHeight: 1.8,
+    boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
   },
 };
