@@ -29,6 +29,13 @@ export default function Services() {
     >
       About
     </button>
+
+    <button
+      onClick={() => (window.location.href = "/contact")}
+      style={styles.navButton}
+    >
+     Contact
+    </button>
   </div>
 
   {menuOpen && (
