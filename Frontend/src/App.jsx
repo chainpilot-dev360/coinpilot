@@ -5,6 +5,7 @@ import DashboardPreview from "./components/DashboardPreview";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Services from "./pages/Services";
+import Contact from "./pages/Contact";
 import AdminPanel from "./components/AdminPanel";
 import Notification from "./components/Notification";
 import LandingPage from "./components/LandingPage";
@@ -21,6 +22,7 @@ function App() {
   const isHomePage = window.location.pathname === "/";
   const isAboutPage = window.location.pathname === "/about";
   const isServicesPage = window.location.pathname === "/services";
+  const isContactPage = window.location.pathname === "/contact";
 
   const [authMode, setAuthMode] = useState("login");
   const [showAuth, setShowAuth] = useState(false);
@@ -291,6 +293,10 @@ function App() {
 
   if (!user && isServicesPage) {
     return <Services />;
+  }
+
+  if (!user && isContactPage) {
+    return <Contact />;
   }
 
   if (!user && !showAuth) {
