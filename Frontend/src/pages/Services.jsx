@@ -1,26 +1,54 @@
+import { useState } from "react";
 export default function Services() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  
   return (
     <div style={styles.page}>
       <div style={styles.overlay}>
         <nav style={styles.nav}>
-          <h2 style={styles.logo}>ChainPilot</h2>
+  <h2 style={styles.logo}>ChainPilot</h2>
 
-          <div>
-            <button
-              onClick={() => (window.location.href = "/")}
-              style={styles.navButton}
-            >
-              Home
-            </button>
+  <button
+    onClick={() => setMenuOpen(!menuOpen)}
+    style={styles.mobileMenuButton}
+  >
+    ☰
+  </button>
 
-            <button
-              onClick={() => (window.location.href = "/about")}
-              style={styles.navButton}
-            >
-              About
-            </button>
-          </div>
-        </nav>
+  <div style={styles.desktopNav}>
+    <button
+      onClick={() => (window.location.href = "/")}
+      style={styles.navButton}
+    >
+      Home
+    </button>
+
+    <button
+      onClick={() => (window.location.href = "/about")}
+      style={styles.navButton}
+    >
+      About
+    </button>
+  </div>
+
+  {menuOpen && (
+    <div style={styles.mobileDropdown}>
+      <button
+        onClick={() => (window.location.href = "/")}
+        style={styles.mobileNavItem}
+      >
+        Home
+      </button>
+
+      <button
+        onClick={() => (window.location.href = "/about")}
+        style={styles.mobileNavItem}
+      >
+        About
+      </button>
+    </div>
+  )}
+</nav>
 
         <section style={styles.hero}>
           <h1 style={styles.title}>Our Services</h1>
@@ -175,4 +203,46 @@ const styles = {
     lineHeight: 1.8,
     boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
   },
+
+  desktopNav: {
+  display: window.innerWidth < 768 ? "none" : "flex",
+  alignItems: "center",
+  gap: "14px",
+},
+
+mobileMenuButton: {
+  display: window.innerWidth < 768 ? "block" : "none",
+  background: "transparent",
+  border: "1px solid rgba(255,255,255,0.2)",
+  color: "white",
+  fontSize: "24px",
+  borderRadius: "10px",
+  padding: "8px 12px",
+  cursor: "pointer",
+},
+
+mobileDropdown: {
+  position: "absolute",
+  top: "70px",
+  right: "20px",
+  background: "rgba(2,6,23,0.98)",
+  border: "1px solid rgba(255,255,255,0.12)",
+  borderRadius: "14px",
+  padding: "14px",
+  width: "200px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "10px",
+  zIndex: 100,
+},
+
+mobileNavItem: {
+  background: "transparent",
+  color: "#cbd5e1",
+  border: "none",
+  textAlign: "left",
+  padding: "10px",
+  cursor: "pointer",
+  fontSize: "15px",
+},
 };
