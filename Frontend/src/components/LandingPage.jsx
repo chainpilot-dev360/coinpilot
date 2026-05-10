@@ -98,6 +98,10 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
                 Services
               </button>
 
+              <button onClick={() => (window.location.href = "/contact")} style={mobileNavItem}>
+                Contact
+              </button>
+
               <button onClick={onLoginClick} style={mobileNavItem}>
                  Login
               </button>
