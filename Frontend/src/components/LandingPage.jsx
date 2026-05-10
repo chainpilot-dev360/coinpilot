@@ -51,6 +51,26 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
           </div>
 
           <div>
+            <button
+              onClick={() => (window.location.href = "/")}
+              style={navButton}
+            >
+              Home
+            </button>
+
+            <button
+              onClick={() => (window.location.href = "/about")}
+              style={navButton}
+            >
+              About
+            </button>
+
+            <button
+              onClick={() => (window.location.href = "/services")}
+              style={navButton}
+            >
+              Services
+            </button>
             <button onClick={onLoginClick} style={navButton}>
               Login
             </button>
