@@ -71,6 +71,10 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
               Services
             </button>
 
+            <button onClick={() => (window.location.href = "/contact")} style={navButton}>
+              Contact
+            </button>
+
             <button onClick={onLoginClick} style={navButton}>
               Login
             </button>
