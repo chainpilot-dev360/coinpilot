@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import DashboardPreview from "./components/DashboardPreview";
+
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Services from "./pages/Services";
 import AdminPanel from "./components/AdminPanel";
 import Notification from "./components/Notification";
 import LandingPage from "./components/LandingPage";
@@ -14,6 +18,9 @@ function App() {
   const isVerifyPage = window.location.pathname === "/verify-email";
   const isForgotPasswordPage = window.location.pathname === "/forgot-password";
   const isResetPasswordPage = window.location.pathname === "/reset-password";
+  const isHomePage = window.location.pathname === "/";
+  const isAboutPage = window.location.pathname === "/about";
+  const isServicesPage = window.location.pathname === "/services";
 
   const [authMode, setAuthMode] = useState("login");
   const [showAuth, setShowAuth] = useState(false);
@@ -276,6 +283,18 @@ function App() {
 
   if (isResetPasswordPage) {
     return <ResetPassword />;
+  }
+
+  if (!user && isHomePage) {
+    return <Home />;
+  }
+
+  if (!user && isAboutPage) {
+    return <About />;
+  }
+
+  if (!user && isServicesPage) {
+    return <Services />;
   }
 
   if (!user && !showAuth) {
