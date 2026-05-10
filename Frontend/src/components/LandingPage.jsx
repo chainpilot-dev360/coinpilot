@@ -480,6 +480,59 @@ const navPrimary = {
   padding: "10px 16px",
 };
 
+const desktopNav = {
+  display: window.innerWidth < 768 ? "none" : "flex",
+  alignItems: "center",
+  gap: "12px",
+};
+
+const mobileMenuButton = {
+  display: window.innerWidth < 768 ? "block" : "none",
+  background: "transparent",
+  border: "1px solid rgba(255,255,255,0.2)",
+  color: "white",
+  fontSize: "24px",
+  borderRadius: "10px",
+  padding: "8px 12px",
+  cursor: "pointer",
+};
+
+const mobileDropdown = {
+  position: "absolute",
+  top: "70px",
+  right: "20px",
+  background: "rgba(2,6,23,0.98)",
+  border: "1px solid rgba(255,255,255,0.12)",
+  borderRadius: "14px",
+  padding: "14px",
+  width: "220px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "10px",
+  zIndex: 100,
+  boxShadow: "0 20px 50px rgba(0,0,0,0.45)",
+};
+
+const mobileNavItem = {
+  background: "transparent",
+  color: "#cbd5e1",
+  border: "none",
+  textAlign: "left",
+  padding: "10px",
+  cursor: "pointer",
+  fontSize: "15px",
+};
+
+const mobileNavPrimary = {
+  background: "#2563eb",
+  color: "white",
+  border: "none",
+  padding: "12px",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+};
+
 const dots = {
   marginTop: "28px",
   display: "flex",
