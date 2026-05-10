@@ -285,10 +285,6 @@ function App() {
     return <ResetPassword />;
   }
 
-  if (!user && isHomePage) {
-    return <Home />;
-  }
-
   if (!user && isAboutPage) {
     return <About />;
   }
