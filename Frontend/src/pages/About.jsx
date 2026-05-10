@@ -1,49 +1,101 @@
 export default function About() {
   return (
     <div style={styles.page}>
-      <div style={styles.container}>
-        <h1 style={styles.title}>About Us</h1>
+      <div style={styles.overlay}>
+        <nav style={styles.nav}>
+          <h2 style={styles.logo}>ChainPilot</h2>
 
-        <p style={styles.text}>
-          We are a modern digital investment platform focused on secure crypto
-          asset management, investment growth, and transparent financial
-          operations.
-        </p>
+          <div>
+            <button
+              onClick={() => (window.location.href = "/")}
+              style={styles.navButton}
+            >
+              Home
+            </button>
 
-        <p style={styles.text}>
-          Our mission is to provide users worldwide with secure and scalable
-          digital investment opportunities backed by professional portfolio
-          monitoring systems.
-        </p>
+            <button
+              onClick={() => (window.location.href = "/services")}
+              style={styles.navButton}
+            >
+              Services
+            </button>
+          </div>
+        </nav>
 
-        <div style={styles.grid}>
+        <section style={styles.hero}>
+          <h1 style={styles.title}>About ChainPilot</h1>
+
+          <p style={styles.subtitle}>
+            ChainPilot is a premium digital asset investment platform focused on
+            helping users grow wealth through modern cryptocurrency investment
+            strategies, portfolio management, and advanced financial technology.
+          </p>
+        </section>
+
+        <section style={styles.section}>
           <div style={styles.card}>
-            <h3>Security</h3>
+            <h2>Who We Are</h2>
 
             <p>
-              Advanced protection systems for transactions, balances, and
-              digital assets.
+              ChainPilot was created to simplify digital investing for users
+              around the world. We combine modern blockchain infrastructure,
+              investment automation, and real-time analytics to provide a secure
+              and transparent investment experience.
+            </p>
+
+            <p>
+              Our platform supports cryptocurrency portfolio management,
+              automated investment plans, secure wallet systems, and detailed
+              account analytics for both beginner and advanced investors.
             </p>
           </div>
 
           <div style={styles.card}>
-            <h3>Transparency</h3>
+            <h2>Our Mission</h2>
 
             <p>
-              Clear tracking of investments, withdrawals, deposits, and
-              portfolio performance.
+              Our mission is to make digital asset investing accessible,
+              secure, and profitable for everyone by building a platform that
+              combines innovation, transparency, and long-term financial growth.
+            </p>
+
+            <p>
+              We aim to provide investors with a reliable ecosystem where they
+              can manage assets confidently while benefiting from modern fintech
+              solutions and strategic investment tools.
             </p>
           </div>
 
           <div style={styles.card}>
-            <h3>Growth</h3>
+            <h2>Why Investors Choose Us</h2>
+
+            <ul style={styles.list}>
+              <li>Secure wallet and transaction system</li>
+              <li>Professional investment management</li>
+              <li>Automated investment growth tracking</li>
+              <li>Transparent transaction monitoring</li>
+              <li>Fast withdrawal processing</li>
+              <li>24/7 customer support assistance</li>
+              <li>Modern investment dashboard experience</li>
+            </ul>
+          </div>
+
+          <div style={styles.card}>
+            <h2>Global Investment Vision</h2>
 
             <p>
-              Scalable investment opportunities designed for both beginners and
-              advanced investors.
+              ChainPilot continues to expand its infrastructure to support
+              investors globally with secure financial technology solutions,
+              improved investment intelligence, and scalable digital asset
+              management systems.
+            </p>
+
+            <p>
+              We believe the future of finance belongs to secure decentralized
+              technology combined with professional investment systems.
             </p>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
@@ -52,39 +104,78 @@ export default function About() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "#050816",
+    backgroundImage:
+      "linear-gradient(rgba(2,6,23,0.88), rgba(2,6,23,0.95)), url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1600&q=80')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
     color: "white",
-    padding: "60px 20px",
+    fontFamily: "Arial, sans-serif",
   },
 
-  container: {
-    maxWidth: "1000px",
+  overlay: {
+    minHeight: "100vh",
+    paddingBottom: "60px",
+  },
+
+  nav: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "24px",
+    flexWrap: "wrap",
+  },
+
+  logo: {
+    margin: 0,
+  },
+
+  navButton: {
+    background: "transparent",
+    border: "none",
+    color: "white",
+    cursor: "pointer",
+    marginLeft: "14px",
+    fontSize: "15px",
+  },
+
+  hero: {
+    textAlign: "center",
+    padding: "70px 20px 40px",
+    maxWidth: "900px",
     margin: "0 auto",
   },
 
   title: {
-    fontSize: "48px",
-    marginBottom: "30px",
-  },
-
-  text: {
-    fontSize: "18px",
-    lineHeight: "1.8",
-    opacity: 0.9,
+    fontSize: "52px",
     marginBottom: "20px",
   },
 
-  grid: {
+  subtitle: {
+    color: "#cbd5e1",
+    fontSize: "18px",
+    lineHeight: 1.8,
+  },
+
+  section: {
+    maxWidth: "1100px",
+    margin: "0 auto",
+    padding: "20px",
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-    gap: "20px",
-    marginTop: "60px",
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+    gap: "24px",
   },
 
   card: {
-    background: "#111827",
-    padding: "30px",
-    borderRadius: "16px",
-    border: "1px solid #1f2937",
+    background: "rgba(15,23,42,0.82)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: "18px",
+    padding: "28px",
+    lineHeight: 1.8,
+    boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+  },
+
+  list: {
+    paddingLeft: "20px",
+    lineHeight: 2,
   },
 };
