@@ -23,6 +23,10 @@ export default function About() {
           <button onClick={() => (window.location.href = "/services")} style={styles.navButton}>
             Services
           </button>
+
+            <button onClick={() => (window.location.href = "/contact")} style={styles.navButton}>
+            Contact
+          </button>
    </div>
 
   {menuOpen && (
