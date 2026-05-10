@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+
 
 export default function Home() {
   return (
@@ -14,13 +14,13 @@ export default function Home() {
         </p>
 
         <div style={styles.buttonRow}>
-          <Link to="/register" style={styles.primaryBtn}>
+          <button onClick={() => (window.location.href = "/")} style={styles.primaryBtn}>
             Get Started
-          </Link>
+          </button>
 
-          <Link to="/services" style={styles.secondaryBtn}>
+          <button onClick={() => (window.location.href = "/services")} style={styles.secondaryBtn}>
             Explore Services
-          </Link>
+          </button>
         </div>
       </section>
 
