@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { siteConfig } from "../config/siteConfig";
 import axios from "axios";
 import {
   LineChart,
@@ -475,8 +476,10 @@ async function changePassword() {
 
         <div style={depositInfoBox}>
           <strong>Company Wallet Address</strong>
-          <p style={walletText}>BTC: bc1qkqwr63l6x3rqskej75sqxvx74eew9w5smfn4p8
-            ETH: 0xd420b9bb7969b6c403e1e774be1d36fdb9c76aa3</p>
+          <p style={walletText}>
+            BTC: {siteConfig.btcWallet}
+            <br />
+            ETH: {siteConfig.ethWallet}
         </div>
 
         <input
