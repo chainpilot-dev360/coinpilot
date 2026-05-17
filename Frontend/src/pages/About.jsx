@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { siteConfig } from "../config/siteConfig";
 export default function About() {
   const [menuOpen, setMenuOpen] = useState(false);
   
@@ -6,7 +7,7 @@ export default function About() {
     <div style={styles.page}>
       <div style={styles.overlay}>
         <nav style={styles.nav}>
-          <h2 style={styles.logo}>ChainPilot</h2>
+          <h2 style={styles.logo}>{siteConfig.siteName}</h2>
 
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -43,10 +44,10 @@ export default function About() {
 </nav>
 
         <section style={styles.hero}>
-          <h1 style={styles.title}>About ChainPilot</h1>
+          <h1 style={styles.title}>About {siteConfig.siteName}</h1>
 
           <p style={styles.subtitle}>
-            ChainPilot is a premium digital asset investment platform focused on
+            {siteConfig.siteName} is a premium digital asset investment platform focused on
             helping users grow wealth through modern cryptocurrency investment
             strategies, portfolio management, and advanced financial technology.
           </p>
@@ -57,7 +58,7 @@ export default function About() {
             <h2>Who We Are</h2>
 
             <p>
-              ChainPilot was created to simplify digital investing for users
+              {siteConfig.siteName} was created to simplify digital investing for users
               around the world. We combine modern blockchain infrastructure,
               investment automation, and real-time analytics to provide a secure
               and transparent investment experience.
@@ -104,7 +105,7 @@ export default function About() {
             <h2>Global Investment Vision</h2>
 
             <p>
-              ChainPilot continues to expand its infrastructure to support
+              {siteConfig.siteName} continues to expand its infrastructure to support
               investors globally with secure financial technology solutions,
               improved investment intelligence, and scalable digital asset
               management systems.
