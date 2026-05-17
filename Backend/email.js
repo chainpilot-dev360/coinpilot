@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
-const config = require("./config");
+import config from "./config.js";
 
 dotenv.config();
 
