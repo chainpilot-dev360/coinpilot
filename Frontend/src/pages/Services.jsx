@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { siteConfig } from "../config/siteConfig";
 export default function Services() {
   const [menuOpen, setMenuOpen] = useState(false);
   
@@ -6,7 +7,7 @@ export default function Services() {
     <div style={styles.page}>
       <div style={styles.overlay}>
         <nav style={styles.nav}>
-  <h2 style={styles.logo}>ChainPilot</h2>
+  <h2 style={styles.logo}>{siteConfig.siteName}</h2>
 
   <button
     onClick={() => setMenuOpen(!menuOpen)}
@@ -61,7 +62,7 @@ export default function Services() {
           <h1 style={styles.title}>Our Services</h1>
 
           <p style={styles.subtitle}>
-            ChainPilot provides advanced digital investment solutions designed
+            {siteConfig.siteName} provides advanced digital investment solutions designed
             for modern investors seeking secure portfolio growth and financial
             technology innovation.
           </p>
@@ -95,7 +96,7 @@ export default function Services() {
           <div style={styles.card}>
             <h2>Secure Wallet Infrastructure</h2>
             <p>
-              ChainPilot provides secure wallet architecture with protected
+              {siteConfig.siteName} provides secure wallet architecture with protected
               transaction processing and advanced account management systems.
             </p>
           </div>
@@ -127,7 +128,7 @@ export default function Services() {
           <div style={styles.card}>
             <h2>Financial Growth Solutions</h2>
             <p>
-              ChainPilot helps users build long-term digital asset wealth
+              {siteConfig.siteName} helps users build long-term digital asset wealth
               through strategic investment management and scalable financial
               technology systems.
             </p>
