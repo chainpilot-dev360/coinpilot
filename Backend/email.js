@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
+const config = require("./config");
 
 dotenv.config();
 
@@ -24,11 +25,11 @@ export async function sendWelcomeEmail(to, name) {
     if (!transporter) return;
 
     await transporter.sendMail({
-      from: `ChainPilot <${process.env.EMAIL_USER}>`,
+      from: `${config.siteName} <${process.env.EMAIL_USER}>`,
       to,
-      subject: "Welcome to ChainPilot",
+      subject: `Welcome to ${config.siteName}`,
       html: `
-        <h2>Welcome to ChainPilot, ${name}</h2>
+        <h2>Welcome to ${config.siteName}, ${name}</h2>
         <p>Your account has been created successfully.</p>
       `,
     });
@@ -45,12 +46,12 @@ export async function sendVerificationEmail(to, name, token) {
     const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
     await transporter.sendMail({
-      from: `ChainPilot <${process.env.EMAIL_USER}>`,
+      from: `${config.siteName} <${process.env.EMAIL_USER}>`,
       to,
-      subject: "Verify your ChainPilot email",
+      subject: `Verify your ${config.siteName} email`,
       html: `
         <h2>Hello ${name},</h2>
-        <p>Please verify your email address to activate your ChainPilot account.</p>
+        <p>Please verify your email address to activate your ${config.siteName} account.</p>
 
         <p>
           <a href="${verifyUrl}" style="background:#2563eb;color:white;padding:12px 18px;border-radius:8px;text-decoration:none;">
@@ -75,9 +76,9 @@ export async function sendPasswordResetEmail(to, name, token) {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
     await transporter.sendMail({
-      from: `ChainPilot <${process.env.EMAIL_USER}>`,
+      from: `${config.siteName} <${process.env.EMAIL_USER}>`,
       to,
-      subject: "Reset your ChainPilot password",
+      subject: `Reset your ${config.siteName} password`,
       html: `
         <h2>Hello ${name},</h2>
         <p>You requested to reset your password.</p>
