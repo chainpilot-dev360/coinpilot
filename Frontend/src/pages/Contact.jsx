@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { siteConfig } from "../config/siteConfig";
 
 export default function Contact() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -7,7 +8,7 @@ export default function Contact() {
     <div style={styles.page}>
       <div style={styles.overlay}>
         <nav style={styles.nav}>
-          <h2 style={styles.logo}>ChainPilot</h2>
+          <h2 style={styles.logo}>{siteConfig.siteName}</h2>
 
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -80,7 +81,7 @@ export default function Contact() {
             <h2>Email Support</h2>
 
             <p>
-              support@chainpilot.com
+              {siteConfig.supportEmail}
             </p>
 
             <p>
@@ -93,7 +94,7 @@ export default function Contact() {
             <h2>Investment Department</h2>
 
             <p>
-              investments@chainpilot.com
+              {siteConfig.investmentEmail}
             </p>
 
             <p>
@@ -106,7 +107,7 @@ export default function Contact() {
             <h2>Global Availability</h2>
 
             <p>
-              ChainPilot operates globally and supports investors from multiple
+              {siteConfig.siteName} operates globally and supports investors from multiple
               regions worldwide.
             </p>
           </div>
