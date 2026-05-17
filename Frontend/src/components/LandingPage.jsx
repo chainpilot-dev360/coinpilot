@@ -168,7 +168,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
       </section>
 
       <section style={section}>
-        <h2 style={sectionTitle}>Why Choose ChainPilot</h2>
+        <h2 style={sectionTitle}>Why Choose {siteConfig.siteName}</h2>
         <div style={grid}>
           <Card title="Live Market Dashboard" text="Forex, crypto, and portfolio visuals in one dashboard." />
           <Card title="Secure Admin Controls" text="Deposits, withdrawals, and balances are managed securely." />
@@ -185,7 +185,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
 
       <section style={cta}>
         <h2>Start Managing Your Portfolio Today</h2>
-        <p style={heroText}>Create your ChainPilot account and access your dashboard in minutes.</p>
+        <p style={heroText}>Create your {siteConfig.siteName} account and access your dashboard in minutes.</p>
         <button onClick={onRegisterClick} style={primaryButton}>
           Get Started Now
         </button>
@@ -195,7 +195,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
         <div style={footerBrand}>
           <div style={logoMark}>CP</div>
           <div>
-            <h3 style={{ margin: 0 }}>ChainPilot</h3>
+            <h3 style={{ margin: 0 }}>{siteConfig.siteName}</h3>
             <p style={footerText}>Premium digital asset portfolio platform.</p>
           </div>
         </div>
@@ -209,7 +209,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
         </div>
 
         <p style={footerBottom}>
-          © {new Date().getFullYear()} ChainPilot. All rights reserved.
+          © {new Date().getFullYear()} {siteConfig.siteName}. All rights reserved.
         </p>
       </footer>
     </div>
