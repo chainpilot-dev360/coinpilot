@@ -14,4 +14,4 @@ const config = {
     process.env.COMPANY_SHORT_NAME || "CPX",
 };
 
-module.exports = config;
+export default config;
