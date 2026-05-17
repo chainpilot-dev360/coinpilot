@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { siteConfig } from "../config/siteConfig";
 
 const slides = [
   {
@@ -44,10 +45,10 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
       >
         <nav style={nav}>
           <div style={brand}>
-            <div style={logoMark}>CP</div>
+            <div style={logoMark}>{siteConfig.companyNameShort}</div>
             <div>
-              <h2 style={brandName}>ChainPilot</h2>
-              <small style={brandTag}>Digital Asset Growth</small>
+              <h2 style={brandName}>{siteConfig.siteName}</h2>
+              <small style={brandTag}>{siteConfig.tagline}</small>
             </div>
           </div>
 
@@ -202,8 +203,8 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
         <div style={footerLinks}>
           <button onClick={onRegisterClick} style={footerLink}>Create Account</button>
           <button onClick={onLoginClick} style={footerLink}>Login</button>
-          <a href="mailto:support@chainpilot.com" style={footerAnchor}>
-            support@chainpilot.com
+          <a href={`mailto:${siteConfig.supportEmail}`} style={footerAnchor}>
+            {siteConfig.supportEmail}
           </a>
         </div>
 
