@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { siteConfig } from "../config/siteConfig";
+import useSystemSettings from "../hooks/useSystemSettings";
 export default function Services() {
+  const settings = useSystemSettings();
   const [menuOpen, setMenuOpen] = useState(false);
   
   return (
