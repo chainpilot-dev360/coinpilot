@@ -1105,6 +1105,60 @@ app.post(
         ]
       );
 
+      const referredUserResult = await client.query(
+  `
+  SELECT referred_by
+  FROM users
+  WHERE id = $1
+  `,
+  [deposit.user_id]
+);
+
+const referrerId = referredUserResult.rows[0]?.referred_by;
+
+if (referrerId) {
+  const referralCommission = Number(deposit.amount) * 0.05;
+
+  await client.query(
+    `
+    INSERT INTO referral_earnings (
+      referrer_id,
+      referred_user_id,
+      amount,
+      currency,
+      source,
+      status
+    )
+    VALUES ($1, $2, $3, $4, 'DEPOSIT', 'APPROVED')
+    `,
+    [
+      referrerId,
+      deposit.user_id,
+      referralCommission,
+      deposit.currency,
+    ]
+  );
+
+  await client.query(
+    `
+    INSERT INTO account_balances (user_id, currency, available, locked)
+    VALUES ($1, $2, $3, 0)
+    ON CONFLICT (user_id, currency)
+    DO UPDATE SET
+      available = account_balances.available + EXCLUDED.available,
+      updated_at = CURRENT_TIMESTAMP
+    `,
+    [referrerId, deposit.currency, referralCommission]
+  );
+
+  await createNotification(
+    referrerId,
+    "Referral Bonus Received",
+    `You earned ${referralCommission} ${deposit.currency} referral commission.`,
+    "SUCCESS"
+  );
+}
+
       await createNotification(
         deposit.user_id,
         "Deposit Approved",
