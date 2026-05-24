@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { siteConfig } from "../config/siteConfig";
+import useSystemSettings from "../hooks/useSystemSettings";
 export default function About() {
+  const settings = useSystemSettings();
   const [menuOpen, setMenuOpen] = useState(false);
   
   return (
     <div style={styles.page}>
       <div style={styles.overlay}>
         <nav style={styles.nav}>
-          <h2 style={styles.logo}>{siteConfig.siteName}</h2>
+          <h2 style={styles.logo}>{settings.site_name}</h2>
 
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -44,10 +46,10 @@ export default function About() {
 </nav>
 
         <section style={styles.hero}>
-          <h1 style={styles.title}>About {siteConfig.siteName}</h1>
+          <h1 style={styles.title}>About {settings.site_name}</h1>
 
           <p style={styles.subtitle}>
-            {siteConfig.siteName} is a premium digital asset investment platform focused on
+            {settings.site_name} is a premium digital asset investment platform focused on
             helping users grow wealth through modern cryptocurrency investment
             strategies, portfolio management, and advanced financial technology.
           </p>
@@ -58,7 +60,7 @@ export default function About() {
             <h2>Who We Are</h2>
 
             <p>
-              {siteConfig.siteName} was created to simplify digital investing for users
+              {settings.site_name} was created to simplify digital investing for users
               around the world. We combine modern blockchain infrastructure,
               investment automation, and real-time analytics to provide a secure
               and transparent investment experience.
@@ -105,7 +107,7 @@ export default function About() {
             <h2>Global Investment Vision</h2>
 
             <p>
-              {siteConfig.siteName} continues to expand its infrastructure to support
+              {settings.site_name} continues to expand its infrastructure to support
               investors globally with secure financial technology solutions,
               improved investment intelligence, and scalable digital asset
               management systems.
