@@ -18,6 +18,17 @@ import { logAdminAction } from "./utils/adminLogger.js";
 
 dotenv.config();
 
+function generateReferralCode(username) {
+  const cleanName = String(username || "USER")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .toUpperCase()
+    .slice(0, 4);
+
+  const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+  return `${cleanName}${randomPart}`;
+}
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -342,7 +353,7 @@ if (referral) {
         accountCurrency,
         referral || null,
         referrerId,
-        username.toLowerCase(),
+        generateReferralCode(username),
         passwordHash,
       ]
     );
