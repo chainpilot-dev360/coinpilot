@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { siteConfig } from "../config/siteConfig";
+import useSystemSettings from "../hooks/useSystemSettings";
 import axios from "axios";
 import {
   LineChart,
@@ -127,6 +128,7 @@ function MarketChart() {
 }
 
 function DashboardPreview({ token, user }) {
+  const settings = useSystemSettings();
   const [data, setData] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -478,9 +480,9 @@ async function changePassword() {
           <strong>Company Wallet Address</strong>
           
           <p style={walletText}>
-            BTC: {siteConfig.btcWallet}
+            BTC: {settings.btc_wallet}
             <br />
-            ETH: {siteConfig.ethWallet}
+            ETH: {settings.ethWallet}
           </p>
         </div>
 
