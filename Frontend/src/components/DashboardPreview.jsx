@@ -395,7 +395,7 @@ async function changePassword() {
 
         <p style={mutedSmall}>Your Code</p>
 
-        <h3>{referralStats?.user?.referral_code || "Loading..."}</h3>
+        <h3>{referralStats?.user?.referral_code || "No referral code yet"}</h3>
 
         <p style={mutedSmall}>Total Earnings</p>
 
@@ -403,9 +403,14 @@ async function changePassword() {
 
         <button
           onClick={() => {
-            navigator.clipboard.writeText(
-              `${window.location.origin}/?ref=${referralStats?.user?.referral_code}`
-            );
+            const code = referralStats?.user?.referral_code;
+
+            if (!code) {
+              alert("Referral code not ready yet. Please refresh.");
+              return;
+            }
+
+            navigator.clipboard.writeText(`${window.location.origin}/?ref=${code}`);
             alert("Referral link copied");
           }}
           style={{
