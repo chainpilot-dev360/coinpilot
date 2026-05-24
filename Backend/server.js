@@ -2264,7 +2264,7 @@ app.get("/api/system-settings", async (req, res) => {
 
 app.get("/api/referrals/me", requireAuth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.id || req.user.userId;
 
     const userResult = await pool.query(
       `
