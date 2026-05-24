@@ -257,6 +257,26 @@ app.post("/api/auth/register", authLimiter, async (req, res) => {
       });
     }
 
+    let referrerId = null;
+
+if (referral) {
+  const referrerResult = await pool.query(
+    `
+    SELECT id
+    FROM users
+    WHERE LOWER(username) = LOWER($1)
+       OR LOWER(email) = LOWER($1)
+       OR LOWER(referral_code) = LOWER($1)
+    LIMIT 1
+    `,
+    [referral]
+  );
+
+  if (referrerResult.rows.length > 0) {
+    referrerId = referrerResult.rows[0].id;
+  }
+}
+
     const passwordHash = await bcrypt.hash(password, 10);
     const fullName = `${firstName} ${lastName}`;
 
@@ -272,12 +292,30 @@ app.post("/api/auth/register", authLimiter, async (req, res) => {
         country,
         account_currency,
         referral,
+        referred_by,
+        referral_code,
         password_hash,
         role,
         email_verified,
         verification_token
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'USER', true, NULL)
+      VALUES (
+        $1,
+        $2,
+        $3,
+        $4,
+        $5,
+        $6,
+        $7,
+        $8,
+        $9,
+        $10,
+        $11,
+        $12,
+        'USER',
+        true,
+        NULL
+      )
       RETURNING
         id,
         username,
@@ -303,6 +341,8 @@ app.post("/api/auth/register", authLimiter, async (req, res) => {
         country,
         accountCurrency,
         referral || null,
+        referrerId,
+        username.toLowerCase(),
         passwordHash,
       ]
     );
