@@ -2268,12 +2268,16 @@ app.get("/api/referrals/me", requireAuth, async (req, res) => {
 
     const userResult = await pool.query(
       `
-      SELECT id, username, email, referral_code
+      SELECT
+        id,
+        username,
+        email,
+        COALESCE(referral_code, '') AS referral_code
       FROM users
       WHERE id = $1
       `,
       [userId]
-    );
+     );
 
     const referredUsersResult = await pool.query(
       `
