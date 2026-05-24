@@ -482,7 +482,7 @@ async function changePassword() {
           <p style={walletText}>
             BTC: {settings.btc_wallet}
             <br />
-            ETH: {settings.ethWallet}
+            ETH: {settings.eth_wallet}
           </p>
         </div>
 
