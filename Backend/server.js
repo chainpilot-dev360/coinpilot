@@ -2129,6 +2129,34 @@ app.put("/api/admin/system-settings", requireAuth, requireAdmin, async (req, res
   }
 });
 
+app.get("/api/system-settings", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        site_name,
+        company_short_name,
+        support_email,
+        investment_email,
+        btc_wallet,
+        eth_wallet
+      FROM system_settings
+      ORDER BY id ASC
+      LIMIT 1
+      `
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "System settings not found" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Public system settings error:", error);
+    res.status(500).json({ message: "Failed to load system settings" });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.get("/api/admin/stats", requireAuth, requireAdmin, async (req, res) => {
