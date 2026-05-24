@@ -388,7 +388,7 @@ async function changePassword() {
         </div>
       </div>
 
-      <div style={statCard}>
+      <div style={profileCard}>
         <p style={mutedSmall}>Referral Program</p>
 
         <h2>Invite & Earn 5%</h2>
@@ -408,7 +408,14 @@ async function changePassword() {
             );
             alert("Referral link copied");
           }}
-          style={buttonStyle}
+          style={{
+            background: "#2563eb",
+            color: "white",
+            border: "none",
+            padding: "10px 14px",
+            borderRadius: "10px",
+            cursor: "pointer",
+          }}
         >
           Copy Referral Link
         </button>
