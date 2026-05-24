@@ -38,6 +38,18 @@ function App() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [referral, setReferral] = useState("");
+  
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const refCode = params.get("ref");
+
+    if (refCode) {
+      setReferral(refCode);
+      setShowAuth(true);
+      setAuthMode("register");
+    }
+  }, []);
+  
   const [loginId, setLoginId] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
