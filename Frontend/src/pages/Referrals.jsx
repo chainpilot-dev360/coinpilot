@@ -62,6 +62,24 @@ export default function Referrals() {
           {data?.user?.referral_code}
         </p>
 
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(data?.user?.referral_code || "");
+            alert("Referral code copied");
+          }}
+          style={{
+            background: "#2563eb",
+            color: "white",
+            border: "none",
+            padding: "10px 14px",
+            borderRadius: "10px",
+            cursor: "pointer",
+            marginTop: "10px",
+          }}
+         >
+          Copy Referral Code
+         </button>
+
         <p>Total Referral Earnings</p>
 
         <h2>
