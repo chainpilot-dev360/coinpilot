@@ -476,10 +476,12 @@ async function changePassword() {
 
         <div style={depositInfoBox}>
           <strong>Company Wallet Address</strong>
+          
           <p style={walletText}>
             BTC: {siteConfig.btcWallet}
             <br />
             ETH: {siteConfig.ethWallet}
+          </p>
         </div>
 
         <input
