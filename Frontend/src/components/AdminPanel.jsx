@@ -285,7 +285,7 @@ async function updateKyc(id, status) {
     <div>
       <h2>Admin Control Center</h2>
       
-      <SystemSettings />
+      <SystemSettings token={token} />
 
       <button onClick={loadData} style={buttonStyle}>
         Refresh Admin Data
