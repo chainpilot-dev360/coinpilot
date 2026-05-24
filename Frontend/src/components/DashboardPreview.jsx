@@ -131,6 +131,7 @@ function DashboardPreview({ token, user }) {
   const settings = useSystemSettings();
   const [data, setData] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [referralStats, setReferralStats] = useState(null);
   const [notificationOpen, setNotificationOpen] = useState(false);
 
   const [depositAmount, setDepositAmount] = useState("");
@@ -149,11 +150,13 @@ function DashboardPreview({ token, user }) {
   loadDashboard();
   loadNotifications();
   loadTransactionHistory();
+  loadReferralStats();
 
   const interval = setInterval(() => {
     loadDashboard();
     loadNotifications();
     loadTransactionHistory();
+    loadReferralStats();
   }, 5000);
 
   return () => clearInterval(interval);
@@ -180,6 +183,18 @@ async function loadNotifications() {
     setNotifications(res.data || []);
   } catch (error) {
     console.error("Notifications load error", error);
+  }
+}
+
+async function loadReferralStats() {
+  try {
+    const res = await axios.get(`${API_URL}/api/referrals/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setReferralStats(res.data);
+  } catch (error) {
+    console.error("Failed to load referral stats", error);
   }
 }
 
@@ -371,6 +386,32 @@ async function changePassword() {
             </div>
           )}
         </div>
+      </div>
+
+      <div style={statCard}>
+        <p style={mutedSmall}>Referral Program</p>
+
+        <h2>Invite & Earn 5%</h2>
+
+        <p style={mutedSmall}>Your Code</p>
+
+        <h3>{referralStats?.user?.referral_code || "Loading..."}</h3>
+
+        <p style={mutedSmall}>Total Earnings</p>
+
+        <h3>${Number(referralStats?.totalEarnings || 0).toFixed(2)}</h3>
+
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(
+              `${window.location.origin}/?ref=${referralStats?.user?.referral_code}`
+            );
+            alert("Referral link copied");
+          }}
+          style={buttonStyle}
+        >
+          Copy Referral Link
+        </button>
       </div>
 
       <div style={profileCard}>
