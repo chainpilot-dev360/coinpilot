@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { siteConfig } from "../config/siteConfig";
+import useSystemSettings from "../hooks/useSystemSettings";
 
 const slides = [
   {
@@ -23,6 +24,7 @@ const slides = [
 ];
 
 function LandingPage({ onLoginClick, onRegisterClick }) {
+  const settings = useSystemSettings();
   const [activeSlide, setActiveSlide] = useState(0);
   const slide = slides[activeSlide];
   const [menuOpen, setMenuOpen] = useState(false);
@@ -45,9 +47,9 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
       >
         <nav style={nav}>
           <div style={brand}>
-            <div style={logoMark}>{siteConfig.companyNameShort}</div>
+            <div style={logoMark}>{settings.company_short_name}</div>
             <div>
-              <h2 style={brandName}>{siteConfig.siteName}</h2>
+              <h2 style={brandName}>{settings.site_name}</h2>
               <small style={brandTag}>{siteConfig.tagline}</small>
             </div>
           </div>
@@ -168,7 +170,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
       </section>
 
       <section style={section}>
-        <h2 style={sectionTitle}>Why Choose {siteConfig.siteName}</h2>
+        <h2 style={sectionTitle}>Why Choose {settings.site_name}</h2>
         <div style={grid}>
           <Card title="Live Market Dashboard" text="Forex, crypto, and portfolio visuals in one dashboard." />
           <Card title="Secure Admin Controls" text="Deposits, withdrawals, and balances are managed securely." />
@@ -185,7 +187,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
 
       <section style={cta}>
         <h2>Start Managing Your Portfolio Today</h2>
-        <p style={heroText}>Create your {siteConfig.siteName} account and access your dashboard in minutes.</p>
+        <p style={heroText}>Create your {settings.site_name} account and access your dashboard in minutes.</p>
         <button onClick={onRegisterClick} style={primaryButton}>
           Get Started Now
         </button>
@@ -195,7 +197,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
         <div style={footerBrand}>
           <div style={logoMark}>CP</div>
           <div>
-            <h3 style={{ margin: 0 }}>{siteConfig.siteName}</h3>
+            <h3 style={{ margin: 0 }}>{settings.site_name}</h3>
             <p style={footerText}>Premium digital asset portfolio platform.</p>
           </div>
         </div>
@@ -203,13 +205,13 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
         <div style={footerLinks}>
           <button onClick={onRegisterClick} style={footerLink}>Create Account</button>
           <button onClick={onLoginClick} style={footerLink}>Login</button>
-          <a href={`mailto:${siteConfig.supportEmail}`} style={footerAnchor}>
-            {siteConfig.supportEmail}
+          <a href={`mailto:${settings.support_email}`} style={footerAnchor}>
+            {settings.support_email}
           </a>
         </div>
 
         <p style={footerBottom}>
-          © {new Date().getFullYear()} {siteConfig.siteName}. All rights reserved.
+          © {new Date().getFullYear()} {settings.site_name}. All rights reserved.
         </p>
       </footer>
     </div>
