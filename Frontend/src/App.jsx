@@ -12,6 +12,7 @@ import LandingPage from "./components/LandingPage";
 import VerifyEmail from "./components/VerifyEmail";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
+import Referrals from "./pages/Referrals";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -547,6 +548,13 @@ function App() {
             Invest
           </button>
 
+          <button
+            onClick={() => openTab("referrals")}
+            style={activeTab === "referrals" ? activeMenu : menu}
+          >
+            Referrals
+          </button>
+
           {user.role === "ADMIN" && (
             <button
               onClick={() => openTab("admin")}
@@ -696,6 +704,12 @@ function App() {
                 </button>
               )}
             </div>
+          </section>
+        )}
+
+        {activeTab === "referrals" && (
+          <section style={panel}>
+            <Referrals />
           </section>
         )}
 
