@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import SystemSettings from "./SystemSettings";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -283,6 +284,8 @@ async function updateKyc(id, status) {
   return (
     <div>
       <h2>Admin Control Center</h2>
+      
+      <SystemSettings />
 
       <button onClick={loadData} style={buttonStyle}>
         Refresh Admin Data
