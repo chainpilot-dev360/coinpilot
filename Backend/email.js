@@ -43,7 +43,7 @@ export async function sendVerificationEmail(to, name, token) {
     const transporter = getMailTransporter();
     if (!transporter) return;
 
-    const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+    const verifyUrl = `${config.frontendUrl}/verify-email?token=${token}`;
 
     await transporter.sendMail({
       from: `${config.siteName} <${process.env.EMAIL_USER}>`,
@@ -73,7 +73,7 @@ export async function sendPasswordResetEmail(to, name, token) {
     const transporter = getMailTransporter();
     if (!transporter) return;
 
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+    const resetUrl = `${config.frontendUrl}/reset-password?token=${token}`;
 
     await transporter.sendMail({
       from: `${config.siteName} <${process.env.EMAIL_USER}>`,
