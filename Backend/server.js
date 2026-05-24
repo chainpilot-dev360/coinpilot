@@ -2251,6 +2251,68 @@ app.get("/api/system-settings", async (req, res) => {
   }
 });
 
+app.get("/api/referrals/me", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const userResult = await pool.query(
+      `
+      SELECT id, username, email, referral_code
+      FROM users
+      WHERE id = $1
+      `,
+      [userId]
+    );
+
+    const referredUsersResult = await pool.query(
+      `
+      SELECT id, username, email, created_at
+      FROM users
+      WHERE referred_by = $1
+      ORDER BY created_at DESC
+      `,
+      [userId]
+    );
+
+    const earningsResult = await pool.query(
+      `
+      SELECT
+        id,
+        referred_user_id,
+        amount,
+        currency,
+        source,
+        status,
+        created_at
+      FROM referral_earnings
+      WHERE referrer_id = $1
+      ORDER BY created_at DESC
+      `,
+      [userId]
+    );
+
+    const totalResult = await pool.query(
+      `
+      SELECT COALESCE(SUM(amount), 0) AS total_earnings
+      FROM referral_earnings
+      WHERE referrer_id = $1
+      AND status = 'APPROVED'
+      `,
+      [userId]
+    );
+
+    res.json({
+      user: userResult.rows[0],
+      referredUsers: referredUsersResult.rows,
+      earnings: earningsResult.rows,
+      totalEarnings: totalResult.rows[0].total_earnings,
+    });
+  } catch (error) {
+    console.error("Referral dashboard error:", error);
+    res.status(500).json({ message: "Failed to load referral dashboard" });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.get("/api/admin/stats", requireAuth, requireAdmin, async (req, res) => {
