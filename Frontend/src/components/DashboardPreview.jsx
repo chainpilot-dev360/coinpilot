@@ -526,6 +526,42 @@ async function changePassword() {
   <h2>Account Settings</h2>
 
   <div style={{ marginTop: "20px" }}>
+  <label>Profile Picture</label>
+
+  <input
+    type="file"
+    accept="image/*"
+    onChange={async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("profileImage", file);
+
+      try {
+        await axios.post(
+          `${API_URL}/api/users/profile-image`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        alert("Profile image uploaded successfully");
+        loadDashboard();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to upload profile image");
+      }
+    }}
+    style={input}
+  />
+</div>
+
+  <div style={{ marginTop: "20px" }}>
     <label>Full Name</label>
     <input
       type="text"
