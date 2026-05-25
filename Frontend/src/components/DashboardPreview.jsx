@@ -529,7 +529,7 @@ async function changePassword() {
           full_name: e.target.value,
         })
       }
-      style={inputStyle}
+      style={input}
     />
   </div>
 
@@ -544,7 +544,7 @@ async function changePassword() {
           email: e.target.value,
         })
       }
-      style={inputStyle}
+      style={input}
     />
   </div>
 
@@ -559,7 +559,7 @@ async function changePassword() {
           country: e.target.value,
         })
       }
-      style={inputStyle}
+      style={input}
     />
   </div>
 
@@ -574,7 +574,7 @@ async function changePassword() {
           account_currency: e.target.value,
         })
       }
-      style={inputStyle}
+      style={input}
     />
   </div>
 
