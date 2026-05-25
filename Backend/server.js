@@ -710,6 +710,57 @@ app.get("/api/users/:id/balances", requireAuth, async (req, res) => {
   }
 });
 
+app.put("/api/users/profile", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id || req.user.userId;
+
+    const {
+      full_name,
+      email,
+      country,
+      account_currency,
+    } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE users
+      SET
+        full_name = $1,
+        email = $2,
+        country = $3,
+        account_currency = $4,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $5
+      RETURNING
+        id,
+        username,
+        full_name,
+        email,
+        country,
+        account_currency
+      `,
+      [
+        full_name,
+        email,
+        country,
+        account_currency,
+        userId,
+      ]
+    );
+
+    res.json({
+      message: "Profile updated successfully",
+      user: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Profile update error:", error);
+
+    res.status(500).json({
+      message: "Failed to update profile",
+    });
+  }
+});
+
 app.get("/api/users/:id/deposits-withdrawals", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
