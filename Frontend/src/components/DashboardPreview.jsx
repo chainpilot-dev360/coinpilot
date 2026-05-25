@@ -154,6 +154,7 @@ function DashboardPreview({ token, user }) {
   country: "",
   account_currency: "",
 });
+  const [profileLoaded, setProfileLoaded] = useState(false);
 
  useEffect(() => {
   loadDashboard();
@@ -171,6 +172,19 @@ function DashboardPreview({ token, user }) {
   return () => clearInterval(interval);
 }, [token]);
 
+useEffect(() => {
+  if (user && !profileLoaded) {
+    setProfileForm({
+      full_name: user.full_name || "",
+      email: user.email || "",
+      country: user.country || "",
+      account_currency: user.account_currency || "",
+    });
+
+    setProfileLoaded(true);
+  }
+}, [user, profileLoaded]);
+
 async function loadDashboard() {
   try {
     const res = await axios.get(`${API_URL}/api/users/${user.id}/balances`, {
@@ -182,13 +196,6 @@ async function loadDashboard() {
     setFullName(res.data.user?.full_name || "");
     setUsername(res.data.user?.username || "");
     setProfileImage(res.data.user?.profile_image || "");
-
-    setProfileForm({
-      full_name: res.data.user?.full_name || "",
-      email: res.data.user?.email || "",
-      country: res.data.user?.country || "",
-      account_currency: res.data.user?.account_currency || "",
-    });
     
   } catch (error) {
     console.error("Dashboard load error", error);
