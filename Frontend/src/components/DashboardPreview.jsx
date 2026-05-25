@@ -145,6 +145,9 @@ function DashboardPreview({ token, user }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
+  const [profileImage, setProfileImage] = useState("");
   const [profileForm, setProfileForm] = useState({
   full_name: "",
   email: "",
@@ -176,6 +179,10 @@ async function loadDashboard() {
 
     setData(res.data);
 
+    setFullName(res.data.user?.full_name || "");
+    setUsername(res.data.user?.username || "");
+    setProfileImage(res.data.user?.profile_image || "");
+
     setProfileForm({
       full_name: res.data.user?.full_name || "",
       email: res.data.user?.email || "",
@@ -193,6 +200,31 @@ async function saveProfile() {
     await axios.put(
       `${API_URL}/api/users/profile`,
       profileForm,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert("Profile updated successfully");
+
+    loadDashboard();
+  } catch (error) {
+    console.error(error);
+    alert("Failed to update profile");
+  }
+}
+
+async function updateProfile() {
+  try {
+    await axios.put(
+      `${API_URL}/api/users/profile`,
+      {
+        full_name: fullName,
+        username,
+        profile_image: profileImage,
+      },
       {
         headers: {
           Authorization: `Bearer ${token}`,
