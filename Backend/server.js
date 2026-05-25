@@ -728,8 +728,7 @@ app.put("/api/users/profile", requireAuth, async (req, res) => {
         full_name = $1,
         email = $2,
         country = $3,
-        account_currency = $4,
-        updated_at = CURRENT_TIMESTAMP
+        account_currency = $4
       WHERE id = $5
       RETURNING
         id,
