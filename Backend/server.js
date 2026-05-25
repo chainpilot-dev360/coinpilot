@@ -49,7 +49,7 @@ const app = express();
 
 app.post("/api/users/profile-image", requireAuth, upload.single("profileImage"), async (req, res) => {
   try {
-    const userId = req.user.id || req.user.userId;
+    const userId = req.user.userId;
 
     if (!req.file || !req.file.path) {
       return res.status(400).json({ message: "No image uploaded" });
