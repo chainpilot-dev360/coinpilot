@@ -44,6 +44,9 @@ const storage = new CloudinaryStorage({
 });
 
 const upload = multer({ storage });
+
+const app = express();
+
 app.post("/api/users/profile-image", requireAuth, upload.single("profileImage"), async (req, res) => {
   try {
     const userId = req.user.id || req.user.userId;
@@ -73,8 +76,6 @@ app.post("/api/users/profile-image", requireAuth, upload.single("profileImage"),
     res.status(500).json({ message: "Failed to upload profile image" });
   }
 });
-
-const app = express();
 
 app.use(cors());
 app.use(express.json());
