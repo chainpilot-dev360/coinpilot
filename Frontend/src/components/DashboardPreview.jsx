@@ -553,8 +553,13 @@ async function changePassword() {
         alert("Profile image uploaded successfully");
         loadDashboard();
       } catch (error) {
-        console.error(error);
-        alert("Failed to upload profile image");
+        console.error("Upload error:", error.response?.data || error);
+
+        alert(
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to upload profile image"
+        );
       }
     }}
     style={input}
