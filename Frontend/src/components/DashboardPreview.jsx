@@ -572,18 +572,32 @@ async function changePassword() {
 
   <div style={{ marginTop: "20px" }}>
     <label>Account Currency</label>
-    <input
-      type="text"
-      value={profileForm.account_currency}
-      onChange={(e) =>
-        setProfileForm({
-          ...profileForm,
-          account_currency: e.target.value,
-        })
-      }
-      style={input}
-    />
-  </div>
+    <select
+  style={input}
+  value={profileForm.account_currency}
+  onChange={(e) =>
+    setProfileForm({
+      ...profileForm,
+      account_currency: e.target.value,
+    })
+  }
+>
+  <option value="USD">USD</option>
+  <option value="EUR">EUR</option>
+  <option value="GBP">GBP</option>
+  <option value="NGN">NGN</option>
+  <option value="CAD">CAD</option>
+  <option value="AUD">AUD</option>
+  <option value="CHF">CHF</option>
+  <option value="JPY">JPY</option>
+  <option value="CNY">CNY</option>
+  <option value="INR">INR</option>
+  <option value="ZAR">ZAR</option>
+  <option value="SGD">SGD</option>
+  <option value="AED">AED</option>
+  <option value="SAR">SAR</option>
+</select>
+</div>
 
   <button
     onClick={saveProfile}
