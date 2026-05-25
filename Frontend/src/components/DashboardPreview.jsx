@@ -145,6 +145,12 @@ function DashboardPreview({ token, user }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [profileForm, setProfileForm] = useState({
+  full_name: "",
+  email: "",
+  country: "",
+  account_currency: "",
+});
 
  useEffect(() => {
   loadDashboard();
@@ -169,8 +175,37 @@ async function loadDashboard() {
     });
 
     setData(res.data);
+
+    setProfileForm({
+      full_name: res.data.user?.full_name || "",
+      email: res.data.user?.email || "",
+      country: res.data.user?.country || "",
+      account_currency: res.data.user?.account_currency || "",
+    });
+    
   } catch (error) {
     console.error("Dashboard load error", error);
+  }
+}
+
+async function saveProfile() {
+  try {
+    await axios.put(
+      `${API_URL}/api/users/profile`,
+      profileForm,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert("Profile updated successfully");
+
+    loadDashboard();
+  } catch (error) {
+    console.error(error);
+    alert("Failed to update profile");
   }
 }
 
@@ -447,6 +482,86 @@ async function changePassword() {
             </span>
           </div>
         </div>
+
+        <div style={profileCard}>
+  <h2>Account Settings</h2>
+
+  <div style={{ marginTop: "20px" }}>
+    <label>Full Name</label>
+    <input
+      type="text"
+      value={profileForm.full_name}
+      onChange={(e) =>
+        setProfileForm({
+          ...profileForm,
+          full_name: e.target.value,
+        })
+      }
+      style={inputStyle}
+    />
+  </div>
+
+  <div style={{ marginTop: "20px" }}>
+    <label>Email</label>
+    <input
+      type="email"
+      value={profileForm.email}
+      onChange={(e) =>
+        setProfileForm({
+          ...profileForm,
+          email: e.target.value,
+        })
+      }
+      style={inputStyle}
+    />
+  </div>
+
+  <div style={{ marginTop: "20px" }}>
+    <label>Country</label>
+    <input
+      type="text"
+      value={profileForm.country}
+      onChange={(e) =>
+        setProfileForm({
+          ...profileForm,
+          country: e.target.value,
+        })
+      }
+      style={inputStyle}
+    />
+  </div>
+
+  <div style={{ marginTop: "20px" }}>
+    <label>Account Currency</label>
+    <input
+      type="text"
+      value={profileForm.account_currency}
+      onChange={(e) =>
+        setProfileForm({
+          ...profileForm,
+          account_currency: e.target.value,
+        })
+      }
+      style={inputStyle}
+    />
+  </div>
+
+  <button
+    onClick={saveProfile}
+    style={{
+      marginTop: "24px",
+      background: "#2563eb",
+      color: "white",
+      border: "none",
+      padding: "12px 18px",
+      borderRadius: "10px",
+      cursor: "pointer",
+      fontWeight: "bold",
+    }}
+  >
+    Save Profile
+  </button>
+</div>
 
         <div style={profileMeta}>
           <small style={mutedSmall}>Member since</small>
