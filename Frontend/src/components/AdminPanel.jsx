@@ -19,6 +19,7 @@ function AdminPanel() {
   
   const [users, setUsers] = useState([]);
   const [adminLogs, setAdminLogs] = useState([]);
+  const [adminLogLimit, setAdminLogLimit] = useState(10);
 
   const [selectedUserData, setSelectedUserData] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -783,7 +784,7 @@ async function updateKyc(id, status) {
       {adminLogs.length === 0 ? (
         <p>No admin activity yet</p>
       ) : (
-        adminLogs.map((log) => (
+        adminLogs.slice(0, adminLogLimit).map((log) => (
           <div key={log.id} style={logCard}>
             <div style={logHeader}>
               <strong>{log.action}</strong>
@@ -800,7 +801,19 @@ async function updateKyc(id, status) {
           </div>
         ))
       )}
-    </div>
+
+       {adminLogs.length > adminLogLimit && (
+         <div style={{ marginTop: "15px" }}>
+           <button
+             onClick={() => setAdminLogLimit((prev) => prev + 10)}
+             style={buttonSecondary}
+           >
+             Load More Logs
+           </button>
+         </div>
+       )}
+
+       </div>
   );
 }
 
