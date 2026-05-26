@@ -753,6 +753,7 @@ async function updateKyc(id, status) {
               Reject Withdrawal
             </button>
           </div>
+        )}
 
       {withdrawals.length > withdrawalLimit && (
         <div style={{ marginTop: "15px" }}>
