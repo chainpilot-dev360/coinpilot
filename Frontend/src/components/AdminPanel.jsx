@@ -10,6 +10,10 @@ function AdminPanel() {
   const [analytics, setAnalytics] = useState(null);
   const [deposits, setDeposits] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
+  
+  const [withdrawalSearch, setWithdrawalSearch] = useState("");
+  const [withdrawalStatusFilter, setWithdrawalStatusFilter] = useState("ALL");
+  
   const [users, setUsers] = useState([]);
   const [adminLogs, setAdminLogs] = useState([]);
 
@@ -514,10 +518,43 @@ async function updateKyc(id, status) {
 
       <h3>Pending Deposits</h3>
 
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "15px" }}>
+         <input
+           type="text"
+           placeholder="Search by name, email, amount, currency..."
+           value={depositSearch}
+           onChange={(e) => setDepositSearch(e.target.value)}
+           style={input}
+          />
+
+          <select
+            value={depositStatusFilter}
+            onChange={(e) => setDepositStatusFilter(e.target.value)}
+            style={input}
+           >
+            <option value="ALL">All Status</option>
+            <option value="PENDING">Pending</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+           </select>
+         </div>
+
       {deposits.length === 0 ? (
         <p>No pending deposits</p>
       ) : (
-        deposits.map((deposit) => {
+        deposits
+          .filter((deposit) => {
+            const searchText = `${deposit.full_name || ""} ${deposit.email || ""} ${deposit.amount || ""} ${deposit.currency || ""}`.toLowerCase();
+
+            const matchesSearch = searchText.includes(depositSearch.toLowerCase());
+
+            const matchesStatus =
+              depositStatusFilter === "ALL" ||
+              String(deposit.status || "").toUpperCase() === depositStatusFilter;
+
+            return matchesSearch && matchesStatus;
+          })
+         .map((deposit) => {
           const proofLink = getProofUrl(
             deposit.proof_url ||
             deposit.proof_image ||
@@ -633,10 +670,43 @@ async function updateKyc(id, status) {
 
       <h3>Pending Withdrawals</h3>
 
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "15px" }}>
+        <input
+          type="text"
+          placeholder="Search withdrawals..."
+          value={withdrawalSearch}
+          onChange={(e) => setWithdrawalSearch(e.target.value)}
+          style={input}
+         />
+
+         <select
+           value={withdrawalStatusFilter}
+           onChange={(e) => setWithdrawalStatusFilter(e.target.value)}
+           style={input}
+         >
+           <option value="ALL">All Status</option>
+           <option value="PENDING">Pending</option>
+           <option value="APPROVED">Approved</option>
+           <option value="REJECTED">Rejected</option>
+         </select>
+       </div>
+
       {withdrawals.length === 0 ? (
         <p>No pending withdrawals</p>
       ) : (
-        withdrawals.map((withdrawal) => (
+        withdrawals
+          .filter((withdrawal) => {
+            const searchText = `${withdrawal.full_name || ""} ${withdrawal.email || ""} ${withdrawal.amount || ""} ${withdrawal.currency || ""}`.toLowerCase();
+
+            const matchesSearch = searchText.includes(withdrawalSearch.toLowerCase());
+
+            const matchesStatus =
+              withdrawalStatusFilter === "ALL" ||
+              String(withdrawal.status || "").toUpperCase() === withdrawalStatusFilter;
+
+            return matchesSearch && matchesStatus;
+          })
+          .map((withdrawal) => {
           <div key={withdrawal.id} style={cardStyle}>
             <p><strong>User:</strong> {withdrawal.full_name} ({withdrawal.email})</p>
             <p><strong>Amount:</strong> {withdrawal.amount} {withdrawal.currency}</p>
