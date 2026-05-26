@@ -821,9 +821,48 @@ async function changePassword() {
             </p>
 
             {deposit.receipt_reference && (
-              <p style={mutedSmall}>
-                Receipt: {deposit.receipt_reference}
-              </p>
+              <div style={mutedSmall}>
+                <p>Receipt: {deposit.receipt_reference}</p>
+
+                <button
+                  onClick={() => {
+                    const receiptWindow = window.open("", "_blank");
+
+                    receiptWindow.document.write(`
+                      <html>
+                        <head>
+                          <title>Deposit Receipt</title>
+                        </head>
+                        <body style="font-family: Arial; padding: 30px;">
+                          <h2>Deposit Receipt</h2>
+                          <p><strong>Receipt:</strong> ${deposit.receipt_reference}</p>
+                          <p><strong>Amount:</strong> ${deposit.amount} ${deposit.currency}</p>
+                          <p><strong>Status:</strong> ${deposit.status}</p>
+                          <p><strong>Date:</strong> ${new Date(deposit.created_at).toLocaleString()}</p>
+                          <hr />
+                          <p>This is an automatically generated transaction receipt.</p>
+                          <script>
+                            window.print();
+                          </script>
+                        </body>
+                      </html>
+                    `);
+
+                    receiptWindow.document.close();
+                  }}
+                  style={{
+                    marginTop: "8px",
+                    background: "#2563eb",
+                    color: "white",
+                    border: "none",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Download Receipt
+                </button>
+              </div>
             )}
 
             <small style={muted}>
@@ -853,9 +892,49 @@ async function changePassword() {
             </p>
 
             {withdrawal.receipt_reference && (
-              <p style={mutedSmall}>
-                Receipt: {withdrawal.receipt_reference}
-              </p>
+              <div style={mutedSmall}>
+                <p>Receipt: {withdrawal.receipt_reference}</p>
+
+                <button
+                  onClick={() => {
+                    const receiptWindow = window.open("", "_blank");
+
+                    receiptWindow.document.write(`
+                      <html>
+                        <head>
+                          <title>Withdrawal Receipt</title>
+                        </head>
+                        <body style="font-family: Arial; padding: 30px;">
+                          <h2>Withdrawal Receipt</h2>
+                          <p><strong>Receipt:</strong> ${withdrawal.receipt_reference}</p>
+                          <p><strong>Amount:</strong> ${withdrawal.amount} ${withdrawal.currency}</p>
+                          <p><strong>Status:</strong> ${withdrawal.status}</p>
+                          <p><strong>Date:</strong> ${new Date(withdrawal.created_at).toLocaleString()}</p>
+                          <p><strong>Wallet:</strong> ${withdrawal.wallet_address || "N/A"}</p>
+                          <hr />
+                          <p>This is an automatically generated withdrawal receipt.</p>
+                          <script>
+                            window.print();
+                          </script>
+                        </body>
+                      </html>
+                    `);
+
+                    receiptWindow.document.close();
+                  }}
+                  style={{
+                    marginTop: "8px",
+                    background: "#2563eb",
+                    color: "white",
+                    border: "none",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Download Receipt
+                </button>
+              </div>
             )}
 
             {withdrawal.wallet_address && (
