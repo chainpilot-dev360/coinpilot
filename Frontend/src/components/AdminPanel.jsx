@@ -529,6 +529,48 @@ async function updateKyc(id, status) {
                 <strong>User:</strong> {deposit.full_name} ({deposit.email})
               </p>
 
+              {deposit.receipt_reference && (
+                <p>
+                  <strong>Receipt:</strong> {deposit.receipt_reference}
+                </p>
+              )}
+
+              {proofLink && (
+                <div style={{ marginTop: "10px" }}>
+                  <a
+                    href={proofLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      display: "inline-block",
+                      padding: "8px 12px",
+                      background: "#2563eb",
+                      color: "white",
+                      borderRadius: "8px",
+                      textDecoration: "none",
+                      marginRight: "10px"
+                    }}
+                  >
+                    View Proof
+                  </a>
+
+                  <a
+                    href={proofLink}
+                    download
+                    style={{
+                      display: "inline-block",
+                      padding: "8px 12px",
+                      background: "#16a34a",
+                      color: "white",
+                      borderRadius: "8px",
+                      textDecoration: "none"
+                     }}
+                   >
+                     Download Proof
+                   </a>
+                 </div>
+               )}
+
               <p>
                 <strong>Status:</strong> {deposit.status}
               </p>
