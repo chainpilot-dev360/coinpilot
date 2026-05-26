@@ -274,17 +274,26 @@ async function loadReferralStats() {
 
 async function loadTransactionHistory() {
   try {
+    const userId = user?.id || user?.userId;
+
+    if (!userId) {
+      console.error("No user ID found for transaction history");
+      return;
+    }
+
     const res = await axios.get(
-      `${API_URL}/api/users/${user.id}/deposits-withdrawals`,
+      `${API_URL}/api/users/${userId}/deposits-withdrawals`,
       {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
 
     setDepositHistory(res.data.deposits || []);
     setWithdrawalHistory(res.data.withdrawals || []);
   } catch (error) {
-    console.error("Transaction history error", error);
+    console.error("Transaction history load error", error);
   }
 }
 
