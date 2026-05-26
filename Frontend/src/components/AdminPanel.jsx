@@ -672,17 +672,6 @@ async function updateKyc(id, status) {
         })
       )}
 
-      {deposits.length > depositLimit && (
-        <div style={{ marginTop: "15px" }}>
-          <button
-            onClick={() => setDepositLimit((prev) => prev + 10)}
-            style={buttonSecondary}
-          >
-            Load More Deposits
-          </button>
-        </div>
-      )}
-
       <h3>Pending Withdrawals</h3>
 
       <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "15px" }}>
