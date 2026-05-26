@@ -10,6 +10,9 @@ function AdminPanel() {
   const [analytics, setAnalytics] = useState(null);
   const [deposits, setDeposits] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
+
+  const [depositSearch, setDepositSearch] = useState("");
+  const [depositStatusFilter, setDepositStatusFilter] = useState("ALL");
   
   const [withdrawalSearch, setWithdrawalSearch] = useState("");
   const [withdrawalStatusFilter, setWithdrawalStatusFilter] = useState("ALL");
