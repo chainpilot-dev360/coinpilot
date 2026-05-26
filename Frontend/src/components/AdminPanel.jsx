@@ -710,7 +710,7 @@ async function updateKyc(id, status) {
 
             return matchesSearch && matchesStatus;
           })
-          .map((withdrawal) => {
+          .map((withdrawal) => (
           <div key={withdrawal.id} style={cardStyle}>
             <p><strong>User:</strong> {withdrawal.full_name} ({withdrawal.email})</p>
             <p><strong>Amount:</strong> {withdrawal.amount} {withdrawal.currency}</p>
