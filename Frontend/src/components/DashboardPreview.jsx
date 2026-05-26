@@ -502,7 +502,20 @@ async function changePassword() {
 
       <div style={profileCard}>
         <div style={avatarCircle}>
-          {(user.full_name || user.email || "U").charAt(0).toUpperCase()}
+          {data?.user?.profile_image ? (
+            <img
+              src={data.user.profile_image}
+              alt="Profile"
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: "50%",
+                objectFit: "cover",
+              }}
+             />
+           ) : (
+             (user.full_name || user.email || "U").charAt(0).toUpperCase()
+           )}
         </div>
 
         <div style={{ flex: 1 }}>
