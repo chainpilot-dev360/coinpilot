@@ -2484,7 +2484,7 @@ app.get("/api/admin/stats", requireAuth, requireAdmin, async (req, res) => {
     );
 
     const activeInvestments = await pool.query(
-      `SELECT COUNT(*) FROM investments WHERE status = 'ACTIVE'`
+      `SELECT COUNT(*) FROM user_investments WHERE status = 'ACTIVE'`
     );
 
     const platformBalance = await pool.query(
