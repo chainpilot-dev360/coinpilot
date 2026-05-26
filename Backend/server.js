@@ -699,6 +699,7 @@ app.get("/api/users/:id/balances", requireAuth, async (req, res) => {
     const user = userResult.rows[0];
 
     res.json({
+      user,
       balances: balances.rows,
       ledger: ledger.rows,
       investments: investments.rows.map((inv) => {
