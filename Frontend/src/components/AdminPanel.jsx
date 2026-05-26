@@ -510,7 +510,12 @@ async function updateKyc(id, status) {
         <p>No pending deposits</p>
       ) : (
         deposits.map((deposit) => {
-          const proofLink = getProofUrl(deposit.proof_url);
+          const proofLink = getProofUrl(
+            deposit.proof_url ||
+            deposit.proof_image ||
+            deposit.proof ||
+            deposit.payment_proof
+          );
 
           return (
             <div key={deposit.id} style={depositReviewCard}>
