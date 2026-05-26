@@ -531,13 +531,13 @@ async function updateKyc(id, status) {
            placeholder="Search by name, email, amount, currency..."
            value={depositSearch}
            onChange={(e) => setDepositSearch(e.target.value)}
-           style={input}
+           style={{ padding: "10px", borderRadius: "8px", marginBottom: "10px" }}
           />
 
           <select
             value={depositStatusFilter}
             onChange={(e) => setDepositStatusFilter(e.target.value)}
-            style={input}
+            style={{ padding: "10px", borderRadius: "8px", marginBottom: "10px" }}
            >
             <option value="ALL">All Status</option>
             <option value="PENDING">Pending</option>
@@ -695,13 +695,13 @@ async function updateKyc(id, status) {
           placeholder="Search withdrawals..."
           value={withdrawalSearch}
           onChange={(e) => setWithdrawalSearch(e.target.value)}
-          style={input}
+          style={{ padding: "10px", borderRadius: "8px", marginBottom: "10px" }}
          />
 
          <select
            value={withdrawalStatusFilter}
            onChange={(e) => setWithdrawalStatusFilter(e.target.value)}
-           style={input}
+           style={{ padding: "10px", borderRadius: "8px", marginBottom: "10px" }}
          >
            <option value="ALL">All Status</option>
            <option value="PENDING">Pending</option>
