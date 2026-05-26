@@ -1187,9 +1187,22 @@ app.post(
           .json({ message: "Deposit has already been processed" });
       }
 
-      await client.query("UPDATE deposits SET status = 'APPROVED' WHERE id = $1", [
-        depositId,
-      ]);
+      const receiptReference =
+        "DEP-" +
+        depositId +
+        "-" +
+        Math.random().toString(36).substring(2, 8).toUpperCase();
+
+      await client.query(
+        `
+        UPDATE deposits
+        SET
+          status = 'APPROVED',
+          receipt_reference = $1
+        WHERE id = $2
+      `,
+        [receiptReference, depositId]
+      );
 
       const balanceResult = await client.query(
         `
@@ -1435,15 +1448,28 @@ app.post(
         return res.status(400).json({ message: "Insufficient locked balance" });
       }
 
+      const receiptReference =
+        "WDR-" +
+        withdrawalId +
+        "-" +
+        Math.random().toString(36).substring(2, 8).toUpperCase();
+
       await client.query(
         `
-       UPDATE withdrawals
-       SET status = 'APPROVED',
-           reference = $1,
-           admin_note = $2
-       WHERE id = $3
-       `,
-       [reference || null, admin_note || null, withdrawalId]
+          UPDATE withdrawals
+          SET
+            status = 'APPROVED',
+            reference = $1,
+            admin_note = $2,
+            receipt_reference = $3
+          WHERE id = $4
+        `,
+        [
+          reference || null,
+          admin_note || null,
+          receiptReference,
+          withdrawalId
+        ]
       );
 
       const updatedBalance = await client.query(
