@@ -677,6 +677,27 @@ app.get("/api/users/:id/balances", requireAuth, async (req, res) => {
       [id]
     );
 
+    const userResult = await pool.query(
+      `
+      SELECT 
+        id,
+        username,
+        full_name,
+        email,
+        role,
+        email_verified,
+        country,
+        account_currency,
+        referral_code,
+        profile_image
+      FROM users
+      WHERE id = $1
+      `,
+      [id]
+    );
+
+    const user = userResult.rows[0];
+
     res.json({
       balances: balances.rows,
       ledger: ledger.rows,
