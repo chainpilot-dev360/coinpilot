@@ -290,6 +290,8 @@ async function loadTransactionHistory() {
       }
     );
 
+    console.log("TRANSACTION HISTORY RESPONSE:", res.data);
+
     setDepositHistory(res.data.deposits || []);
     setWithdrawalHistory(res.data.withdrawals || []);
   } catch (error) {
