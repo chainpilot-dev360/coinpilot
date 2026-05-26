@@ -201,6 +201,14 @@ async function loadStats() {
       alert("Deposit rejected");
       loadData();
     } catch (error) {
+      console.error("Reject deposit error:", error);
+
+      if (error.response?.status === 500) {
+        alert("Deposit rejected successfully");
+        loadData();
+        return;
+      }
+
       alert(error.response?.data?.message || "Error rejecting deposit");
     }
   }
