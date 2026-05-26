@@ -766,6 +766,17 @@ async function updateKyc(id, status) {
           </div>
          ))
         )}
+
+    {withdrawals.length > withdrawalLimit && (
+      <div style={{ marginTop: "15px" }}>
+        <button
+          onClick={() => setWithdrawalLimit((prev) => prev + 10)}
+          style={buttonSecondary}
+        >
+          Load More Withdrawals
+        </button>
+      </div>
+ )}
       
    <h3>Admin Activity Log</h3>
 
