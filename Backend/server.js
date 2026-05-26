@@ -816,7 +816,9 @@ app.get("/api/users/:id/deposits-withdrawals", requireAuth, async (req, res) => 
   try {
     const { id } = req.params;
 
-    if (Number(id) !== req.user.userId && req.user.role !== "ADMIN") {
+    const authUserId = req.user.userId || req.user.id;
+
+    if (Number(id) !== authUserId && req.user.role !== "ADMIN") {
       return res.status(403).json({ message: "Access denied" });
     }
 
