@@ -823,39 +823,14 @@ app.get("/api/users/:id/deposits-withdrawals", requireAuth, async (req, res) => 
     }
 
     const deposits = await pool.query(
-      `
-SELECT
-  id,
-  amount,
-  currency,
-  status,
-  created_at,
-  receipt_reference,
-  tx_hash,
-  proof_image
-FROM deposits
-WHERE user_id = $1
-ORDER BY created_at DESC
-`,
+      "SELECT * FROM deposits WHERE user_id = $1 ORDER BY created_at DESC",
       [id]
     );
 
     const withdrawals = await pool.query(
-      `
-SELECT
-  id,
-  amount,
-  currency,
-  status,
-  created_at,
-  receipt_reference,
-  reference
-FROM withdrawals
-WHERE user_id = $1
-ORDER BY created_at DESC
-`,
+      "SELECT * FROM withdrawals WHERE user_id = $1 ORDER BY created_at DESC",
       [id]
-    );
+     );
 
     res.json({
       deposits: deposits.rows,
