@@ -13,6 +13,9 @@ function AdminPanel() {
   
   const [withdrawalSearch, setWithdrawalSearch] = useState("");
   const [withdrawalStatusFilter, setWithdrawalStatusFilter] = useState("ALL");
+
+  const [depositLimit, setDepositLimit] = useState(10);
+  const [withdrawalLimit, setWithdrawalLimit] = useState(10);
   
   const [users, setUsers] = useState([]);
   const [adminLogs, setAdminLogs] = useState([]);
@@ -552,9 +555,10 @@ async function updateKyc(id, status) {
               depositStatusFilter === "ALL" ||
               String(deposit.status || "").toUpperCase() === depositStatusFilter;
 
-            return matchesSearch && matchesStatus;
-          })
-         .map((deposit) => {
+           return matchesSearch && matchesStatus;
+              })
+              .slice(0, depositLimit)
+              .map((deposit) => {
           const proofLink = getProofUrl(
             deposit.proof_url ||
             deposit.proof_image ||
@@ -668,6 +672,17 @@ async function updateKyc(id, status) {
         })
       )}
 
+      {deposits.length > depositLimit && (
+        <div style={{ marginTop: "15px" }}>
+          <button
+            onClick={() => setDepositLimit((prev) => prev + 10)}
+            style={buttonSecondary}
+          >
+            Load More Deposits
+          </button>
+        </div>
+      )}
+
       <h3>Pending Withdrawals</h3>
 
       <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "15px" }}>
@@ -750,6 +765,17 @@ async function updateKyc(id, status) {
             </button>
           </div>
         ))
+      )}
+
+      {withdrawals.length > withdrawalLimit && (
+        <div style={{ marginTop: "15px" }}>
+          <button
+            onClick={() => setWithdrawalLimit((prev) => prev + 10)}
+            style={buttonSecondary}
+          >
+            Load More Withdrawals
+          </button>
+        </div>
       )}
 
       <h3>Admin Activity Log</h3>
