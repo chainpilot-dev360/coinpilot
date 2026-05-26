@@ -680,7 +680,14 @@ async function updateKyc(id, status) {
         <div style={{ marginTop: "15px" }}>
           <button
             onClick={() => setDepositLimit((prev) => prev + 10)}
-            style={buttonSecondary}
+            style={{
+              padding: "10px 14px",
+              borderRadius: "8px",
+              border: "none",
+              background: "#2563eb",
+              color: "white",
+              cursor: "pointer"
+            }}
           >
             Load More Deposits
          </button>
@@ -775,7 +782,14 @@ async function updateKyc(id, status) {
       <div style={{ marginTop: "15px" }}>
         <button
           onClick={() => setWithdrawalLimit((prev) => prev + 10)}
-          style={buttonSecondary}
+          style={{
+            padding: "10px 14px",
+            borderRadius: "8px",
+            border: "none",
+            background: "#2563eb",
+            color: "white",
+            cursor: "pointer"
+          }}
         >
           Load More Withdrawals
         </button>
@@ -809,7 +823,14 @@ async function updateKyc(id, status) {
          <div style={{ marginTop: "15px" }}>
            <button
              onClick={() => setAdminLogLimit((prev) => prev + 10)}
-             style={buttonSecondary}
+             style={{
+               padding: "10px 14px",
+               borderRadius: "8px",
+               border: "none",
+               background: "#2563eb",
+               color: "white",
+               cursor: "pointer"
+             }}
            >
              Load More Logs
            </button>
