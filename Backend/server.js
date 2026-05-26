@@ -47,36 +47,6 @@ const upload = multer({ storage });
 
 const app = express();
 
-app.post("/api/users/profile-image", requireAuth, upload.single("profileImage"), async (req, res) => {
-  try {
-    const userId = req.user.userId;
-
-    if (!req.file || !req.file.path) {
-      return res.status(400).json({ message: "No image uploaded" });
-    }
-
-    const imageUrl = req.file.path;
-
-    const result = await pool.query(
-      `
-      UPDATE users
-      SET profile_image = $1
-      WHERE id = $2
-      RETURNING id, full_name, email, profile_image
-      `,
-      [imageUrl, userId]
-    );
-
-    res.json({
-      message: "Profile image updated successfully",
-      user: result.rows[0],
-    });
-  } catch (error) {
-    console.error("Profile image upload error:", error);
-    res.status(500).json({ message: "Failed to upload profile image" });
-  }
-});
-
 app.use(cors());
 app.use(express.json());
 
@@ -787,6 +757,36 @@ app.put("/api/users/profile", requireAuth, async (req, res) => {
     res.status(500).json({
       message: "Failed to update profile",
     });
+  }
+});
+
+app.post("/api/users/profile-image", requireAuth, upload.single("profileImage"), async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({ message: "No image uploaded" });
+    }
+
+    const imageUrl = req.file.path;
+
+    const result = await pool.query(
+      `
+      UPDATE users
+      SET profile_image = $1
+      WHERE id = $2
+      RETURNING id, full_name, email, profile_image
+      `,
+      [imageUrl, userId]
+    );
+
+    res.json({
+      message: "Profile image updated successfully",
+      user: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Profile image upload error:", error);
+    res.status(500).json({ message: "Failed to upload profile image" });
   }
 });
 
