@@ -754,8 +754,7 @@ async function updateKyc(id, status) {
             </button>
           </div>
         )}
-
-      <h3>Admin Activity Log</h3>
+        <h3>Admin Activity Log</h3>
 
       {adminLogs.length === 0 ? (
         <p>No admin activity yet</p>
