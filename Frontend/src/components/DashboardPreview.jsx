@@ -820,6 +820,12 @@ async function changePassword() {
               <strong>Status:</strong> <StatusBadge status={deposit.status} />
             </p>
 
+            {deposit.receipt_reference && (
+              <p style={mutedSmall}>
+                Receipt: {deposit.receipt_reference}
+              </p>
+            )}
+
             <small style={muted}>
               Submitted: {new Date(deposit.created_at).toLocaleString()}
             </small>
@@ -846,12 +852,18 @@ async function changePassword() {
               <strong>Status:</strong> <StatusBadge status={withdrawal.status} />
             </p>
 
+            {withdrawal.receipt_reference && (
+              <p style={mutedSmall}>
+                Receipt: {withdrawal.receipt_reference}
+              </p>
+            )}
+
             {withdrawal.wallet_address && (
               <p>
                 <strong>Wallet:</strong>{" "}
                 <span style={walletSmall}>{withdrawal.wallet_address}</span>
               </p>
-            )}
+             )}
 
             {withdrawal.reference && (
               <p>
