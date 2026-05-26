@@ -753,6 +753,7 @@ async function updateKyc(id, status) {
               Reject Withdrawal
             </button>
           </div>
+         ))
         )}
         <h3>Admin Activity Log</h3>
 
