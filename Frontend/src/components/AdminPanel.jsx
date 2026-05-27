@@ -3,6 +3,8 @@ import axios from "axios";
 import SystemSettings from "./SystemSettings";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const COMPANY_LOGO =
+  "https://res.cloudinary.com/dlvtuijb1/image/upload/v1779874195/WhatsApp_Image_2026-05-27_at_10.29.15_AM_llqpmg.jpg";
 
 function AdminPanel() {
   const token = localStorage.getItem("token");
@@ -461,6 +463,21 @@ async function updateKyc(id, status) {
 
   return (
     <div>
+
+      <img
+        src={COMPANY_LOGO}
+        alt="CoinPilot Logo"
+        style={{
+          width: "120px",
+          height: "120px",
+          borderRadius: "20px",
+          display: "block",
+          margin: "0 auto 20px",
+          objectFit: "cover",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
+        }}
+      />
+      
       <h2>Admin Control Center</h2>
       
       <SystemSettings token={token} />
