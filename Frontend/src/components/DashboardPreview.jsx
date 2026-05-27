@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import KycPanel from "./KycPanel";
+import TransactionReceipt from "./TransactionReceipt";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const COMPANY_LOGO =
@@ -157,6 +158,8 @@ function DashboardPreview({ token, user }) {
   account_currency: "",
 });
   const [profileLoaded, setProfileLoaded] = useState(false);
+  
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
 
  useEffect(() => {
   loadDashboard();
@@ -422,6 +425,31 @@ async function changePassword() {
 
   return (
     <div style={pageFade}>
+
+      {selectedReceipt && (
+        <div>
+          <button
+            onClick={() => setSelectedReceipt(null)}
+            style={{
+              marginBottom: "20px",
+              padding: "10px 14px",
+              borderRadius: "8px",
+              border: "none",
+              background: "#dc2626",
+              color: "white",
+              cursor: "pointer",
+             }}
+           >
+             Close Receipt
+           </button>
+
+          <TransactionReceipt
+            type={selectedReceipt.type}
+            user={data?.user}
+            transaction={selectedReceipt.transaction}
+          />
+        </div>
+     )}
       <MarketTicker />
 
       <div style={dashboardHeader}>
@@ -889,7 +917,35 @@ async function changePassword() {
                 >
                   Download Receipt
                 </button>
-              </div>
+
+                <button
+                  onClick={() =>
+                    setSelectedReceipt({
+                      type: "Deposit",
+                      transaction: {
+                        ...deposit,
+                        reference:
+                        deposit.receipt_reference ||
+                        deposit.reference ||
+                        deposit.id,
+                      },
+                    })
+                 }
+                 style={{
+                   marginTop: "10px",
+                   background: "#16a34a",
+                   color: "#fff",
+                   border: "none",
+                   padding: "10px 14px",
+                   borderRadius: "8px",
+                   cursor: "pointer",
+                   fontWeight: "bold",
+                 }}
+               >
+                 View Professional Receipt
+               </button>
+                
+               </div>
             )}
 
             <small style={muted}>
