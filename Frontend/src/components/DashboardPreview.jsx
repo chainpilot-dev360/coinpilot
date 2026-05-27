@@ -864,8 +864,8 @@ async function changePassword() {
             transaction: {
               id: `STATEMENT-${Date.now()}`,
               reference: `STATEMENT-${Date.now()}`,
-              amount: accountValue || balance || 0,
-              currency: user?.account_currency || "USD",
+              amount: data?.user?.balance || 0,
+              currency: data?.user?.account_currency || "USD",
               status: "GENERATED",
               payment_method: "Account Statement",
               admin_note: "Official account statement generated from CoinPilot dashboard.",
