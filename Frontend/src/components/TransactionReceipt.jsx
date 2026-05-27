@@ -110,7 +110,6 @@ const totalWithdrawals = withdrawals.reduce(
       </div>
 
       <div ref={receiptRef} style={receiptPage}>
-        <div style={topBar}></div>
 
         <div style={header}>
           <div style={brandLeft}>
@@ -478,18 +477,6 @@ const receiptPage = {
   position: "relative",
   borderRadius: "6px",
   overflow: "hidden",
-};
-
-const topBar = {
-  position: "absolute",
-  top: 0,
-  right: 0,
-  width: "140px",
-  height: "110px",
-  background:
-    "linear-gradient(135deg, #0f172a 0%, #0f172a 60%, #d4af37 60%, #f7d774 100%)",
-  clipPath: "polygon(35% 0, 100% 0, 100% 100%)",
-  opacity: 0.95,
 };
 
 const header = {
