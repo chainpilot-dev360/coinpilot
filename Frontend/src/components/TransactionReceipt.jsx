@@ -1,14 +1,14 @@
 const COMPANY = {
   name: "CoinPilot",
   tagline: "Digital Investment Platform",
-  logo: "https://res.cloudinary.com/dlvtuijb1/image/upload/v1779874195/WhatsApp_Image_2026-05-27_at_10.29.15_AM_llqpmg.jpg",
+  logo:
+    "https://res.cloudinary.com/dlvtuijb1/image/upload/v1779874195/WhatsApp_Image_2026-05-27_at_10.29.15_AM_llqpmg.jpg",
   website: "www.coinpilot.com",
   email: "coinpilot@gmail.com",
   phone: "+1552174458",
   address: "125 Jefferson Avenue, Austin TX, USA",
   registration: "C1234567",
   ceo: "Peter Woods",
-  currency: "USD",
 };
 
 export default function TransactionReceipt({
@@ -16,214 +16,542 @@ export default function TransactionReceipt({
   user = {},
   transaction = {},
 }) {
+  const receiptId =
+    transaction.receipt_reference ||
+    transaction.reference ||
+    `${type.toUpperCase()}-${transaction.id || Date.now()}`;
+
+  const amount = transaction.amount || 0;
+  const currency = transaction.currency || "USD";
+  const status = transaction.status || "APPROVED";
+
+  const date = transaction.created_at
+    ? new Date(transaction.created_at).toLocaleString()
+    : new Date().toLocaleString();
+
   const handlePrint = () => {
     window.print();
   };
 
   return (
-    <div
-      style={{
-        background: "#f4f7fb",
-        minHeight: "100vh",
-        padding: "40px",
-        fontFamily: "Arial",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "900px",
-          margin: "0 auto",
-          background: "#fff",
-          padding: "40px",
-          borderRadius: "20px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-        }}
-      >
-        {/* HEADER */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            borderBottom: "3px solid #2563eb",
-            paddingBottom: "20px",
-          }}
-        >
-          <div style={{ display: "flex", gap: "20px" }}>
+    <div style={pageWrap}>
+      <div style={actions} className="no-print">
+        <button onClick={handlePrint} style={printBtn}>
+          Print / Save PDF
+        </button>
+      </div>
+
+      <div style={receiptPage}>
+        <div style={topBar}></div>
+
+        <div style={header}>
+          <div style={brandLeft}>
             <img
               src={COMPANY.logo}
-              alt="logo"
-              style={{
-                width: "100px",
-                height: "100px",
-                borderRadius: "20px",
-                objectFit: "cover",
-              }}
+              alt="CoinPilot Logo"
+              style={logo}
             />
 
             <div>
-              <h1 style={{ margin: 0, color: "#0f172a" }}>
-                {COMPANY.name}
+              <h1 style={brandName}>
+                COIN
+                <span style={{ color: "#c9972b" }}>
+                  PILOT
+                </span>
               </h1>
 
-              <h3 style={{ margin: "10px 0", color: "#2563eb" }}>
+              <p style={tagline}>
                 {COMPANY.tagline}
-              </h3>
+              </p>
 
-              <p style={{ color: "#475569" }}>
+              <p style={smallMuted}>
                 Secure. Transparent. Profitable.
               </p>
             </div>
           </div>
 
-          <div style={{ textAlign: "right", color: "#334155" }}>
-            <p>{COMPANY.website}</p>
-            <p>{COMPANY.email}</p>
-            <p>{COMPANY.phone}</p>
-            <p>{COMPANY.address}</p>
+          <div style={companyInfo}>
+            <strong>{COMPANY.name}</strong>
+            <span>{COMPANY.website}</span>
+            <span>{COMPANY.email}</span>
+            <span>{COMPANY.phone}</span>
+            <span>{COMPANY.address}</span>
           </div>
         </div>
 
-        {/* TITLE */}
-        <div
-          style={{
-            marginTop: "40px",
-            marginBottom: "30px",
-          }}
-        >
-          <h1 style={{ color: "#1e293b" }}>
-            {type.toUpperCase()} RECEIPT
-          </h1>
+        <div style={goldLine}></div>
 
-          <p style={{ color: "#64748b" }}>
-            Official transaction confirmation
-          </p>
-        </div>
+        <div style={titleRow}>
+          <div>
+            <h2 style={receiptTitle}>
+              {type.toUpperCase()} RECEIPT
+            </h2>
 
-        {/* CUSTOMER DETAILS */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "20px",
-            marginBottom: "30px",
-          }}
-        >
-          <div
-            style={{
-              border: "1px solid #e2e8f0",
-              borderRadius: "12px",
-              padding: "20px",
-            }}
-          >
-            <h3 style={{ color: "#2563eb" }}>
-              Customer Details
-            </h3>
-
-            <p>
-              <strong>Name:</strong> {user.full_name}
-            </p>
-
-            <p>
-              <strong>Email:</strong> {user.email}
-            </p>
-
-            <p>
-              <strong>User ID:</strong> {user.id}
+            <p style={subtitle}>
+              Official Receipt for Your Transaction
             </p>
           </div>
 
-          <div
-            style={{
-              border: "1px solid #e2e8f0",
-              borderRadius: "12px",
-              padding: "20px",
-            }}
-          >
-            <h3 style={{ color: "#2563eb" }}>
-              Transaction Details
-            </h3>
+          <div style={receiptMeta}>
+            <p>
+              <strong>Receipt No:</strong>{" "}
+              {receiptId}
+            </p>
 
             <p>
-              <strong>Amount:</strong>{" "}
-              {COMPANY.currency} {transaction.amount}
+              <strong>Date Issued:</strong>{" "}
+              {date}
             </p>
 
             <p>
               <strong>Status:</strong>{" "}
-              {transaction.status}
-            </p>
-
-            <p>
-              <strong>Reference:</strong>{" "}
-              {transaction.reference}
-            </p>
-
-            <p>
-              <strong>Date:</strong>{" "}
-              {new Date().toLocaleString()}
+              <span style={statusBadge}>
+                {status}
+              </span>
             </p>
           </div>
         </div>
 
-        {/* MESSAGE */}
-        <div
-          style={{
-            background: "#ecfdf5",
-            border: "1px solid #10b981",
-            padding: "20px",
-            borderRadius: "12px",
-            marginBottom: "40px",
-          }}
-        >
-          <h3 style={{ color: "#047857" }}>
-            Transaction Successful
+        <div style={twoCols}>
+          <section style={box}>
+            <h3 style={boxHeader}>
+              CUSTOMER DETAILS
+            </h3>
+
+            <Detail
+              label="Full Name"
+              value={
+                user.full_name ||
+                user.name ||
+                "Valued Client"
+              }
+            />
+
+            <Detail
+              label="Email Address"
+              value={user.email || "N/A"}
+            />
+
+            <Detail
+              label="User ID"
+              value={user.id || "N/A"}
+            />
+          </section>
+
+          <section style={box}>
+            <h3 style={boxHeader}>
+              TRANSACTION DETAILS
+            </h3>
+
+            <Detail
+              label="Transaction Type"
+              value={type}
+            />
+
+            <Detail
+              label="Payment Method"
+              value={
+                transaction.payment_method ||
+                "Crypto Transfer"
+              }
+            />
+
+            <Detail
+              label="Reference ID"
+              value={receiptId}
+            />
+
+            <Detail
+              label="Transaction Status"
+              value={status}
+            />
+          </section>
+        </div>
+        <section style={summaryBox}>
+          <h3 style={summaryHeader}>
+            TRANSACTION SUMMARY
           </h3>
 
-          <p style={{ color: "#065f46" }}>
-            This document confirms that your transaction
-            has been successfully processed on CoinPilot.
+          <Detail
+            label="Amount"
+            value={`${amount} ${currency}`}
+          />
+
+          <Detail
+            label="Currency"
+            value={currency}
+          />
+
+          <Detail
+            label="Transaction Hash"
+            value={
+              transaction.tx_hash ||
+              transaction.hash ||
+              "N/A"
+            }
+          />
+
+          <Detail
+            label="Wallet Address"
+            value={transaction.wallet_address || "N/A"}
+          />
+
+          <Detail
+            label="Admin Note"
+            value={transaction.admin_note || "N/A"}
+          />
+
+          <Detail
+            label="Date Completed"
+            value={date}
+          />
+        </section>
+
+        <div style={successBox}>
+          <strong>
+            This is to confirm that this transaction has been successfully processed.
+          </strong>
+
+          <p>
+            This receipt was generated by {COMPANY.name} and confirms the
+            transaction record stored on our platform.
           </p>
         </div>
 
-        {/* FOOTER */}
-        <div
-          style={{
-            borderTop: "2px solid #e2e8f0",
-            paddingTop: "30px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <div style={thanks}>
+          Thank you for choosing {COMPANY.name}.
+          <p>Your trust drives our innovation.</p>
+        </div>
+
+        <div style={verification}>
           <div>
-            <h2
-              style={{
-                fontFamily: "cursive",
-                color: "#1d4ed8",
-              }}
-            >
+            <div style={signature}>
               Peter Woods
-            </h2>
+            </div>
+
+            <strong>{COMPANY.ceo}</strong>
 
             <p>Chief Executive Officer</p>
+            <p>{COMPANY.name}</p>
           </div>
 
-          <button
-            onClick={handlePrint}
-            style={{
-              padding: "14px 24px",
-              background: "#2563eb",
-              color: "#fff",
-              border: "none",
-              borderRadius: "12px",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
-          >
-            Print / Save PDF
-          </button>
+          <div style={seal}>
+            VERIFIED
+          </div>
+
+          <div style={verifyText}>
+            <strong>Registration No:</strong>
+            <p>{COMPANY.registration}</p>
+
+            <strong>Verification:</strong>
+            <p>{COMPANY.website}/verify</p>
+          </div>
         </div>
+
+        <footer style={footer}>
+          <span>Bank-Level Security</span>
+          <span>Encrypted Transaction</span>
+          <span>Global Compliance</span>
+          <span>Financial Integrity</span>
+        </footer>
       </div>
+
+      <style>
+        {`
+          @media print {
+            body {
+              margin: 0;
+              background: white;
+            }
+
+            .no-print {
+              display: none !important;
+            }
+
+            @page {
+              size: A4;
+              margin: 0;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 }
+
+function Detail({ label, value }) {
+  return (
+    <div style={detailRow}>
+      <span style={detailLabel}>
+        {label}
+      </span>
+
+      <span style={detailValue}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
+const pageWrap = {
+  background: "#e5e7eb",
+  minHeight: "100vh",
+  padding: "30px",
+  fontFamily: "Arial, sans-serif",
+};
+
+const actions = {
+  textAlign: "center",
+  marginBottom: "20px",
+};
+
+const printBtn = {
+  padding: "12px 22px",
+  background: "#0f172a",
+  color: "#fff",
+  border: "none",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "bold",
+};
+
+const receiptPage = {
+  width: "794px",
+  minHeight: "1123px",
+  margin: "0 auto",
+  background: "#fff",
+  color: "#0f172a",
+  padding: "35px",
+  boxSizing: "border-box",
+  position: "relative",
+  borderRadius: "6px",
+  overflow: "hidden",
+};
+
+const topBar = {
+  position: "absolute",
+  top: 0,
+  right: 0,
+  width: "190px",
+  height: "150px",
+  background:
+    "linear-gradient(135deg, #0f172a 0%, #0f172a 60%, #d4af37 60%, #f7d774 100%)",
+  clipPath: "polygon(25% 0, 100% 0, 100% 100%)",
+};
+
+const header = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "flex-start",
+  gap: "20px",
+};
+
+const brandLeft = {
+  display: "flex",
+  gap: "18px",
+  alignItems: "center",
+};
+
+const logo = {
+  width: "90px",
+  height: "90px",
+  borderRadius: "18px",
+  objectFit: "cover",
+};
+
+const brandName = {
+  fontSize: "36px",
+  margin: 0,
+  letterSpacing: "1px",
+  color: "#0f172a",
+};
+
+const tagline = {
+  margin: "5px 0",
+  color: "#2563eb",
+  fontWeight: "bold",
+};
+
+const smallMuted = {
+  margin: 0,
+  color: "#64748b",
+};
+
+const companyInfo = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "5px",
+  fontSize: "13px",
+  color: "#334155",
+  maxWidth: "250px",
+  zIndex: 2,
+};
+
+const goldLine = {
+  height: "3px",
+  background: "linear-gradient(90deg, #c9972b, #2563eb)",
+  margin: "30px 0",
+};
+
+const titleRow = {
+  display: "flex",
+  justifyContent: "space-between",
+  marginBottom: "25px",
+};
+
+const receiptTitle = {
+  fontSize: "34px",
+  margin: 0,
+  color: "#0f172a",
+};
+
+const subtitle = {
+  color: "#64748b",
+};
+
+const receiptMeta = {
+  fontSize: "14px",
+  lineHeight: "1.6",
+};
+
+const statusBadge = {
+  background: "#dcfce7",
+  color: "#15803d",
+  padding: "6px 12px",
+  borderRadius: "999px",
+  fontWeight: "bold",
+};
+
+const twoCols = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: "20px",
+  marginBottom: "25px",
+};
+
+const box = {
+  border: "1px solid #dbe4f0",
+  borderRadius: "14px",
+  overflow: "hidden",
+};
+
+const boxHeader = {
+  background: "#2563eb",
+  color: "#fff",
+  margin: 0,
+  padding: "12px 16px",
+  fontSize: "15px",
+};
+
+const summaryBox = {
+  border: "1px solid #dbe4f0",
+  borderRadius: "14px",
+  overflow: "hidden",
+  marginBottom: "25px",
+};
+
+const summaryHeader = {
+  background: "#0f172a",
+  color: "#f7d774",
+  margin: 0,
+  padding: "12px 16px",
+};
+
+const detailRow = {
+  display: "grid",
+  gridTemplateColumns: "180px 1fr",
+  padding: "11px 16px",
+  borderBottom: "1px solid #e5e7eb",
+  fontSize: "14px",
+};
+
+const detailLabel = {
+  fontWeight: "bold",
+  color: "#334155",
+};
+
+const detailValue = {
+  color: "#0f172a",
+  wordBreak: "break-word",
+};
+
+const successBox = {
+  background: "#f0fdf4",
+  border: "1px solid #86efac",
+  color: "#166534",
+  borderRadius: "14px",
+  padding: "18px",
+  marginBottom: "25px",
+};
+
+const thanks = {
+  textAlign: "center",
+  color: "#2563eb",
+  fontSize: "22px",
+  fontFamily: "cursive",
+  marginBottom: "25px",
+};
+
+const verification = {
+  display: "grid",
+  gridTemplateColumns: "1fr 130px 1fr",
+  gap: "20px",
+  alignItems: "center",
+  border: "1px solid #f1d18a",
+  borderRadius: "14px",
+  padding: "20px",
+  marginBottom: "25px",
+};
+
+const signature = {
+  fontSize: "30px",
+  fontFamily: "cursive",
+  borderBottom: "1px solid #c9972b",
+  marginBottom: "8px",
+};
+
+const seal = {
+  width: "120px",
+  height: "120px",
+  borderRadius: "50%",
+  background: "radial-gradient(circle, #f7d774, #c9972b)",
+  color: "#0f172a",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontWeight: "bold",
+  border: "6px double #8a6a13",
+};
+
+const verifyText = {
+  fontSize: "13px",
+  color: "#334155",
+};
+
+const footer = {
+  background: "linear-gradient(90deg, #0f172a, #1e3a8a)",
+  color: "#f7d774",
+  padding: "18px",
+  borderRadius: "12px",
+  display: "flex",
+  justifyContent: "space-between",
+  fontSize: "12px",
+  fontWeight: "bold",
+};
+
+const printStyles = `
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+}
+`;
