@@ -13,6 +13,7 @@ import VerifyEmail from "./components/VerifyEmail";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import Referrals from "./pages/Referrals";
+import ReceiptVerification from "./components/ReceiptVerification";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -24,6 +25,9 @@ function App() {
   const isAboutPage = window.location.pathname === "/about";
   const isServicesPage = window.location.pathname === "/services";
   const isContactPage = window.location.pathname === "/contact";
+  
+  const isVerifyReceiptPage =
+  window.location.pathname === "/verify";
 
   const [authMode, setAuthMode] = useState("login");
   const [showAuth, setShowAuth] = useState(false);
@@ -310,6 +314,10 @@ function App() {
 
   if (!user && isContactPage) {
     return <Contact />;
+  }
+
+  if (isVerifyReceiptPage)
+  return <ReceiptVerification />;
   }
 
   if (!user && !showAuth) {
