@@ -1,3 +1,7 @@
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { useRef } from "react";
+
 const COMPANY = {
   name: "CoinPilot",
   tagline: "Digital Investment Platform",
@@ -16,6 +20,7 @@ export default function TransactionReceipt({
   user = {},
   transaction = {},
 }) {
+  const receiptRef = useRef(null);
   const receiptId =
     transaction.receipt_reference ||
     transaction.reference ||
@@ -63,19 +68,48 @@ const totalWithdrawals = withdrawals.reduce(
     ? new Date(transaction.created_at).toLocaleString()
     : new Date().toLocaleString();
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = async () => {
+  const element = receiptRef.current;
+
+  if (!element) return;
+
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+  });
+
+  const imgData = canvas.toDataURL("image/png");
+
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+
+  const pdfHeight =
+    (canvas.height * pdfWidth) / canvas.width;
+
+  pdf.addImage(
+    imgData,
+    "PNG",
+    0,
+    0,
+    pdfWidth,
+    pdfHeight
+  );
+
+  pdf.save(
+    `${type.replace(/\s+/g, "_")}_Receipt.pdf`
+  );
+};
 
   return (
     <div style={pageWrap}>
       <div style={actions} className="no-print">
         <button onClick={handlePrint} style={printBtn}>
-          Print / Save PDF
+          Download Official PDF
         </button>
       </div>
 
-      <div style={receiptPage}>
+      <div ref={receiptRef} style={receiptPage}>
         <div style={topBar}></div>
 
         <div style={header}>
