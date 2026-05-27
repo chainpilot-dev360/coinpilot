@@ -4,40 +4,33 @@ export default function ReceiptVerification() {
   const [reference, setReference] = useState("");
   const [result, setResult] = useState(null);
 
-  const handleVerify = () => {
-    const deposits =
-      JSON.parse(
-        localStorage.getItem("depositHistory")
-      ) || [];
+  const handleVerify = async () => {
+  try {
+    setResult(null);
 
-    const withdrawals =
-      JSON.parse(
-        localStorage.getItem("withdrawalHistory")
-      ) || [];
-
-    const allTransactions = [
-      ...deposits,
-      ...withdrawals,
-    ];
-
-    const found = allTransactions.find(
-      (tx) =>
-        tx.receipt_reference === reference ||
-        tx.reference === reference ||
-        tx.id === reference
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/verify-receipt/${reference}`
     );
 
-    if (found) {
+    const data = await response.json();
+
+    if (data.valid) {
       setResult({
         success: true,
-        data: found,
+        data: data.receipt,
       });
     } else {
       setResult({
         success: false,
       });
     }
-  };
+  } catch (error) {
+    console.error("Receipt verification failed:", error);
+    setResult({
+      success: false,
+    });
+  }
+};
 
   return (
     <div style={page}>
