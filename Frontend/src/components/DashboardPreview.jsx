@@ -857,6 +857,35 @@ async function changePassword() {
         </p>
       </div>
 
+      <button
+        onClick={() =>
+          setSelectedReceipt({
+            type: "Account Statement",
+            transaction: {
+              id: `STATEMENT-${Date.now()}`,
+              reference: `STATEMENT-${Date.now()}`,
+              amount: accountValue || balance || 0,
+              currency: user?.account_currency || "USD",
+              status: "GENERATED",
+              payment_method: "Account Statement",
+              admin_note: "Official account statement generated from CoinPilot dashboard.",
+            },
+          })
+        }
+        style={{
+          marginBottom: "15px",
+          background: "#0f172a",
+          color: "#f7d774",
+          border: "none",
+          padding: "12px 16px",
+          borderRadius: "10px",
+          cursor: "pointer",
+          fontWeight: "bold",
+        }}
+      >
+        Generate Account Statement
+      </button>
+
       <h3>Deposit History</h3>
 
       {depositHistory.length === 0 ? (
