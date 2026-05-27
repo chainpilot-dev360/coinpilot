@@ -13,6 +13,8 @@ import {
 import KycPanel from "./KycPanel";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const COMPANY_LOGO =
+  "https://res.cloudinary.com/dlvtuijb1/image/upload/v1779874195/WhatsApp_Image_2026-05-27_at_10.29.15_AM_llqpmg.jpg";
 
 const tickerItems = [
   { symbol: "BTC/USD", price: "$67,240", change: "+2.4%" },
@@ -546,7 +548,21 @@ async function changePassword() {
           </div>
         </div>
 
-        <div style={profileCard}>
+        <img
+          src={COMPANY_LOGO}
+          alt="CoinPilot Logo"
+          style={{
+            width: "100px",
+            height: "100px",
+            borderRadius: "18px",
+            display: "block",
+            margin: "0 auto 20px",
+            objectFit: "cover",
+            boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
+           }}
+        />    
+
+<div style={profileCard}>
   <h2>Account Settings</h2>
 
   <div style={{ marginTop: "20px" }}>
