@@ -22,6 +22,40 @@ export default function TransactionReceipt({
     `${type.toUpperCase()}-${transaction.id || Date.now()}`;
 
   const amount = transaction.amount || 0;
+  const deposits = transaction.deposits || [];
+const withdrawals = transaction.withdrawals || [];
+const currentBalance = transaction.currentBalance || 0;
+
+const allTransactions = [
+  ...deposits.map((d) => ({
+    date: d.created_at,
+    description: "Deposit",
+    type: "Credit",
+    amount: d.amount,
+    status: d.status,
+  })),
+
+  ...withdrawals.map((w) => ({
+    date: w.created_at,
+    description: "Withdrawal",
+    type: "Debit",
+    amount: w.amount,
+    status: w.status,
+  })),
+].sort(
+  (a, b) =>
+    new Date(b.date) - new Date(a.date)
+);
+
+const totalDeposits = deposits.reduce(
+  (sum, d) => sum + Number(d.amount || 0),
+  0
+);
+
+const totalWithdrawals = withdrawals.reduce(
+  (sum, w) => sum + Number(w.amount || 0),
+  0
+);
   const currency = transaction.currency || "USD";
   const status = transaction.status || "APPROVED";
 
@@ -167,45 +201,129 @@ export default function TransactionReceipt({
             />
           </section>
         </div>
-        <section style={summaryBox}>
-          <h3 style={summaryHeader}>
-            TRANSACTION SUMMARY
-          </h3>
+        {type === "Account Statement" ? (
+  <section style={summaryBox}>
+    <h3 style={summaryHeader}>
+      ACCOUNT STATEMENT
+    </h3>
 
-          <Detail
-            label="Amount"
-            value={`${amount} ${currency}`}
-          />
+    <div style={{ padding: "20px" }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          gap: "15px",
+          marginBottom: "25px",
+        }}
+      >
+        <div style={statCard}>
+          <strong>Current Balance</strong>
+          <p>
+            {currentBalance} {currency}
+          </p>
+        </div>
 
-          <Detail
-            label="Currency"
-            value={currency}
-          />
+        <div style={statCard}>
+          <strong>Total Deposits</strong>
+          <p>
+            {totalDeposits} {currency}
+          </p>
+        </div>
 
-          <Detail
-            label="Transaction Hash"
-            value={
-              transaction.tx_hash ||
-              transaction.hash ||
-              "N/A"
-            }
-          />
+        <div style={statCard}>
+          <strong>Total Withdrawals</strong>
+          <p>
+            {totalWithdrawals} {currency}
+          </p>
+        </div>
+      </div>
 
-          <Detail
-            label="Wallet Address"
-            value={transaction.wallet_address || "N/A"}
-          />
+      <table style={table}>
+        <thead>
+          <tr>
+            <th style={th}>Date</th>
+            <th style={th}>Description</th>
+            <th style={th}>Type</th>
+            <th style={th}>Amount</th>
+            <th style={th}>Status</th>
+          </tr>
+        </thead>
 
-          <Detail
-            label="Admin Note"
-            value={transaction.admin_note || "N/A"}
-          />
+        <tbody>
+          {allTransactions.map((tx, index) => (
+            <tr key={index}>
+              <td style={td}>
+                {new Date(
+                  tx.date
+                ).toLocaleString()}
+              </td>
 
-          <Detail
-            label="Date Completed"
-            value={date}
-          />
-        </section>
+              <td style={td}>
+                {tx.description}
+              </td>
+
+              <td style={td}>
+                {tx.type}
+              </td>
+
+              <td style={td}>
+                {tx.amount} {currency}
+              </td>
+
+              <td style={td}>
+                {tx.status}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+) : (
+  <section style={summaryBox}>
+    <h3 style={summaryHeader}>
+      TRANSACTION SUMMARY
+    </h3>
+
+    <Detail
+      label="Amount"
+      value={`${amount} ${currency}`}
+    />
+
+    <Detail
+      label="Currency"
+      value={currency}
+    />
+
+    <Detail
+      label="Transaction Hash"
+      value={
+        transaction.tx_hash ||
+        transaction.hash ||
+        "N/A"
+      }
+    />
+
+    <Detail
+      label="Wallet Address"
+      value={
+        transaction.wallet_address || "N/A"
+      }
+    />
+
+    <Detail
+      label="Admin Note"
+      value={
+        transaction.admin_note || "N/A"
+      }
+    />
+
+    <Detail
+      label="Date Completed"
+      value={date}
+    />
+  </section>
+)}
 
         <div style={successBox}>
           <strong>
@@ -537,6 +655,32 @@ const footer = {
   justifyContent: "space-between",
   fontSize: "12px",
   fontWeight: "bold",
+};
+
+const statCard = {
+  background: "#f8fafc",
+  border: "1px solid #dbe4f0",
+  borderRadius: "12px",
+  padding: "16px",
+  textAlign: "center",
+};
+
+const table = {
+  width: "100%",
+  borderCollapse: "collapse",
+  fontSize: "13px",
+};
+
+const th = {
+  background: "#0f172a",
+  color: "#fff",
+  padding: "12px",
+  textAlign: "left",
+};
+
+const td = {
+  borderBottom: "1px solid #e5e7eb",
+  padding: "10px",
 };
 
 const printStyles = `
