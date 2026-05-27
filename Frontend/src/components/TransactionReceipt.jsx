@@ -724,45 +724,47 @@ const inkStamp = {
 };
 
 const stampOuter = {
-  width: "150px",
-  height: "150px",
+  width: "160px",
+  height: "160px",
   borderRadius: "50%",
-  border: "3px solid rgba(29,78,216,0.85)",
+  background:
+    "radial-gradient(circle at 30% 30%, #ffe89a, #d4af37 55%, #9f7300 100%)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  transform: "rotate(-7deg)",
-  opacity: 0.78,
-  filter: "contrast(1.15)",
+  boxShadow:
+    "inset 0 0 0 4px rgba(255,255,255,0.25), inset 0 0 18px rgba(0,0,0,0.25), 0 4px 10px rgba(0,0,0,0.18)",
 };
 
 const stampInner = {
-  width: "126px",
-  height: "126px",
+  width: "132px",
+  height: "132px",
   borderRadius: "50%",
-  border: "2px dashed rgba(29,78,216,0.85)",
+  border: "3px solid rgba(120,85,0,0.55)",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  color: "#1d4ed8",
+  color: "#3f2d00",
   textAlign: "center",
+  background:
+    "radial-gradient(circle at top, rgba(255,255,255,0.45), rgba(255,255,255,0.05))",
 };
 
 const stampArc = {
-  fontSize: "15px",
+  fontSize: "14px",
   letterSpacing: "4px",
   fontWeight: "bold",
 };
 
 const stampCenter = {
-  fontSize: "28px",
+  fontSize: "30px",
   fontWeight: "900",
-  borderTop: "2px solid #1d4ed8",
-  borderBottom: "2px solid #1d4ed8",
-  padding: "5px 0",
+  borderTop: "2px solid rgba(80,60,0,0.5)",
+  borderBottom: "2px solid rgba(80,60,0,0.5)",
+  padding: "6px 0",
   margin: "8px 0",
-  width: "105px",
+  width: "108px",
 };
 
 const stampSmall = {
