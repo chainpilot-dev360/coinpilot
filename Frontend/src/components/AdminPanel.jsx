@@ -171,6 +171,59 @@ async function loadStats() {
 
   URL.revokeObjectURL(url);
 }
+
+  function exportUsersCSV() {
+  if (!users || users.length === 0) {
+    alert("No users to export");
+    return;
+  }
+
+  const headers = [
+    "ID",
+    "Full Name",
+    "Email",
+    "Country",
+    "Currency",
+    "Referral Code",
+    "Role",
+    "KYC Status",
+    "Created At",
+  ];
+
+  const rows = users.map((user) => [
+    user.id,
+    user.full_name || "",
+    user.email || "",
+    user.country || "",
+    user.account_currency || "",
+    user.referral_code || "",
+    user.role || "",
+    user.kyc_status || "",
+    user.created_at || "",
+  ]);
+
+  const csvContent =
+    [headers, ...rows]
+      .map((row) =>
+        row
+          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+          .join(",")
+      )
+      .join("\n");
+
+  const blob = new Blob([csvContent], {
+    type: "text/csv;charset=utf-8;",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "users-report.csv";
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
   
   async function loadData() {
     try {
@@ -468,6 +521,22 @@ async function updateKyc(id, status) {
       )}
 
       <h3>All Users</h3>
+
+      <div style={{ marginBottom: "15px" }}>
+        <button
+          onClick={exportUsersCSV}
+          style={{
+          padding: "10px 14px",
+          borderRadius: "8px",
+          border: "none",
+          background: "#16a34a",
+          color: "white",
+          cursor: "pointer",
+        }}
+       >
+        Export Users CSV
+      </button>
+    </div>
 
       <input
         placeholder="Search by name, email, or ID"
