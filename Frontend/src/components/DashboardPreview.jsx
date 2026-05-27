@@ -864,27 +864,28 @@ async function changePassword() {
             transaction: {
               id: `STATEMENT-${Date.now()}`,
               reference: `STATEMENT-${Date.now()}`,
-              amount: data?.user?.balance || 0,
               currency: data?.user?.account_currency || "USD",
               status: "GENERATED",
-              payment_method: "Account Statement",
+              deposits: depositHistory || [],
+              withdrawals: withdrawalHistory || [],
+              currentBalance: data?.user?.balance || 0,
               admin_note: "Official account statement generated from CoinPilot dashboard.",
             },
-          })
-        }
-        style={{
-          marginBottom: "15px",
-          background: "#0f172a",
-          color: "#f7d774",
-          border: "none",
-          padding: "12px 16px",
-          borderRadius: "10px",
-          cursor: "pointer",
-          fontWeight: "bold",
-        }}
-      >
-        Generate Account Statement
-      </button>
+         })
+       }
+       style={{
+         marginBottom: "15px",
+         background: "#0f172a",
+         color: "#f7d774",
+         border: "none",
+         padding: "12px 16px",
+         borderRadius: "10px",
+         cursor: "pointer",
+         fontWeight: "bold",
+      }}
+    >
+      Generate Account Statement
+    </button>
 
       <h3>Deposit History</h3>
 
