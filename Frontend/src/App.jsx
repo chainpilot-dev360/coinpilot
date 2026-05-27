@@ -316,10 +316,6 @@ function App() {
     return <Contact />;
   }
 
-  if (isVerifyReceiptPage)
-  return <ReceiptVerification />;
-  }
-
   if (!user && !showAuth) {
     return (
       <>
@@ -327,6 +323,10 @@ function App() {
         <LandingPage onLoginClick={openLogin} onRegisterClick={openRegister} />
       </>
     );
+  }
+
+  if (isVerifyReceiptPage) {
+    return <ReceiptVerification />;
   }
 
   if (!user && showAuth) {
