@@ -2506,6 +2506,81 @@ app.get("/api/admin/stats", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+app.get("/api/verify-receipt/:reference", async (req, res) => {
+  try {
+    const { reference } = req.params;
+
+    const depositResult = await pool.query(
+      `
+      SELECT 
+        id,
+        full_name,
+        email,
+        amount,
+        currency,
+        status,
+        receipt_reference,
+        reference,
+        created_at,
+        'Deposit' AS type
+      FROM deposits
+      WHERE receipt_reference = $1
+         OR reference = $1
+         OR CAST(id AS TEXT) = $1
+      LIMIT 1
+      `,
+      [reference]
+    );
+
+    if (depositResult.rows.length > 0) {
+      return res.json({
+        valid: true,
+        receipt: depositResult.rows[0],
+      });
+    }
+
+    const withdrawalResult = await pool.query(
+      `
+      SELECT 
+        id,
+        full_name,
+        email,
+        amount,
+        currency,
+        status,
+        receipt_reference,
+        reference,
+        created_at,
+        'Withdrawal' AS type
+      FROM withdrawals
+      WHERE receipt_reference = $1
+         OR reference = $1
+         OR CAST(id AS TEXT) = $1
+      LIMIT 1
+      `,
+      [reference]
+    );
+
+    if (withdrawalResult.rows.length > 0) {
+      return res.json({
+        valid: true,
+        receipt: withdrawalResult.rows[0],
+      });
+    }
+
+    return res.status(404).json({
+      valid: false,
+      message: "Receipt not found",
+    });
+  } catch (error) {
+    console.error("Verify receipt error:", error);
+    return res.status(500).json({
+      valid: false,
+      message: "Server error while verifying receipt",
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://127.0.0.1:${PORT}`);
 });
