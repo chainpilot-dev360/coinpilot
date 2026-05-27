@@ -116,6 +116,61 @@ async function loadStats() {
 
   URL.revokeObjectURL(url);
 }
+
+  function exportWithdrawalsCSV() {
+  if (!withdrawals || withdrawals.length === 0) {
+    alert("No withdrawals to export");
+    return;
+  }
+
+  const headers = [
+    "ID",
+    "User",
+    "Email",
+    "Amount",
+    "Currency",
+    "Status",
+    "Wallet Address",
+    "Reference",
+    "Receipt Reference",
+    "Created At",
+  ];
+
+  const rows = withdrawals.map((withdrawal) => [
+    withdrawal.id,
+    withdrawal.full_name || "",
+    withdrawal.email || "",
+    withdrawal.amount || "",
+    withdrawal.currency || "",
+    withdrawal.status || "",
+    withdrawal.wallet_address || "",
+    withdrawal.reference || "",
+    withdrawal.receipt_reference || "",
+    withdrawal.created_at || "",
+  ]);
+
+  const csvContent =
+    [headers, ...rows]
+      .map((row) =>
+        row
+          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+          .join(",")
+      )
+      .join("\n");
+
+  const blob = new Blob([csvContent], {
+    type: "text/csv;charset=utf-8;",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "withdrawals-report.csv";
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
   
   async function loadData() {
     try {
@@ -762,6 +817,22 @@ async function updateKyc(id, status) {
      )}
 
       <h3>Pending Withdrawals</h3>
+
+      <div style={{ marginBottom: "15px" }}>
+        <button
+          onClick={exportWithdrawalsCSV}
+          style={{
+          padding: "10px 14px",
+          borderRadius: "8px",
+          border: "none",
+          background: "#16a34a",
+          color: "white",
+          cursor: "pointer",
+        }}
+       >
+        Export Withdrawals CSV
+       </button>
+     </div>
 
       <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "15px" }}>
         <input
