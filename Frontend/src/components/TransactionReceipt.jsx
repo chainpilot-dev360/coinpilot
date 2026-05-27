@@ -394,9 +394,7 @@ const totalWithdrawals = withdrawals.reduce(
 
         <div style={stampCenter}>VERIFIED</div>
 
-        <div style={stampSmall}>
-          DIGITAL INVESTMENT PLATFORM
-        </div>
+        <div style={stampSmall}>OFFICIAL SEAL</div>
       </div>
     </div>
   </div>
@@ -724,53 +722,53 @@ const inkStamp = {
 };
 
 const stampOuter = {
-  width: "160px",
-  height: "160px",
+  width: "150px",
+  height: "150px",
   borderRadius: "50%",
   background:
-    "radial-gradient(circle at 30% 30%, #ffe89a, #d4af37 55%, #9f7300 100%)",
+    "radial-gradient(circle at 30% 25%, #fff3b0 0%, #f5c542 42%, #c99612 72%, #8a6408 100%)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   boxShadow:
-    "inset 0 0 0 4px rgba(255,255,255,0.25), inset 0 0 18px rgba(0,0,0,0.25), 0 4px 10px rgba(0,0,0,0.18)",
+    "inset 0 0 0 5px rgba(255,255,255,0.22), inset 0 0 14px rgba(0,0,0,0.22), 0 5px 12px rgba(0,0,0,0.18)",
 };
 
 const stampInner = {
-  width: "132px",
-  height: "132px",
+  width: "118px",
+  height: "118px",
   borderRadius: "50%",
-  border: "3px solid rgba(120,85,0,0.55)",
+  border: "3px double rgba(80,55,0,0.65)",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
   color: "#3f2d00",
   textAlign: "center",
-  background:
-    "radial-gradient(circle at top, rgba(255,255,255,0.45), rgba(255,255,255,0.05))",
 };
 
 const stampArc = {
-  fontSize: "14px",
-  letterSpacing: "4px",
-  fontWeight: "bold",
+  fontSize: "13px",
+  letterSpacing: "3px",
+  fontWeight: "900",
+  marginBottom: "6px",
 };
 
 const stampCenter = {
-  fontSize: "30px",
+  fontSize: "25px",
   fontWeight: "900",
-  borderTop: "2px solid rgba(80,60,0,0.5)",
-  borderBottom: "2px solid rgba(80,60,0,0.5)",
-  padding: "6px 0",
-  margin: "8px 0",
-  width: "108px",
+  borderTop: "2px solid rgba(80,55,0,0.55)",
+  borderBottom: "2px solid rgba(80,55,0,0.55)",
+  padding: "5px 0",
+  width: "95px",
+  lineHeight: "1",
 };
 
 const stampSmall = {
-  fontSize: "8px",
-  letterSpacing: "1px",
-  fontWeight: "bold",
+  fontSize: "10px",
+  letterSpacing: "1.5px",
+  fontWeight: "900",
+  marginTop: "7px",
 };
 
 const documentSealBox = {
