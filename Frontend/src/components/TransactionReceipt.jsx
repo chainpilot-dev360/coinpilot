@@ -484,11 +484,12 @@ const topBar = {
   position: "absolute",
   top: 0,
   right: 0,
-  width: "190px",
-  height: "150px",
+  width: "140px",
+  height: "110px",
   background:
     "linear-gradient(135deg, #0f172a 0%, #0f172a 60%, #d4af37 60%, #f7d774 100%)",
-  clipPath: "polygon(25% 0, 100% 0, 100% 100%)",
+  clipPath: "polygon(35% 0, 100% 0, 100% 100%)",
+  opacity: 0.95,
 };
 
 const header = {
