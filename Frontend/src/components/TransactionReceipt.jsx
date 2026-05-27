@@ -76,6 +76,7 @@ const totalWithdrawals = withdrawals.reduce(
   const canvas = await html2canvas(element, {
     scale: 2,
     useCORS: true,
+    backgroundColor: "#ffffff",
   });
 
   const imgData = canvas.toDataURL("image/png");
@@ -83,22 +84,25 @@ const totalWithdrawals = withdrawals.reduce(
   const pdf = new jsPDF("p", "mm", "a4");
 
   const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = pdf.internal.pageSize.getHeight();
 
-  const pdfHeight =
-    (canvas.height * pdfWidth) / canvas.width;
+  const imgWidth = pdfWidth;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-  pdf.addImage(
-    imgData,
-    "PNG",
-    0,
-    0,
-    pdfWidth,
-    pdfHeight
-  );
+  let heightLeft = imgHeight;
+  let position = 0;
 
-  pdf.save(
-    `${type.replace(/\s+/g, "_")}_Receipt.pdf`
-  );
+  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+  heightLeft -= pdfHeight;
+
+  while (heightLeft > 0) {
+    position -= pdfHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pdfHeight;
+  }
+
+  pdf.save(`${type.replace(/\s+/g, "_")}_Document.pdf`);
 };
 
   return (
