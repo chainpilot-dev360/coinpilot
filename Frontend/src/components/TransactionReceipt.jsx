@@ -376,36 +376,77 @@ const totalWithdrawals = withdrawals.reduce(
 
         <div style={verification}>
   <div style={signatureBox}>
-    <div style={signatureMark}>P.W.</div>
+    <div style={signatureMark}>P∿W</div>
+
     <div style={signatureLine}></div>
+
     <strong>Peter Woods</strong>
+
     <p>Chief Executive Officer</p>
+
     <p>CoinPilot Digital Investment Platform</p>
   </div>
 
   <div style={inkStamp}>
-    <div style={stampCircle}>
-      <div style={stampTop}>COINPILOT</div>
-      <div style={stampCenter}>VERIFIED</div>
-      <div style={stampBottom}>DIGITAL INVESTMENT PLATFORM</div>
+    <div style={stampOuter}>
+      <div style={stampInner}>
+        <div style={stampArc}>COINPILOT</div>
+
+        <div style={stampCenter}>VERIFIED</div>
+
+        <div style={stampSmall}>
+          DIGITAL INVESTMENT PLATFORM
+        </div>
+      </div>
     </div>
   </div>
 
-  <div style={qrBox}>
-    <div style={fakeQr}>
-      <div></div><div></div><div></div><div></div>
-      <div></div><div></div><div></div><div></div>
-      <div></div><div></div><div></div><div></div>
-      <div></div><div></div><div></div><div></div>
-    </div>
+  <div style={documentSealBox}>
+    <strong
+      style={{
+        display: "block",
+        marginBottom: "10px",
+        color: "#0f172a",
+      }}
+    >
+      DOCUMENT AUTHENTICATION
+    </strong>
 
-    <div>
-      <strong>Scan to verify</strong>
-      <p>this receipt on</p>
-      <p>our platform</p>
-      <p style={{ color: "#1d4ed8", fontWeight: "bold" }}>
-        {COMPANY.website}/verify
-      </p>
+    <p>
+      This document was electronically generated and officially
+      verified by CoinPilot.
+    </p>
+
+    <p>
+      Registration No: {COMPANY.registration}
+    </p>
+
+    <p>
+      Verification Portal:
+    </p>
+
+    <p
+      style={{
+        color: "#2563eb",
+        fontWeight: "bold",
+      }}
+    >
+      {COMPANY.website}/verify
+    </p>
+
+    <div
+      style={{
+        marginTop: "12px",
+        background: "#dbeafe",
+        color: "#1e3a8a",
+        padding: "6px 10px",
+        borderRadius: "8px",
+        fontWeight: "bold",
+        fontSize: "11px",
+        display: "inline-block",
+      }}
+    >
+      AUTHENTICATED DOCUMENT
     </div>
   </div>
 </div>
@@ -645,96 +686,101 @@ const thanks = {
 
 const verification = {
   display: "grid",
-  gridTemplateColumns: "1fr 170px 1fr",
-  gap: "25px",
+  gridTemplateColumns: "1fr 180px 1fr",
+  gap: "24px",
   alignItems: "center",
-  borderTop: "1px solid #e5e7eb",
-  borderBottom: "1px solid #e5e7eb",
-  padding: "25px 0",
+  borderTop: "1px solid #dbe4f0",
+  borderBottom: "1px solid #dbe4f0",
+  padding: "24px 0",
   marginBottom: "25px",
 };
 
 const signatureBox = {
   textAlign: "left",
+  paddingLeft: "10px",
 };
 
 const signatureMark = {
-  fontSize: "54px",
-  fontFamily: "Brush Script MT, Segoe Script, cursive",
-  color: "#0f2a66",
-  transform: "rotate(-4deg)",
-  letterSpacing: "2px",
-  marginBottom: "-8px",
+  fontSize: "76px",
+  lineHeight: "0.75",
+  fontFamily: "Brush Script MT, Segoe Script, Lucida Handwriting, cursive",
+  color: "#061a44",
+  transform: "rotate(-6deg)",
+  letterSpacing: "-8px",
+  marginBottom: "-2px",
 };
 
 const signatureLine = {
-  width: "210px",
-  height: "1px",
+  width: "230px",
+  height: "1.5px",
   background: "#0f172a",
-  margin: "0 0 10px 0",
+  margin: "2px 0 10px 0",
 };
 
 const inkStamp = {
   display: "flex",
   justifyContent: "center",
+  alignItems: "center",
 };
 
-const stampCircle = {
-  width: "145px",
-  height: "145px",
+const stampOuter = {
+  width: "150px",
+  height: "150px",
   borderRadius: "50%",
-  border: "4px double #1d4ed8",
-  color: "#1d4ed8",
+  border: "3px solid rgba(29,78,216,0.85)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  transform: "rotate(-7deg)",
+  opacity: 0.78,
+  filter: "contrast(1.15)",
+};
+
+const stampInner = {
+  width: "126px",
+  height: "126px",
+  borderRadius: "50%",
+  border: "2px dashed rgba(29,78,216,0.85)",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  fontWeight: "bold",
-  transform: "rotate(-8deg)",
-  opacity: 0.82,
-  boxShadow: "0 0 0 2px rgba(29,78,216,0.18)",
+  color: "#1d4ed8",
+  textAlign: "center",
 };
 
-const stampTop = {
+const stampArc = {
   fontSize: "15px",
-  letterSpacing: "3px",
+  letterSpacing: "4px",
+  fontWeight: "bold",
 };
 
 const stampCenter = {
   fontSize: "28px",
+  fontWeight: "900",
   borderTop: "2px solid #1d4ed8",
   borderBottom: "2px solid #1d4ed8",
   padding: "5px 0",
   margin: "8px 0",
+  width: "105px",
 };
 
-const stampBottom = {
-  fontSize: "9px",
+const stampSmall = {
+  fontSize: "8px",
   letterSpacing: "1px",
-  textAlign: "center",
+  fontWeight: "bold",
 };
 
-const qrBox = {
-  display: "flex",
-  alignItems: "center",
-  gap: "15px",
+const documentSealBox = {
+  background: "#f8fafc",
+  border: "1px solid #dbe4f0",
+  borderLeft: "5px solid #2563eb",
+  borderRadius: "12px",
+  padding: "16px",
   fontSize: "13px",
   color: "#0f172a",
+  lineHeight: "1.5",
 };
-
-const fakeQr = {
-  width: "95px",
-  height: "95px",
-  display: "grid",
-  gridTemplateColumns: "repeat(4, 1fr)",
-  gridTemplateRows: "repeat(4, 1fr)",
-  gap: "4px",
-  background: "#fff",
-  border: "6px solid #111",
-  padding: "5px",
-};
-
-const fakeQrCell = {};
 
 const footer = {
   background: "#071a3a",
