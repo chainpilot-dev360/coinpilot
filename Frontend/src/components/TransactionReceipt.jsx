@@ -375,29 +375,40 @@ const totalWithdrawals = withdrawals.reduce(
         </div>
 
         <div style={verification}>
-          <div>
-            <div style={signature}>
-              Peter Woods
-            </div>
+  <div style={signatureBox}>
+    <div style={signatureMark}>P.W.</div>
+    <div style={signatureLine}></div>
+    <strong>Peter Woods</strong>
+    <p>Chief Executive Officer</p>
+    <p>CoinPilot Digital Investment Platform</p>
+  </div>
 
-            <strong>{COMPANY.ceo}</strong>
+  <div style={inkStamp}>
+    <div style={stampCircle}>
+      <div style={stampTop}>COINPILOT</div>
+      <div style={stampCenter}>VERIFIED</div>
+      <div style={stampBottom}>DIGITAL INVESTMENT PLATFORM</div>
+    </div>
+  </div>
 
-            <p>Chief Executive Officer</p>
-            <p>{COMPANY.name}</p>
-          </div>
+  <div style={qrBox}>
+    <div style={fakeQr}>
+      <div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div>
+    </div>
 
-          <div style={seal}>
-            VERIFIED
-          </div>
-
-          <div style={verifyText}>
-            <strong>Registration No:</strong>
-            <p>{COMPANY.registration}</p>
-
-            <strong>Verification:</strong>
-            <p>{COMPANY.website}/verify</p>
-          </div>
-        </div>
+    <div>
+      <strong>Scan to verify</strong>
+      <p>this receipt on</p>
+      <p>our platform</p>
+      <p style={{ color: "#1d4ed8", fontWeight: "bold" }}>
+        {COMPANY.website}/verify
+      </p>
+    </div>
+  </div>
+</div>
 
         <footer style={footer}>
           <span>Bank-Level Security</span>
@@ -634,47 +645,105 @@ const thanks = {
 
 const verification = {
   display: "grid",
-  gridTemplateColumns: "1fr 130px 1fr",
-  gap: "20px",
+  gridTemplateColumns: "1fr 170px 1fr",
+  gap: "25px",
   alignItems: "center",
-  border: "1px solid #f1d18a",
-  borderRadius: "14px",
-  padding: "20px",
+  borderTop: "1px solid #e5e7eb",
+  borderBottom: "1px solid #e5e7eb",
+  padding: "25px 0",
   marginBottom: "25px",
 };
 
-const signature = {
-  fontSize: "30px",
-  fontFamily: "cursive",
-  borderBottom: "1px solid #c9972b",
-  marginBottom: "8px",
+const signatureBox = {
+  textAlign: "left",
 };
 
-const seal = {
-  width: "120px",
-  height: "120px",
-  borderRadius: "50%",
-  background: "radial-gradient(circle, #f7d774, #c9972b)",
-  color: "#0f172a",
+const signatureMark = {
+  fontSize: "54px",
+  fontFamily: "Brush Script MT, Segoe Script, cursive",
+  color: "#0f2a66",
+  transform: "rotate(-4deg)",
+  letterSpacing: "2px",
+  marginBottom: "-8px",
+};
+
+const signatureLine = {
+  width: "210px",
+  height: "1px",
+  background: "#0f172a",
+  margin: "0 0 10px 0",
+};
+
+const inkStamp = {
   display: "flex",
+  justifyContent: "center",
+};
+
+const stampCircle = {
+  width: "145px",
+  height: "145px",
+  borderRadius: "50%",
+  border: "4px double #1d4ed8",
+  color: "#1d4ed8",
+  display: "flex",
+  flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
   fontWeight: "bold",
-  border: "6px double #8a6a13",
+  transform: "rotate(-8deg)",
+  opacity: 0.82,
+  boxShadow: "0 0 0 2px rgba(29,78,216,0.18)",
 };
 
-const verifyText = {
-  fontSize: "13px",
-  color: "#334155",
+const stampTop = {
+  fontSize: "15px",
+  letterSpacing: "3px",
 };
+
+const stampCenter = {
+  fontSize: "28px",
+  borderTop: "2px solid #1d4ed8",
+  borderBottom: "2px solid #1d4ed8",
+  padding: "5px 0",
+  margin: "8px 0",
+};
+
+const stampBottom = {
+  fontSize: "9px",
+  letterSpacing: "1px",
+  textAlign: "center",
+};
+
+const qrBox = {
+  display: "flex",
+  alignItems: "center",
+  gap: "15px",
+  fontSize: "13px",
+  color: "#0f172a",
+};
+
+const fakeQr = {
+  width: "95px",
+  height: "95px",
+  display: "grid",
+  gridTemplateColumns: "repeat(4, 1fr)",
+  gridTemplateRows: "repeat(4, 1fr)",
+  gap: "4px",
+  background: "#fff",
+  border: "6px solid #111",
+  padding: "5px",
+};
+
+const fakeQrCell = {};
 
 const footer = {
-  background: "linear-gradient(90deg, #0f172a, #1e3a8a)",
-  color: "#f7d774",
-  padding: "18px",
-  borderRadius: "12px",
+  background: "#071a3a",
+  color: "#fff",
+  padding: "18px 22px",
+  borderRadius: "10px",
   display: "flex",
   justifyContent: "space-between",
+  alignItems: "center",
   fontSize: "12px",
   fontWeight: "bold",
 };
