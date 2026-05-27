@@ -868,7 +868,15 @@ async function changePassword() {
               status: "GENERATED",
               deposits: depositHistory || [],
               withdrawals: withdrawalHistory || [],
-              currentBalance: data?.user?.balance || 0,
+              currentBalance:
+                (depositHistory || []).reduce(
+                  (sum, d) => sum + Number(d.amount || 0),
+                  0
+                ) -
+                (withdrawalHistory || []).reduce(
+                  (sum, w) => sum + Number(w.amount || 0),
+                  0
+                 ),
               admin_note: "Official account statement generated from CoinPilot dashboard.",
             },
          })
