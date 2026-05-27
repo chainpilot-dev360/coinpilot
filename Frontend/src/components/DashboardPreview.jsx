@@ -1017,6 +1017,34 @@ async function changePassword() {
                 >
                   Download Receipt
                 </button>
+                
+                <button
+                  onClick={() =>
+                    setSelectedReceipt({
+                      type: "Withdrawal",
+                      transaction: {
+                        ...withdrawal,
+                        reference:
+                          withdrawal.receipt_reference ||
+                          withdrawal.reference ||
+                          withdrawal.id,
+                       },
+                     })
+                   }
+                   style={{
+                     marginTop: "10px",
+                     background: "#16a34a",
+                     color: "#fff",
+                     border: "none",
+                     padding: "10px 14px",
+                     borderRadius: "8px",
+                     cursor: "pointer",
+                     fontWeight: "bold",
+                   }}
+                >
+                   View Professional Receipt
+                </button>
+                
               </div>
             )}
 
