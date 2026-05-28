@@ -646,11 +646,8 @@ app.get("/api/auth/me", requireAuth, async (req, res) => {
 app.get("/api/users", requireAuth, requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, full_name, email, role, created_at, is_frozen, freeze_reason
-       FROM users
-       ORDER BY id DESC"
-    );
-
+      "SELECT id, full_name, email, role, created_at, is_frozen, freeze_reason FROM users ORDER BY id DESC"
+);
     res.json(result.rows);
   } catch (error) {
     console.error("Fetch users error:", error);
