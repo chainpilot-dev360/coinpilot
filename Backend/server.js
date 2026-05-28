@@ -2638,6 +2638,37 @@ app.put("/api/admin/users/:id/withdrawals", requireAuth, requireAdmin, async (re
   }
 });
 
+app.put("/api/admin/users/:id/deposits", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { deposits_disabled, deposit_disable_reason } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE users
+      SET
+        deposits_disabled = $1,
+        deposit_disable_reason = $2
+      WHERE id = $3
+      RETURNING id, full_name, email, deposits_disabled, deposit_disable_reason
+      `,
+      [deposits_disabled, deposit_disable_reason || null, id]
+    );
+
+    res.json({
+      message: deposits_disabled
+        ? "Deposits disabled successfully"
+        : "Deposits enabled successfully",
+      user: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Deposit restriction error:", error);
+    res.status(500).json({
+      message: "Failed to update deposit restriction",
+    });
+  }
+});
+
 app.put("/api/admin/investments/:id/stop", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
