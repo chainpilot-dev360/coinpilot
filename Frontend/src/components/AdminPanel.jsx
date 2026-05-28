@@ -851,6 +851,7 @@ async function updateKyc(id, status) {
                 style={{
                   marginTop: "15px",
                   background: "#f8fafc",
+                  color: "#0f172a",
                   padding: "12px",
                   borderRadius: "10px",
                   border: "1px solid #cbd5e1",
