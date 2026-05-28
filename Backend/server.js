@@ -854,13 +854,23 @@ app.post("/api/deposits", requireAuth, upload.single("proof"), async (req, res) 
 
     const proofUrl = req.file?.path || null;
 
+    const receiptReference =
+      "DEP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+
     const result = await pool.query(
       `
-      INSERT INTO deposits (user_id, currency, amount, status, proof_url)
-      VALUES ($1, $2, $3, 'PENDING', $4)
-      RETURNING *
+      INSERT INTO deposits (
+        user_id,
+        currency,
+        amount,
+        status,
+        proof_url,
+        receipt_reference
+)
+VALUES ($1, $2, $3, 'PENDING', $4, $5)
+RETURNING *
       `,
-      [userId, currency, amount, proofUrl]
+      [userId, currency, amount, proofUrl, receiptReference]
     );
 
     await createNotification(
