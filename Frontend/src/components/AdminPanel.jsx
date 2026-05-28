@@ -326,6 +326,35 @@ async function loadStats() {
     alert("Failed to update freeze status");
   }
 }
+
+  async function stopInvestment(investmentId) {
+  if (!confirm("Are you sure you want to stop this investment?")) return;
+
+  try {
+    await axios.put(
+      `${API_URL}/api/admin/investments/${investmentId}/stop`,
+      {
+        is_stopped: true,
+        stop_reason: "Stopped by administrator",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert("Investment stopped successfully");
+
+    loadData();
+  } catch (error) {
+    alert(
+      error.response?.data?.message ||
+      "Failed to stop investment"
+    );
+  }
+}
+  
   async function adjustBalance() {
     if (!selectedUserId) return alert("Select a user first");
     if (!balanceAmount) return alert("Enter amount");
