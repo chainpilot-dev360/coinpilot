@@ -277,6 +277,17 @@ async function loadReferralStats() {
   }
 }
 
+const registerStatement = async (statementData) => {
+  try {
+    await axios.post(
+      `${API_URL}/api/statements/register`,
+      statementData
+    );
+  } catch (error) {
+    console.error("Statement registration failed", error);
+  }
+};
+
 async function loadTransactionHistory() {
   try {
     const userId = user?.id || user?.userId;
@@ -864,6 +875,11 @@ async function changePassword() {
             transaction: {
               id: `STATEMENT-${Date.now()}`,
               reference: `STATEMENT-${Date.now()}`,
+
+              statement_reference:
+                "STMT-" +
+                Math.random().toString(36).substring(2, 8).toUpperCase(),
+              
               currency: data?.user?.account_currency || "USD",
               status: "GENERATED",
               deposits: depositHistory || [],
@@ -881,6 +897,14 @@ async function changePassword() {
             },
          })
        }
+
+        registerStatement({
+          reference: `STATEMENT-${Date.now()}`,
+          type: "Account Statement",
+          currency: data?.user?.account_currency || "USD",
+          status: "GENERATED",
+        });
+      
        style={{
          marginBottom: "15px",
          background: "#0f172a",
