@@ -981,6 +981,23 @@ if (!kyc.rows.length || kyc.rows[0].status !== "APPROVED") {
       [numericAmount, req.user.userId, currency]
     );
 
+    const restrictionCheck = await pool.query(
+      `
+      SELECT withdrawals_disabled, withdrawal_disable_reason
+      FROM users
+      WHERE id = $1
+      `,
+      [userId]
+    );
+
+    if (restrictionCheck.rows[0]?.withdrawals_disabled) {
+      return res.status(403).json({
+        message:
+          restrictionCheck.rows[0].withdrawal_disable_reason ||
+          "Withdrawals are temporarily disabled on this account.",
+      });
+    }
+
     const result = await pool.query(
       `
       INSERT INTO withdrawals (user_id, currency, amount, wallet_address, status)
