@@ -2523,24 +2523,23 @@ app.get("/api/verify-receipt/:reference", async (req, res) => {
     const depositResult = await pool.query(
       `
       SELECT 
-        id,
-        full_name,
-        email,
-        amount,
-        currency,
-        status,
-        receipt_reference,
-        reference,
-        created_at,
+        d.id,
+        u.full_name,
+        u.email,
+        d.amount,
+        d.currency,
+        d.status,
+        d.receipt_reference,
+        d.created_at,
         'Deposit' AS type
-      FROM deposits
-      WHERE receipt_reference = $1
-         OR reference = $1
-         OR CAST(id AS TEXT) = $1
-      LIMIT 1
-      `,
-      [reference]
-    );
+      FROM deposits d
+     JOIN users u ON u.id = d.user_id
+     WHERE d.receipt_reference = $1
+        OR CAST(d.id AS TEXT) = $1
+     LIMIT 1
+     `,
+     [reference]
+   );
 
     if (depositResult.rows.length > 0) {
       return res.json({
