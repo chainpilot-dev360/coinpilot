@@ -2556,6 +2556,33 @@ app.post("/api/statements/register", async (req, res) => {
   }
 });
 
+app.put("/api/admin/users/:id/freeze", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { is_frozen, freeze_reason } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE users
+      SET
+        is_frozen = $1,
+        freeze_reason = $2
+      WHERE id = $3
+      RETURNING id, full_name, email, is_frozen, freeze_reason
+      `,
+      [is_frozen, freeze_reason || null, id]
+    );
+
+    res.json({
+      message: is_frozen ? "User account frozen" : "User account unfrozen",
+      user: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Freeze user error:", error);
+    res.status(500).json({ message: "Failed to update user freeze status" });
+  }
+});
+
 app.get("/api/verify-receipt/:reference", async (req, res) => {
   try {
     const { reference } = req.params;
