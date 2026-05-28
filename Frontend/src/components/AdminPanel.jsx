@@ -29,6 +29,9 @@ function AdminPanel() {
   const [selectedUserData, setSelectedUserData] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
+  const [activityLogs, setActivityLogs] = useState([]);
+  const [showActivityUserId, setShowActivityUserId] = useState(null);
+
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("Loading admin data...");
 
@@ -281,6 +284,25 @@ async function loadStats() {
       alert(error.response?.data?.message || "Failed to load user data");
     }
   }
+
+  async function viewUserActivity(userId) {
+  try {
+    const res = await axios.get(
+      `${API_URL}/api/admin/users/${userId}/activity`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setActivityLogs(res.data);
+    setShowActivityUserId(userId);
+  } catch (error) {
+    console.error(error);
+    alert("Failed to load user activity");
+  }
+}
 
   async function deleteUser(userId) {
     if (!confirm("Are you sure you want to permanently delete this user?")) return;
@@ -790,6 +812,22 @@ async function updateKyc(id, status) {
                 : "Disable Deposits"}
              </button>
 
+            <button
+              onClick={() => viewUserActivity(user.id)}
+              style={{
+                background: "#0f172a",
+                color: "#fff",
+                border: "none",
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                marginTop: "10px",
+                marginLeft: "10px"
+              }}
+            >
+              View Activity
+            </button>
+
             <textarea
               placeholder="Admin internal notes..."
               defaultValue={user.admin_notes || ""}
@@ -807,6 +845,47 @@ async function updateKyc(id, status) {
                 resize: "vertical",
               }}
             />
+
+            {showActivityUserId === user.id && (
+              <div
+                style={{
+                  marginTop: "15px",
+                  background: "#f8fafc",
+                  padding: "12px",
+                  borderRadius: "10px",
+                  border: "1px solid #cbd5e1",
+                  maxHeight: "300px",
+                  overflowY: "auto",
+                }}
+               >
+                <h4>User Activity Timeline</h4>
+
+                {activityLogs.length === 0 ? (
+                   <p>No activity logs found.</p>
+                ) : (
+                  activityLogs.map((log) => (
+                    <div
+                      key={log.id}
+                      style={{
+                      padding: "10px",
+                      borderBottom: "1px solid #e2e8f0",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <p>
+                      <strong>{log.activity_type}</strong>
+                    </p>
+
+                    <p>{log.description}</p>
+
+                    <small>
+                      {new Date(log.created_at).toLocaleString()}
+                    </small>
+                  </div>
+                ))
+              )}
+            </div>
+           )}
             
           </div>
         ))
