@@ -869,42 +869,42 @@ async function changePassword() {
       </div>
 
       <button
-        onClick={() =>
-          setSelectedReceipt({
-            type: "Account Statement",
-            transaction: {
-              id: `STATEMENT-${Date.now()}`,
-              reference: `STATEMENT-${Date.now()}`,
+        onClick={() => {
+          const statementRef =
+            "STMT-" +
+            Math.random().toString(36).substring(2, 8).toUpperCase();
 
-              statement_reference:
-                "STMT-" +
-                Math.random().toString(36).substring(2, 8).toUpperCase(),
-              
-              currency: data?.user?.account_currency || "USD",
-              status: "GENERATED",
-              deposits: depositHistory || [],
-              withdrawals: withdrawalHistory || [],
-              currentBalance:
-                (depositHistory || []).reduce(
-                  (sum, d) => sum + Number(d.amount || 0),
-                  0
-                ) -
-                (withdrawalHistory || []).reduce(
-                  (sum, w) => sum + Number(w.amount || 0),
-                  0
-                 ),
-              admin_note: "Official account statement generated from CoinPilot dashboard.",
-            },
-         })
-       }
+           const currentBalance =
+              (depositHistory || []).reduce(
+                 (sum, d) => sum + Number(d.amount || 0),
+                 0
+               ) -
+               (withdrawalHistory || []).reduce(
+                 (sum, w) => sum + Number(w.amount || 0),
+                 0
+                );
 
-        registerStatement({
-          reference: `STATEMENT-${Date.now()}`,
-          type: "Account Statement",
-          currency: data?.user?.account_currency || "USD",
-          status: "GENERATED",
-        });
-      
+              setSelectedReceipt({
+                type: "Account Statement",
+                transaction: {
+                  id: statementRef,
+                  reference: statementRef,
+                  statement_reference: statementRef,
+                  currency: data?.user?.account_currency || "USD",
+                  status: "GENERATED",
+                  deposits: depositHistory || [],
+                  withdrawals: withdrawalHistory || [],
+                  currentBalance,
+                  admin_note:
+                    "Official account statement generated from CoinPilot dashboard.",
+                },
+              });
+
+              registerStatement({
+                reference: statementRef,
+                currency: data?.user?.account_currency || "USD",
+         });
+       }}
        style={{
          marginBottom: "15px",
          background: "#0f172a",
