@@ -303,6 +303,29 @@ async function loadStats() {
     }
   }
 
+ async function toggleFreeze(userId, freeze) {
+  try {
+    await axios.put(
+      `${API_URL}/api/admin/users/${userId}/freeze`,
+      {
+        is_frozen: freeze,
+        freeze_reason: freeze ? "Frozen by admin" : null,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert(freeze ? "Account frozen successfully" : "Account unfrozen successfully");
+
+    loadData();
+  } catch (error) {
+    console.error(error);
+    alert("Failed to update freeze status");
+  }
+}
   async function adjustBalance() {
     if (!selectedUserId) return alert("Select a user first");
     if (!balanceAmount) return alert("Enter amount");
@@ -580,6 +603,23 @@ async function updateKyc(id, status) {
             <button onClick={() => deleteUser(user.id)} style={dangerButton}>
               Delete User
             </button>
+
+            <button
+              onClick={() => toggleFreeze(user.id, !user.is_frozen)}
+              style={{
+                background: user.is_frozen ? "#16a34a" : "#dc2626",
+                color: "#fff",
+                border: "none",
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                marginTop: "10px",
+                marginLeft: "10px"
+              }}
+             >
+              {user.is_frozen ? "Unfreeze Account" : "Freeze Account"}
+             </button>
+            
           </div>
         ))
       )}
