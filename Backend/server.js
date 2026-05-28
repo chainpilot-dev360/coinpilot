@@ -2875,8 +2875,8 @@ app.get("/api/messages/:userId", requireAuth, async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const requesterId = req.user.id || req.user.userId;
-    const requesterRole = req.user.role;
+    const requesterId = req.user.userId || req.user.id;
+    const requesterRole = req.user.role || "user";
 
     if (requesterRole !== "admin" && Number(userId) !== Number(requesterId)) {
       return res.status(403).json({
