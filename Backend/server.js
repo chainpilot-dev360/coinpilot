@@ -859,6 +859,23 @@ app.post("/api/deposits", requireAuth, upload.single("proof"), async (req, res) 
       return res.status(400).json({ message: "Valid deposit amount is required" });
     }
 
+    const depositRestrictionCheck = await pool.query(
+      `
+      SELECT deposits_disabled, deposit_disable_reason
+      FROM users
+      WHERE id = $1
+      `,
+      [userId]
+    );
+
+    if (depositRestrictionCheck.rows[0]?.deposits_disabled) {
+      return res.status(403).json({
+        message:
+          depositRestrictionCheck.rows[0].deposit_disable_reason ||
+          "Deposits are temporarily disabled on this account.",
+      });
+    }
+
     const proofUrl = req.file?.path || null;
 
     const receiptReference =
