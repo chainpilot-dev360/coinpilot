@@ -309,7 +309,7 @@ async function loadStats() {
       `${API_URL}/api/admin/users/${userId}/freeze`,
       {
         is_frozen: freeze,
-        freeze_reason: freeze ? "Frozen by admin" : null,
+        freeze_reason: freeze ? "Access to this account has been temporarily restricted. Please contact support for further assistance." : null,
       },
       {
         headers: {
