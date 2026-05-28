@@ -2686,6 +2686,33 @@ app.put("/api/admin/users/:id/deposits", requireAuth, requireAdmin, async (req, 
   }
 });
 
+app.put("/api/admin/users/:id/notes", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { admin_notes } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE users
+      SET admin_notes = $1
+      WHERE id = $2
+      RETURNING id, full_name, email, admin_notes
+      `,
+      [admin_notes || null, id]
+    );
+
+    res.json({
+      message: "Admin note updated successfully",
+      user: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Admin note error:", error);
+    res.status(500).json({
+      message: "Failed to update admin note",
+    });
+  }
+});
+
 app.put("/api/admin/investments/:id/stop", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
