@@ -645,9 +645,8 @@ app.get("/api/auth/me", requireAuth, async (req, res) => {
 
 app.get("/api/users", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const result = await pool.query(
       const result = await pool.query(
-  `
+        `
   "SELECT id, full_name, email, role, created_at, is_frozen, freeze_reason, withdrawals_disabled, withdrawal_disable_reason, deposits_disabled, deposit_disable_reason, admin_notes FROM users ORDER BY id DESC"
   
 );
