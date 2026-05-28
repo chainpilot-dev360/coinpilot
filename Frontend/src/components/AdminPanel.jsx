@@ -33,6 +33,8 @@ function AdminPanel() {
   const [showActivityUserId, setShowActivityUserId] = useState(null);
 
   const [messageInputs, setMessageInputs] = useState({});
+  const [chatMessages, setChatMessages] = useState([]);
+  const [openMessageUserId, setOpenMessageUserId] = useState(null);
 
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("Loading admin data...");
@@ -303,6 +305,26 @@ async function loadStats() {
   } catch (error) {
     console.error(error);
     alert("Failed to load user activity");
+  }
+}
+
+async function openMessages(userId) {
+  try {
+    const res = await axios.get(
+      `${API_URL}/api/messages/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setChatMessages(res.data);
+    setOpenMessageUserId(userId);
+  } catch (error) {
+    console.error(error);
+
+    alert("Failed to load messages");
   }
 }
 
@@ -869,6 +891,22 @@ async function updateKyc(id, status) {
               View Activity
             </button>
 
+            <button
+              onClick={() => openMessages(user.id)}
+              style={{
+                background: "#2563eb",
+                color: "#fff",
+                border: "none",
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                marginTop: "10px",
+                marginLeft: "10px"
+              }}
+            >
+              Open Messages
+            </button>
+
             <textarea
               placeholder="Admin internal notes..."
               defaultValue={user.admin_notes || ""}
@@ -923,6 +961,46 @@ async function updateKyc(id, status) {
                 Send Message
               </button>
             </div>
+
+            {openMessageUserId === user.id && (
+              <div
+                style={{
+                  marginTop: "15px",
+                  background: "#f8fafc",
+                  color: "#0f172a",
+                  padding: "12px",
+                  borderRadius: "10px",
+                  border: "1px solid #cbd5e1",
+                  maxHeight: "300px",
+                  overflowY: "auto",
+                }}
+              >
+                <h4>Message History</h4>
+
+                {chatMessages.length === 0 ? (
+                  <p>No messages yet.</p>
+                ) : (
+                  chatMessages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      style={{
+                      padding: "10px",
+                      borderBottom: "1px solid #e2e8f0",
+                      marginBottom: "8px",
+                    }}
+                   >
+                    <p>
+                      <strong>{msg.sender_role}:</strong> {msg.message}
+                    </p>
+
+                   <small>
+                     {new Date(msg.created_at).toLocaleString()}
+                   </small>
+                 </div>
+               ))
+             )}
+           </div>
+         )}
 
             {showActivityUserId === user.id && (
               <div
