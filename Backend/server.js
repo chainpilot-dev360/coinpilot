@@ -2550,21 +2550,20 @@ app.get("/api/verify-receipt/:reference", async (req, res) => {
 
     const withdrawalResult = await pool.query(
       `
-      SELECT 
-        id,
-        full_name,
-        email,
-        amount,
-        currency,
-        status,
-        receipt_reference,
-        reference,
-        created_at,
+      SELECT
+        w.id,
+        u.full_name,
+        u.email,
+        w.amount,
+        w.currency,
+        w.status,
+        w.receipt_reference,
+        w.created_at,
         'Withdrawal' AS type
-      FROM withdrawals
-      WHERE receipt_reference = $1
-         OR reference = $1
-         OR CAST(id AS TEXT) = $1
+      FROM withdrawals w
+      JOIN users u ON u.id = w.user_id
+      WHERE w.receipt_reference = $1
+         OR CAST(w.id AS TEXT) = $1
       LIMIT 1
       `,
       [reference]
