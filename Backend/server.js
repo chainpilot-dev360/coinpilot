@@ -2616,6 +2616,32 @@ app.get("/api/verify-receipt/:reference", async (req, res) => {
       });
     }
 
+const statementResult = await pool.query(
+  `
+  SELECT
+    id,
+    statement_reference AS receipt_reference,
+    currency,
+    current_balance,
+    total_deposits,
+    total_withdrawals,
+    created_at,
+    'Account Statement' AS type,
+    'GENERATED' AS status
+  FROM account_statements
+  WHERE statement_reference = $1
+  LIMIT 1
+  `,
+  [reference]
+);
+
+if (statementResult.rows.length > 0) {
+  return res.json({
+    valid: true,
+    receipt: statementResult.rows[0],
+  });
+}
+
     return res.status(404).json({
       valid: false,
       message: "Receipt not found",
