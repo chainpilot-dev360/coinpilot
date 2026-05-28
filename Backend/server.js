@@ -2818,6 +2818,91 @@ app.post("/api/admin/users/:id/message", requireAuth, requireAdmin, async (req, 
   }
 });
 
+app.post("/api/messages/send", requireAuth, async (req, res) => {
+  try {
+    const { user_id, message } = req.body;
+
+    const senderRole = req.user.role || "user";
+
+    const senderName =
+      req.user.full_name ||
+      req.user.email ||
+      "Unknown";
+
+    const targetUserId =
+      senderRole === "admin"
+        ? user_id
+        : req.user.id;
+
+    await pool.query(
+      `
+      INSERT INTO user_messages
+      (
+        user_id,
+        sender_role,
+        sender_name,
+        message
+      )
+      VALUES ($1, $2, $3, $4)
+      `,
+      [
+        targetUserId,
+        senderRole,
+        senderName,
+        message,
+      ]
+    );
+
+    await logUserActivity(
+      targetUserId,
+      "MESSAGE_SENT",
+      `${senderRole} sent a message`
+    );
+
+    res.json({
+      message: "Message sent successfully",
+    });
+  } catch (error) {
+    console.error("Send message error:", error);
+
+    res.status(500).json({
+      message: "Failed to send message",
+    });
+  }
+});
+
+app.get("/api/messages/:userId", requireAuth, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const requesterId = req.user.id || req.user.userId;
+    const requesterRole = req.user.role;
+
+    if (requesterRole !== "admin" && Number(userId) !== Number(requesterId)) {
+      return res.status(403).json({
+        message: "Not authorized to view these messages",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM user_messages
+      WHERE user_id = $1
+      ORDER BY created_at ASC
+      `,
+      [userId]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Fetch messages error:", error);
+    res.status(500).json({
+      message: "Failed to load messages",
+    });
+  }
+});
+
 app.put("/api/admin/investments/:id/stop", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
