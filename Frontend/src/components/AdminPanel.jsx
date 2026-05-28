@@ -473,17 +473,16 @@ async function openMessages(userId) {
 
   try {
     await axios.post(
-      `${API_URL}/api/admin/users/${userId}/message`,
-      {
-        title: "Message from CoinPilot",
-        message,
-        type: "INFO",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+       `${API_URL}/api/messages/send`,
+       {
+         user_id: userId,
+         message,
+       },
+       {
+         headers: {
+           Authorization: `Bearer ${token}`,
+         },
+       }
     );
 
     alert("Message sent successfully");
