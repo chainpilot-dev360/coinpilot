@@ -2590,6 +2590,41 @@ app.put("/api/admin/users/:id/freeze", requireAuth, requireAdmin, async (req, re
   }
 });
 
+app.put("/api/admin/investments/:id/stop", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { is_stopped, stop_reason } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE user_investments
+      SET
+        is_stopped = $1,
+        stop_reason = $2
+      WHERE id = $3
+      RETURNING *
+      `,
+      [
+        is_stopped,
+        stop_reason || null,
+        id,
+      ]
+    );
+
+    res.json({
+      message: is_stopped
+        ? "Investment stopped successfully"
+        : "Investment restarted successfully",
+      investment: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Stop investment error:", error);
+    res.status(500).json({
+      message: "Failed to update investment status",
+    });
+  }
+});
+
 app.get("/api/verify-receipt/:reference", async (req, res) => {
   try {
     const { reference } = req.params;
