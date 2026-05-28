@@ -418,6 +418,14 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
       });
     }
 
+    if (user.is_frozen) {
+      return res.status(403).json({
+        message:
+          user.freeze_reason ||
+          "Your account has been frozen. Please contact support.",
+      });
+    }
+
     const token = createToken(user);
 
     res.json({
