@@ -2516,6 +2516,46 @@ app.get("/api/admin/stats", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+app.post("/api/statements/register", async (req, res) => {
+  try {
+    const {
+      reference,
+      type,
+      currency,
+      status
+    } = req.body;
+
+    const result = await pool.query(
+      `
+      INSERT INTO account_statements
+      (
+        statement_reference,
+        currency,
+        created_at
+      )
+      VALUES ($1, $2, NOW())
+      RETURNING *
+      `,
+      [
+        reference,
+        currency
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      statement: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Register statement error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to register statement",
+    });
+  }
+});
+
 app.get("/api/verify-receipt/:reference", async (req, res) => {
   try {
     const { reference } = req.params;
