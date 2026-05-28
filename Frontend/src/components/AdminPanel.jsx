@@ -361,6 +361,40 @@ async function loadStats() {
   }
 }
 
+  async function toggleDeposits(userId, disabled) {
+  try {
+    await axios.put(
+      `${API_URL}/api/admin/users/${userId}/deposits`,
+      {
+        deposits_disabled: disabled,
+        deposit_disable_reason: disabled
+          ? "Deposits on this account have been temporarily restricted. Please contact support for assistance."
+          : null,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert(
+      disabled
+        ? "Deposits disabled successfully"
+        : "Deposits enabled successfully"
+    );
+
+    loadData();
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      error.response?.data?.message ||
+      "Failed to update deposit restriction"
+    );
+  }
+}
+
   async function stopInvestment(investmentId) {
   if (!confirm("Are you sure you want to stop this investment?")) return;
 
