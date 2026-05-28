@@ -32,6 +32,8 @@ function AdminPanel() {
   const [activityLogs, setActivityLogs] = useState([]);
   const [showActivityUserId, setShowActivityUserId] = useState(null);
 
+  const [messageInputs, setMessageInputs] = useState({});
+
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("Loading admin data...");
 
@@ -436,6 +438,45 @@ async function loadStats() {
     alert(
       error.response?.data?.message ||
       "Failed to save admin note"
+    );
+  }
+}
+
+  async function sendUserMessage(userId) {
+  const message = messageInputs[userId];
+
+  if (!message || !message.trim()) {
+    return alert("Please enter a message before sending.");
+  }
+
+  try {
+    await axios.post(
+      `${API_URL}/api/admin/users/${userId}/message`,
+      {
+        title: "Message from CoinPilot",
+        message,
+        type: "INFO",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert("Message sent successfully");
+
+    setMessageInputs({
+      ...messageInputs,
+      [userId]: "",
+    });
+
+    loadData();
+  } catch (error) {
+    console.error(error);
+    alert(
+      error.response?.data?.message ||
+      "Failed to send message"
     );
   }
 }
@@ -845,6 +886,43 @@ async function updateKyc(id, status) {
                 resize: "vertical",
               }}
             />
+
+            <div style={{ marginTop: "12px" }}>
+              <textarea
+                placeholder="Write message to user..."
+                value={messageInputs[user.id] || ""}
+                onChange={(e) =>
+                  setMessageInputs({
+                    ...messageInputs,
+                    [user.id]: e.target.value,
+                  })
+                }
+                style={{
+                  width: "100%",
+                  minHeight: "70px",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1px solid #cbd5e1",
+                  fontSize: "14px",
+                  resize: "vertical",
+                }}
+              />
+
+              <button
+                onClick={() => sendUserMessage(user.id)}
+                style={{
+                  marginTop: "8px",
+                  background: "#2563eb",
+                  color: "#fff",
+                  border: "none",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                }}
+              >
+                Send Message
+              </button>
+            </div>
 
             {showActivityUserId === user.id && (
               <div
