@@ -2822,7 +2822,7 @@ app.post("/api/messages/send", requireAuth, async (req, res) => {
   try {
     const { user_id, message } = req.body;
 
-    const senderRole = req.user.role || "user";
+    const senderRole = String(req.user.role || "user").toLowerCase();
 
     const senderName =
       req.user.full_name ||
@@ -2831,10 +2831,9 @@ app.post("/api/messages/send", requireAuth, async (req, res) => {
 
     const targetUserId =
       senderRole === "admin"
-        ? user_id
-        : req.user.id;
-
-    await pool.query(
+        ? Number(user_id)
+        : Number(req.user.userId || req.user.id);
+  await pool.query(
       `
       INSERT INTO user_messages
       (
