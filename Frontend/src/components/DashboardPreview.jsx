@@ -145,6 +145,9 @@ function DashboardPreview({ token, user }) {
   const [depositHistory, setDepositHistory] = useState([]);
   const [withdrawalHistory, setWithdrawalHistory] = useState([]);
 
+  const [userMessages, setUserMessages] = useState([]);
+  const [replyMessage, setReplyMessage] = useState("");
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -166,6 +169,7 @@ function DashboardPreview({ token, user }) {
   loadNotifications();
   loadTransactionHistory();
   loadReferralStats();
+   loadMessages();
 
   const interval = setInterval(() => {
     loadDashboard();
@@ -190,6 +194,69 @@ useEffect(() => {
   }
 }, [user, profileLoaded]);
 
+async function loadMessages() {
+  try {
+    const token = localStorage.getItem("token");
+
+    const userData = JSON.parse(
+      localStorage.getItem("user")
+    );
+
+    const res = await axios.get(
+      `${API_URL}/api/messages/${userData.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setUserMessages(res.data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function sendReplyMessage() {
+  if (!replyMessage.trim()) {
+    return alert("Please enter a message");
+  }
+
+  try {
+    const token = localStorage.getItem("token");
+
+    const userData = JSON.parse(
+      localStorage.getItem("user")
+    );
+
+    await axios.post(
+      `${API_URL}/api/messages/send`,
+      {
+        user_id: userData.id,
+        message: replyMessage.trim(),
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setReplyMessage("");
+
+    loadMessages();
+
+    alert("Reply sent successfully");
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      error.response?.data?.message ||
+      "Failed to send reply"
+    );
+  }
+}
+  
 async function loadDashboard() {
   try {
     const res = await axios.get(`${API_URL}/api/users/${user.id}/balances`, {
@@ -1175,6 +1242,74 @@ async function changePassword() {
           </HoverCard>
         ))
       )}
+
+      <div
+  style={{
+    marginTop: "30px",
+    background: "#f8fafc",
+    padding: "20px",
+    borderRadius: "12px",
+    border: "1px solid #cbd5e1",
+  }}
+>
+  <h3>Support Inbox</h3>
+
+  {userMessages.length === 0 ? (
+    <p>No messages yet.</p>
+  ) : (
+    userMessages.map((msg) => (
+      <div
+        key={msg.id}
+        style={{
+          padding: "10px",
+          marginBottom: "10px",
+          borderBottom: "1px solid #e2e8f0",
+        }}
+      >
+        <p>
+          <strong>{msg.sender_role}:</strong>{" "}
+          {msg.message}
+        </p>
+
+        <small>
+          {new Date(msg.created_at).toLocaleString()}
+        </small>
+      </div>
+    ))
+  )}
+
+  <textarea
+    placeholder="Reply to admin..."
+    value={replyMessage}
+    onChange={(e) =>
+      setReplyMessage(e.target.value)
+    }
+    style={{
+      width: "100%",
+      minHeight: "80px",
+      marginTop: "15px",
+      padding: "10px",
+      borderRadius: "8px",
+      border: "1px solid #cbd5e1",
+      resize: "vertical",
+    }}
+  />
+
+  <button
+    onClick={sendReplyMessage}
+    style={{
+      marginTop: "10px",
+      background: "#2563eb",
+      color: "#fff",
+      border: "none",
+      padding: "10px 15px",
+      borderRadius: "8px",
+      cursor: "pointer",
+    }}
+  >
+    Send Reply
+  </button>
+</div>
 
       <h3>Recent Transactions</h3>
       {data.ledger.length === 0 ? (
