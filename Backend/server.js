@@ -2832,7 +2832,7 @@ app.post("/api/messages/send", requireAuth, async (req, res) => {
     const targetUserId =
       senderRole === "admin"
         ? Number(user_id)
-        : Number(req.user.userId || req.user.id);
+        : Number(req.user.userId || req.user.id || user_id);
   await pool.query(
       `
       INSERT INTO user_messages
