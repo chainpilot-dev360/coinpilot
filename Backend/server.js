@@ -2590,6 +2590,37 @@ app.put("/api/admin/users/:id/freeze", requireAuth, requireAdmin, async (req, re
   }
 });
 
+app.put("/api/admin/users/:id/withdrawals", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { withdrawals_disabled, withdrawal_disable_reason } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE users
+      SET
+        withdrawals_disabled = $1,
+        withdrawal_disable_reason = $2
+      WHERE id = $3
+      RETURNING id, full_name, email, withdrawals_disabled, withdrawal_disable_reason
+      `,
+      [withdrawals_disabled, withdrawal_disable_reason || null, id]
+    );
+
+    res.json({
+      message: withdrawals_disabled
+        ? "Withdrawals disabled successfully"
+        : "Withdrawals enabled successfully",
+      user: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Withdrawal restriction error:", error);
+    res.status(500).json({
+      message: "Failed to update withdrawal restriction",
+    });
+  }
+});
+
 app.put("/api/admin/investments/:id/stop", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
