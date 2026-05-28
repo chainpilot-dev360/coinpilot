@@ -707,6 +707,31 @@ async function updateKyc(id, status) {
                  ? "Enable Withdrawals"
                  : "Disable Withdrawals"}
              </button>
+
+            <button
+              onClick={() =>
+                toggleDeposits(
+                  user.id,
+                  !user.deposits_disabled
+                )
+              }
+              style={{
+                background: user.deposits_disabled
+                  ? "#16a34a"
+                  : "#7c3aed",
+                color: "#fff",
+                border: "none",
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                marginTop: "10px",
+                marginLeft: "10px"
+              }}
+             >
+              {user.deposits_disabled
+                ? "Enable Deposits"
+                : "Disable Deposits"}
+             </button>
             
           </div>
         ))
