@@ -473,16 +473,16 @@ async function openMessages(userId) {
 
   try {
     await axios.post(
-       `${API_URL}/api/messages/send`,
-       {
-         user_id: userId,
-         message,
-       },
-       {
-         headers: {
-           Authorization: `Bearer ${token}`,
-         },
-       }
+      `${API_URL}/api/messages/send`,
+      {
+        user_id: Number(userId),
+        message: message.trim(),
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
 
     alert("Message sent successfully");
