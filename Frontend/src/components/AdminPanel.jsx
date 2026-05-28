@@ -327,6 +327,40 @@ async function loadStats() {
   }
 }
 
+  async function toggleWithdrawals(userId, disabled) {
+  try {
+    await axios.put(
+      `${API_URL}/api/admin/users/${userId}/withdrawals`,
+      {
+        withdrawals_disabled: disabled,
+        withdrawal_disable_reason: disabled
+          ? "Withdrawals on this account have been temporarily restricted. Please contact support for assistance."
+          : null,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert(
+      disabled
+        ? "Withdrawals disabled successfully"
+        : "Withdrawals enabled successfully"
+    );
+
+    loadData();
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      error.response?.data?.message ||
+      "Failed to update withdrawal restriction"
+    );
+  }
+}
+
   async function stopInvestment(investmentId) {
   if (!confirm("Are you sure you want to stop this investment?")) return;
 
@@ -647,6 +681,31 @@ async function updateKyc(id, status) {
               }}
              >
               {user.is_frozen ? "Unfreeze Account" : "Freeze Account"}
+             </button>
+
+            <button
+              onClick={() =>
+                toggleWithdrawals(
+                  user.id,
+                  !user.withdrawals_disabled
+                )
+               }
+               style={{
+                 background: user.withdrawals_disabled
+                   ? "#16a34a"
+                   : "#f59e0b",
+                 color: "#fff",
+                 border: "none",
+                 padding: "10px",
+                 borderRadius: "8px",
+                 cursor: "pointer",
+                 marginTop: "10px",
+                 marginLeft: "10px"
+               }}
+             >
+               {user.withdrawals_disabled
+                 ? "Enable Withdrawals"
+                 : "Disable Withdrawals"}
              </button>
             
           </div>
