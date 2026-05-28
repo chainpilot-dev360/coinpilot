@@ -2782,6 +2782,42 @@ app.put("/api/admin/users/:id/notes", requireAuth, requireAdmin, async (req, res
   }
 });
 
+app.post("/api/admin/users/:id/message", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, message, type } = req.body;
+
+    await pool.query(
+      `
+      INSERT INTO notifications
+      (user_id, title, message, type, sent_by_admin)
+      VALUES ($1, $2, $3, $4, true)
+      `,
+      [
+        id,
+        title || "Message from CoinPilot",
+        message,
+        type || "INFO",
+      ]
+    );
+
+    await logUserActivity(
+      id,
+      "ADMIN_MESSAGE_SENT",
+      title || "Admin sent a direct message"
+    );
+
+    res.json({
+      message: "Message sent successfully",
+    });
+  } catch (error) {
+    console.error("Admin message error:", error);
+    res.status(500).json({
+      message: "Failed to send message",
+    });
+  }
+});
+
 app.put("/api/admin/investments/:id/stop", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
