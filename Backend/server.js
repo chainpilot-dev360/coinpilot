@@ -108,6 +108,21 @@ async function createNotification(userId, title, message, type = "INFO") {
   }
 }
 
+async function logUserActivity(userId, activityType, description) {
+  try {
+    await pool.query(
+      `
+      INSERT INTO user_activity_logs
+      (user_id, activity_type, description)
+      VALUES ($1, $2, $3)
+      `,
+      [userId, activityType, description]
+    );
+  } catch (error) {
+    console.error("Activity log error:", error);
+  }
+}
+
 function requireAdmin(req, res, next) {
   if (req.user.role !== "ADMIN") {
     return res.status(403).json({ message: "Admin access required" });
@@ -653,6 +668,31 @@ app.get("/api/users", requireAuth, requireAdmin, async (req, res) => {
   } catch (error) {
     console.error("Fetch users error:", error);
     res.status(500).json({ message: "Failed to fetch users" });
+  }
+});
+
+app.get("/api/admin/users/:id/activity", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM user_activity_logs
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      LIMIT 100
+      `,
+      [id]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Fetch activity logs error:", error);
+
+    res.status(500).json({
+      message: "Failed to fetch activity logs",
+    });
   }
 });
 
@@ -2615,6 +2655,14 @@ app.put("/api/admin/users/:id/freeze", requireAuth, requireAdmin, async (req, re
       [is_frozen, freeze_reason || null, id]
     );
 
+    await logUserActivity(
+      id,
+      is_frozen ? "ACCOUNT_FROZEN" : "ACCOUNT_UNFROZEN",
+      is_frozen
+        ? "Account was frozen by admin"
+        : "Account was unfrozen by admin"
+    );
+
     res.json({
       message: is_frozen ? "User account frozen" : "User account unfrozen",
       user: result.rows[0],
@@ -2640,6 +2688,16 @@ app.put("/api/admin/users/:id/withdrawals", requireAuth, requireAdmin, async (re
       RETURNING id, full_name, email, withdrawals_disabled, withdrawal_disable_reason
       `,
       [withdrawals_disabled, withdrawal_disable_reason || null, id]
+    );
+
+    await logUserActivity(
+      id,
+      withdrawals_disabled
+        ? "WITHDRAWALS_DISABLED"
+        : "WITHDRAWALS_ENABLED",
+      withdrawals_disabled
+       ? "Withdrawals were disabled by admin"
+       : "Withdrawals were enabled by admin"
     );
 
     res.json({
@@ -2671,6 +2729,16 @@ app.put("/api/admin/users/:id/deposits", requireAuth, requireAdmin, async (req, 
       RETURNING id, full_name, email, deposits_disabled, deposit_disable_reason
       `,
       [deposits_disabled, deposit_disable_reason || null, id]
+    );
+
+    await logUserActivity(
+      id,
+      deposits_disabled
+        ? "DEPOSITS_DISABLED"
+        : "DEPOSITS_ENABLED",
+      deposits_disabled
+        ? "Deposits were disabled by admin"
+        : "Deposits were enabled by admin"
     );
 
     res.json({
@@ -2733,6 +2801,14 @@ app.put("/api/admin/investments/:id/stop", requireAuth, requireAdmin, async (req
         stop_reason || null,
         id,
       ]
+    );
+
+    await logUserActivity(
+      result.rows[0].user_id,
+      is_stopped ? "INVESTMENT_STOPPED" : "INVESTMENT_RESTARTED",
+      is_stopped
+        ? "Investment was stopped by admin"
+        : "Investment was restarted by admin"
     );
 
     res.json({
