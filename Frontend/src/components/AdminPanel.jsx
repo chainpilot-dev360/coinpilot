@@ -395,6 +395,29 @@ async function loadStats() {
   }
 }
 
+  async function saveAdminNote(userId, note) {
+  try {
+    await axios.put(
+      `${API_URL}/api/admin/users/${userId}/notes`,
+      {
+        admin_notes: note,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      error.response?.data?.message ||
+      "Failed to save admin note"
+    );
+  }
+}
+
   async function stopInvestment(investmentId) {
   if (!confirm("Are you sure you want to stop this investment?")) return;
 
@@ -766,6 +789,24 @@ async function updateKyc(id, status) {
                 ? "Enable Deposits"
                 : "Disable Deposits"}
              </button>
+
+            <textarea
+              placeholder="Admin internal notes..."
+              defaultValue={user.admin_notes || ""}
+              onBlur={(e) =>
+                saveAdminNote(user.id, e.target.value)
+              }
+              style={{
+                width: "100%",
+                minHeight: "80px",
+                marginTop: "12px",
+                padding: "10px",
+                borderRadius: "8px",
+                border: "1px solid #cbd5e1",
+                fontSize: "14px",
+                resize: "vertical",
+              }}
+            />
             
           </div>
         ))
