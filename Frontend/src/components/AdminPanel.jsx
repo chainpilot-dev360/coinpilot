@@ -594,7 +594,7 @@ async function loadStats() {
     });
     setKycList(res.data);
   } catch {
-    alert("Failed to load KYC");
+    console.error("Failed to load KYC", error);
   }
 }
 
