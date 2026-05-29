@@ -149,6 +149,8 @@ function DashboardPreview({ token, user }) {
   const [replyMessage, setReplyMessage] = useState("");
   const [userUnreadMessages, setUserUnreadMessages] = useState(0);
   const [showSupportInbox, setShowSupportInbox] = useState(false);
+  
+  const [userUnreadMessages, setUserUnreadMessages] = useState(0);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -171,6 +173,7 @@ function DashboardPreview({ token, user }) {
   loadNotifications();
   loadTransactionHistory();
   loadReferralStats();
+  loadUserUnreadMessages();
 
 
   const interval = setInterval(() => {
@@ -195,6 +198,27 @@ useEffect(() => {
     setProfileLoaded(true);
   }
 }, [user, profileLoaded]);
+
+async function loadUserUnreadMessages() {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await axios.get(
+      `${API_URL}/api/messages/unread/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("UNREAD RESPONSE:", res.data);
+
+    setUserUnreadMessages(res.data.unread_count || 0);
+  } catch (error) {
+    console.error("Unread count error:", error);
+  }
+}
 
 async function loadMessages() {
   try {
@@ -250,6 +274,8 @@ async function sendReplyMessage() {
 
     loadMessages();
 
+    loadUserUnreadMessages();
+
     alert("Reply sent successfully");
   } catch (error) {
     console.error(error);
@@ -266,6 +292,7 @@ async function openSupportInbox() {
 
   if (!showSupportInbox) {
     await loadMessages();
+    setUserUnreadMessages(0);
   }
 }
   
