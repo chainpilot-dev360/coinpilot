@@ -315,6 +315,7 @@ if (referral) {
 }
 
     const passwordHash = await bcrypt.hash(password, 10);
+    const emailVerificationToken = crypto.randomBytes(32).toString("hex");
     const fullName = `${firstName} ${lastName}`;
 
     const result = await pool.query(
@@ -335,6 +336,8 @@ if (referral) {
         role,
         email_verified,
         verification_token
+        email_verification_token,
+        verification_sent_at
       )
       VALUES (
         $1,
@@ -350,8 +353,10 @@ if (referral) {
         $11,
         $12,
         'USER',
-        true,
-        NULL
+        false,
+        NULL,
+        $13,
+        CURRENT_TIMESTAMP
       )
       RETURNING
         id,
@@ -381,11 +386,30 @@ if (referral) {
         referrerId,
         generateReferralCode(username),
         passwordHash,
+        emailVerificationToken
       ]
     );
 
     const user = result.rows[0];
     const token = createToken(user);
+    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${emailVerificationToken}`;
+
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM,
+      to: email,
+      subject: "Verify your CoinPilot account",
+      html: `
+        <h2>Welcome to CoinPilot</h2>
+        <p>Please verify your email address by clicking the button below:</p>
+        <p>
+          <a href="${verificationLink}" style="background:#2563eb;color:white;padding:12px 18px;text-decoration:none;border-radius:8px;">
+             Verify Email
+          </a>
+        </p>
+        <p>If the button does not work, copy this link:</p>
+        <p>${verificationLink}</p>
+      `,
+    });
 
     await createNotification(
       user.id,
