@@ -1250,6 +1250,7 @@ async function changePassword() {
   style={{
     marginTop: "30px",
     background: "#f8fafc",
+    color: "#0f172a",
     padding: "20px",
     borderRadius: "12px",
     border: "1px solid #cbd5e1",
