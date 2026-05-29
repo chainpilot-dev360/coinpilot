@@ -174,12 +174,17 @@ function DashboardPreview({ token, user }) {
   loadUserUnreadMessages();
 
 
-  const interval = setInterval(() => {
-    loadDashboard();
-    loadNotifications();
-    loadTransactionHistory();
-    loadReferralStats();
-  }, 5000);
+const interval = setInterval(() => {
+  loadDashboard();
+  loadNotifications();
+  loadTransactionHistory();
+  loadReferralStats();
+  loadUserUnreadMessages();
+
+  if (showSupportInbox) {
+    loadMessages();
+  }
+}, 5000);
 
   return () => clearInterval(interval);
 }, [token]);
@@ -290,7 +295,7 @@ async function openSupportInbox() {
 
   if (!showSupportInbox) {
     await loadMessages();
-    setUserUnreadMessages(0);
+    await loadUserUnreadMessages();
   }
 }
   
