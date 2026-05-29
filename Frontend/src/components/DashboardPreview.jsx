@@ -1355,6 +1355,7 @@ async function changePassword() {
     Send Reply
   </button>
 </div>
+)}
 
       <h3>Recent Transactions</h3>
       {data.ledger.length === 0 ? (
