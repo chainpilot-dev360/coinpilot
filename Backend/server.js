@@ -508,6 +508,12 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
       });
     }
 
+    if (!user.email_verified) {
+      return res.status(403).json({
+        message: "Please verify your email before logging in.",
+      });
+    }
+
     if (user.is_frozen) {
       return res.status(403).json({
         message:
@@ -541,6 +547,46 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
     console.error("Login error:", error);
     res.status(500).json({
       message: "Login failed",
+    });
+  }
+});
+
+app.get("/api/auth/verify-email", async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({
+        message: "Verification token missing"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE users
+      SET
+        email_verified = true,
+        email_verification_token = NULL
+      WHERE email_verification_token = $1
+      RETURNING id
+      `,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({
+        message: "Invalid or expired verification token"
+      });
+    }
+
+    res.json({
+      message: "Email verified successfully"
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Verification failed"
     });
   }
 });
