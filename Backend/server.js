@@ -2895,6 +2895,32 @@ app.post("/api/messages/send", requireAuth, async (req, res) => {
   }
 });
 
+app.get("/api/messages/unread/me", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId || req.user.id;
+
+    const result = await pool.query(
+      `
+      SELECT COUNT(*) AS unread_count
+      FROM user_messages
+      WHERE user_id = $1
+      AND sender_role = 'admin'
+      AND is_read = FALSE
+      `,
+      [userId]
+    );
+
+    res.json({
+      unread_count: Number(result.rows[0].unread_count),
+    });
+  } catch (error) {
+    console.error("User unread count error:", error);
+    res.status(500).json({
+      message: "Failed to load unread messages",
+    });
+  }
+});
+
 app.get("/api/messages/:userId", requireAuth, async (req, res) => {
   try {
     const { userId } = req.params;
