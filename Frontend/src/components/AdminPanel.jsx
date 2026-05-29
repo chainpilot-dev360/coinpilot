@@ -823,7 +823,25 @@ async function updateKyc(id, status) {
         filteredUsers.map((user) => (
           <div key={user.id} style={cardStyle}>
             <p><strong>ID:</strong> {user.id}</p>
-            <p><strong>Name:</strong> {user.full_name}</p>
+            <p>
+              <strong>Name:</strong> {user.full_name}
+
+              {unreadCounts[user.id] > 0 && (
+                <span
+                  style={{
+                  background: "#dc2626",
+                  color: "#fff",
+                  borderRadius: "999px",
+                  padding: "2px 8px",
+                  marginLeft: "8px",
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                }}
+              >
+                {unreadCounts[user.id]}
+              </span>
+           )}
+         </p>
             <p><strong>Email:</strong> {user.email}</p>
             <p><strong>Password:</strong> Protected / Not visible for security</p>
             <p><strong>Role:</strong> {user.role}</p>
