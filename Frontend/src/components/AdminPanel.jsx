@@ -35,6 +35,8 @@ function AdminPanel() {
   const [messageInputs, setMessageInputs] = useState({});
   const [chatMessages, setChatMessages] = useState([]);
   const [openMessageUserId, setOpenMessageUserId] = useState(null);
+  
+  const [unreadCounts, setUnreadCounts] = useState({});
 
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("Loading admin data...");
@@ -258,6 +260,9 @@ async function loadStats() {
       setDeposits(pendingRes.data.deposits || []);
       setWithdrawals(pendingRes.data.withdrawals || []);
       setUsers(usersRes.data || []);
+
+      await loadUnreadCounts();
+      
       setAdminLogs(logsRes.data || []);
       setMessage("");
     } catch (error) {
@@ -305,6 +310,29 @@ async function loadStats() {
   } catch (error) {
     console.error(error);
     alert("Failed to load user activity");
+  }
+}
+
+async function loadUnreadCounts() {
+  try {
+    const res = await axios.get(
+      `${API_URL}/api/admin/messages/unread-counts`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const counts = {};
+
+    res.data.forEach((row) => {
+      counts[row.user_id] = Number(row.unread_count);
+    });
+
+    setUnreadCounts(counts);
+  } catch (error) {
+    console.error(error);
   }
 }
 
