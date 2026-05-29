@@ -696,6 +696,29 @@ app.get("/api/admin/users/:id/activity", requireAuth, requireAdmin, async (req, 
   }
 });
 
+app.get("/api/admin/messages/unread-counts", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        user_id,
+        COUNT(*) AS unread_count
+      FROM user_messages
+      WHERE sender_role = 'user'
+      AND is_read = FALSE
+      GROUP BY user_id
+      `
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Unread counts error:", error);
+    res.status(500).json({
+      message: "Failed to load unread message counts",
+    });
+  }
+});
+
 app.get("/api/users/:id/balances", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
