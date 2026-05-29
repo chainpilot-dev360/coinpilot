@@ -394,22 +394,26 @@ if (referral) {
     const token = createToken(user);
     const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${emailVerificationToken}`;
 
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM,
-      to: email,
-      subject: "Verify your CoinPilot account",
-      html: `
-        <h2>Welcome to CoinPilot</h2>
-        <p>Please verify your email address by clicking the button below:</p>
-        <p>
-          <a href="${verificationLink}" style="background:#2563eb;color:white;padding:12px 18px;text-decoration:none;border-radius:8px;">
-             Verify Email
-          </a>
-        </p>
-        <p>If the button does not work, copy this link:</p>
-        <p>${verificationLink}</p>
-      `,
-    });
+    try {
+        await transporter.sendMail({
+            from: process.env.SMTP_FROM,
+            to: email,
+            subject: "Verify your CoinPilot account",
+            html: `
+                <h2>Welcome to CoinPilot</h2>
+                <p>Please verify your email address by clicking the button below:</p>
+                <p>
+                    <a href="${verificationLink}" style="background:#2563eb;color:white;padding:12px 18px;text-decoration:none;border-radius:8px;">
+                         Verify Email
+                    </a>
+                </p>
+                <p>If the button does not work, copy this link:</p>
+                <p>${verificationLink}</p>
+           `,
+        });
+    } catch (emailError) {
+        console.error("Verification email failed:", emailError);
+    }
 
     await createNotification(
       user.id,
@@ -419,7 +423,7 @@ if (referral) {
     );
 
     res.status(201).json({
-      message: "Registration successful",
+      message: "Registration successful. Please check your email to verify your account before logging in.",
       token,
       user,
     });
