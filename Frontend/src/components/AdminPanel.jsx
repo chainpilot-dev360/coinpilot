@@ -820,7 +820,9 @@ async function updateKyc(id, status) {
       {filteredUsers.length === 0 ? (
         <p>No users found</p>
       ) : (
-        filteredUsers.map((user) => (
+        [...filteredUsers]
+          .sort((a, b) => (unreadCounts[b.id] || 0) - (unreadCounts[a.id] || 0))
+          .map((user) => (
           <div key={user.id} style={cardStyle}>
             <p><strong>ID:</strong> {user.id}</p>
             <p>
