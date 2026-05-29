@@ -655,7 +655,7 @@ async function openMessages(userId) {
       headers: { Authorization: `Bearer ${token}` },
     });
     setKycList(res.data);
-  } catch {
+  } catch (error) {
     console.error("Failed to load KYC", error);
   }
 }
@@ -670,7 +670,7 @@ async function updateKyc(id, status) {
 
     alert("KYC updated");
     loadKyc();
-  } catch {
+  } catch (error) {
     alert("Failed to update KYC");
   }
 }
