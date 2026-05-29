@@ -335,7 +335,7 @@ if (referral) {
         password_hash,
         role,
         email_verified,
-        verification_token
+        verification_token,
         email_verification_token,
         verification_sent_at
       )
