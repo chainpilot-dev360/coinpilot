@@ -1303,26 +1303,27 @@ async function changePassword() {
       <p>No messages yet.</p>
     ) : (
       userMessages.map((msg) => (
-      <div
-        key={msg.id}
-        style={{
-          padding: "10px",
-          marginBottom: "10px",
-          borderBottom: "1px solid #e2e8f0",
-        }}
-      >
-        <p>
-          <strong>{msg.sender_role}:</strong>{" "}
-          {msg.message}
-        </p>
+        <div
+          key={msg.id}
+          style={{
+            padding: "10px",
+            marginBottom: "10px",
+            borderBottom: "1px solid #e2e8f0",
+          }}
+        >
+          <p>
+            <strong>{msg.sender_role}:</strong>{" "}
+            {msg.message}
+          </p>
 
-        <small>
-          {new Date(msg.created_at).toLocaleString()}
-        </small>
-      </div>
-    ))
-  )}
-
+          <small>
+            {new Date(msg.created_at).toLocaleString()}
+          </small>
+        </div>
+      ))
+    )}
+  </>
+)}
   <textarea
     placeholder="Reply to admin..."
     value={replyMessage}
