@@ -2834,23 +2834,25 @@ app.post("/api/messages/send", requireAuth, async (req, res) => {
         ? Number(user_id)
         : Number(req.user.userId || req.user.id || user_id);
   await pool.query(
-      `
-      INSERT INTO user_messages
-      (
-        user_id,
-        sender_role,
-        sender_name,
-        message
-      )
-      VALUES ($1, $2, $3, $4)
-      `,
-      [
-        targetUserId,
-        senderRole,
-        senderName,
-        message,
-      ]
-    );
+    `
+    INSERT INTO user_messages
+    (
+      user_id,
+      sender_role,
+      sender_name,
+      message,
+      is_read
+    )
+    VALUES ($1, $2, $3, $4, $5)
+    `,
+    [
+      targetUserId,
+      senderRole,
+      senderName,
+      message,
+      false
+    ]
+  );
 
     await logUserActivity(
       targetUserId,
@@ -2881,6 +2883,28 @@ app.get("/api/messages/:userId", requireAuth, async (req, res) => {
       return res.status(403).json({
         message: "Not authorized to view these messages",
       });
+    }
+
+    if (requesterRole === "admin") {
+      await pool.query(
+        `
+        UPDATE user_messages
+        SET is_read = TRUE
+        WHERE user_id = $1
+        AND sender_role = 'user'
+        `,
+        [userId]
+      );
+    } else {
+      await pool.query(
+        `
+        UPDATE user_messages
+        SET is_read = TRUE
+        WHERE user_id = $1
+        AND sender_role = 'admin'
+        `,
+        [userId]
+      );
     }
 
     const result = await pool.query(
