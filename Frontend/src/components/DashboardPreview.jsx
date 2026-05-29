@@ -147,6 +147,7 @@ function DashboardPreview({ token, user }) {
 
   const [userMessages, setUserMessages] = useState([]);
   const [replyMessage, setReplyMessage] = useState("");
+  const [userUnreadMessages, setUserUnreadMessages] = useState(0);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -210,6 +211,11 @@ async function loadMessages() {
       }
     );
 
+    const unread = res.data.filter(
+      (msg) => msg.sender_role === "admin" && !msg.is_read
+    ).length;
+
+    setUserUnreadMessages(unread);
     setUserMessages(res.data);
   } catch (error) {
     console.error(error);
@@ -1249,7 +1255,25 @@ async function changePassword() {
     border: "1px solid #cbd5e1",
   }}
 >
-  <h3>Support Inbox</h3>
+  <h3>
+  Support Inbox
+
+  {userUnreadMessages > 0 && (
+    <span
+      style={{
+        background: "#dc2626",
+        color: "#fff",
+        borderRadius: "999px",
+        padding: "2px 8px",
+        marginLeft: "8px",
+        fontSize: "12px",
+        fontWeight: "bold",
+      }}
+    >
+      {userUnreadMessages}
+    </span>
+  )}
+</h3>
 
   {userMessages.length === 0 ? (
     <p>No messages yet.</p>
