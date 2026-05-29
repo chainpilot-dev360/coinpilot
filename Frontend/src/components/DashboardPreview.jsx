@@ -149,8 +149,6 @@ function DashboardPreview({ token, user }) {
   const [replyMessage, setReplyMessage] = useState("");
   const [userUnreadMessages, setUserUnreadMessages] = useState(0);
   const [showSupportInbox, setShowSupportInbox] = useState(false);
-  
-  const [userUnreadMessages, setUserUnreadMessages] = useState(0);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
