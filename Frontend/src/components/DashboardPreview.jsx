@@ -148,6 +148,7 @@ function DashboardPreview({ token, user }) {
   const [userMessages, setUserMessages] = useState([]);
   const [replyMessage, setReplyMessage] = useState("");
   const [userUnreadMessages, setUserUnreadMessages] = useState(0);
+  const [showSupportInbox, setShowSupportInbox] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -170,7 +171,7 @@ function DashboardPreview({ token, user }) {
   loadNotifications();
   loadTransactionHistory();
   loadReferralStats();
-   loadMessages();
+
 
   const interval = setInterval(() => {
     loadDashboard();
@@ -257,6 +258,14 @@ async function sendReplyMessage() {
       error.response?.data?.message ||
       "Failed to send reply"
     );
+  }
+}
+
+async function openSupportInbox() {
+  setShowSupportInbox(!showSupportInbox);
+
+  if (!showSupportInbox) {
+    await loadMessages();
   }
 }
   
@@ -1256,30 +1265,44 @@ async function changePassword() {
     border: "1px solid #cbd5e1",
   }}
 >
-  <h3>
-  Support Inbox
+  <h3
+  onClick={openSupportInbox}
+  style={{
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  }}
+>
+  <span>Support Inbox</span>
 
-  {userUnreadMessages > 0 && (
-    <span
-      style={{
-        background: "#dc2626",
-        color: "#fff",
-        borderRadius: "999px",
-        padding: "2px 8px",
-        marginLeft: "8px",
-        fontSize: "12px",
-        fontWeight: "bold",
-      }}
-    >
-      {userUnreadMessages}
-    </span>
-  )}
+  <div>
+    {userUnreadMessages > 0 && (
+      <span
+        style={{
+          background: "#dc2626",
+          color: "#fff",
+          borderRadius: "999px",
+          padding: "2px 8px",
+          marginRight: "8px",
+          fontSize: "12px",
+          fontWeight: "bold",
+        }}
+      >
+        {userUnreadMessages}
+      </span>
+    )}
+
+    <span>{showSupportInbox ? "▲" : "▼"}</span>
+  </div>
 </h3>
 
-  {userMessages.length === 0 ? (
-    <p>No messages yet.</p>
-  ) : (
-    userMessages.map((msg) => (
+ {showSupportInbox && (
+  <>
+    {userMessages.length === 0 ? (
+      <p>No messages yet.</p>
+    ) : (
+      userMessages.map((msg) => (
       <div
         key={msg.id}
         style={{
