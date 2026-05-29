@@ -198,12 +198,11 @@ async function loadMessages() {
   try {
     const token = localStorage.getItem("token");
 
-    const userData = JSON.parse(
-      localStorage.getItem("user")
-    );
+    const userData =
+      JSON.parse(localStorage.getItem("user")) || data?.user || user;
 
     const res = await axios.get(
-      `${API_URL}/api/messages/${userData.id}`,
+      `${API_URL}/api/messages/${userData?.id || userData?.userId}`
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -225,16 +224,14 @@ async function sendReplyMessage() {
   try {
     const token = localStorage.getItem("token");
 
-    const userData = JSON.parse(
-      localStorage.getItem("user")
-    );
-
+    const userData =
+     JSON.parse(localStorage.getItem("user")) || data?.user || user;
     await axios.post(
       `${API_URL}/api/messages/send`,
       {
-        user_id: userData.id,
+        user_id: userData?.id || userData?.userId,
         message: replyMessage.trim(),
-      },
+      }
       {
         headers: {
           Authorization: `Bearer ${token}`,
