@@ -231,7 +231,7 @@ async function sendReplyMessage() {
       {
         user_id: userData?.id || userData?.userId,
         message: replyMessage.trim(),
-      }
+      },
       {
         headers: {
           Authorization: `Bearer ${token}`,
