@@ -187,7 +187,7 @@ const interval = setInterval(() => {
 }, 5000);
 
   return () => clearInterval(interval);
-}, [token]);
+}, [token, showSupportInbox]);
 
 useEffect(() => {
   if (user && !profileLoaded) {
