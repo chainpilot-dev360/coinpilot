@@ -431,6 +431,46 @@ if (referral) {
   }
 });
 
+app.get("/api/auth/verify-email", async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({
+        message: "Verification token missing",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE users
+      SET
+        email_verified = true,
+        email_verification_token = NULL
+      WHERE email_verification_token = $1
+      RETURNING id, email
+      `,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({
+        message: "Invalid or expired verification token",
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Email verified successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Verification failed",
+    });
+  }
+});
+
 app.post("/api/auth/login", authLimiter, async (req, res) => {
   try {
     const { loginId, email, password } = req.body;
