@@ -5,18 +5,24 @@ import config from "./config.js";
 dotenv.config();
 
 function getMailTransporter() {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("EMAIL_USER or EMAIL_PASS is missing in .env");
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.error("SMTP_USER or SMTP_PASS is missing in environment variables");
     return null;
   }
 
   return nodemailer.createTransport({
-    service: "gmail",
+    host: process.env.SMTP_HOST || "smtp-relay.brevo.com",
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: false,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
   });
+}
+
+function getSender() {
+  return process.env.SMTP_FROM || `${config.siteName} <${process.env.SMTP_USER}>`;
 }
 
 export async function sendWelcomeEmail(to, name) {
@@ -25,7 +31,7 @@ export async function sendWelcomeEmail(to, name) {
     if (!transporter) return;
 
     await transporter.sendMail({
-      from: `${config.siteName} <${process.env.EMAIL_USER}>`,
+      from: getSender(),
       to,
       subject: `Welcome to ${config.siteName}`,
       html: `
@@ -43,10 +49,10 @@ export async function sendVerificationEmail(to, name, token) {
     const transporter = getMailTransporter();
     if (!transporter) return;
 
-    const verifyUrl = `${config.frontendUrl}/verify-email?token=${token}`;
+    const verifyUrl = `${process.env.FRONTEND_URL || config.frontendUrl}/verify-email?token=${token}`;
 
     await transporter.sendMail({
-      from: `${config.siteName} <${process.env.EMAIL_USER}>`,
+      from: getSender(),
       to,
       subject: `Verify your ${config.siteName} email`,
       html: `
@@ -73,10 +79,10 @@ export async function sendPasswordResetEmail(to, name, token) {
     const transporter = getMailTransporter();
     if (!transporter) return;
 
-    const resetUrl = `${config.frontendUrl}/reset-password?token=${token}`;
+    const resetUrl = `${process.env.FRONTEND_URL || config.frontendUrl}/reset-password?token=${token}`;
 
     await transporter.sendMail({
-      from: `${config.siteName} <${process.env.EMAIL_USER}>`,
+      from: getSender(),
       to,
       subject: `Reset your ${config.siteName} password`,
       html: `
