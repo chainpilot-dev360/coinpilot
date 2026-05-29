@@ -202,7 +202,7 @@ async function loadMessages() {
       JSON.parse(localStorage.getItem("user")) || data?.user || user;
 
     const res = await axios.get(
-      `${API_URL}/api/messages/${userData?.id || userData?.userId}`
+      `${API_URL}/api/messages/${userData?.id || userData?.userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
