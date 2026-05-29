@@ -149,9 +149,10 @@ function App() {
       referral,
     });
 
-    localStorage.setItem("token", res.data.token);
-    setToken(res.data.token);
-    showNotification("Registration successful", "success");
+    showNotification(
+      res.data.message || "Registration successful. Please verify your email before logging in.",
+      "success"
+     );
   } catch (error) {
     showNotification(
       error.response?.data?.message || "Registration failed",
