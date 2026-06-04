@@ -6,7 +6,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 import crypto from "crypto";
 import rateLimit from "express-rate-limit";
 import { pool } from "./db.js";
@@ -18,16 +17,6 @@ import {
 import { logAdminAction } from "./utils/adminLogger.js";
 
 dotenv.config();
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
 
 function generateReferralCode(username) {
   const cleanName = String(username || "USER")
