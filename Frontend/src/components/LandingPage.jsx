@@ -160,6 +160,46 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
         </div>
       </section>
 
+      <section style={section}>
+  <h2 style={sectionTitle}>About CoinPilot Investments</h2>
+
+  <div
+    style={{
+      maxWidth: "900px",
+      margin: "0 auto",
+      textAlign: "left",
+      lineHeight: "1.9",
+      color: "#cbd5e1",
+      fontSize: "17px",
+    }}
+  >
+    <p>
+      CoinPilot is a digital asset investment platform designed to provide
+      investors with access to professionally managed opportunities across
+      multiple financial markets.
+    </p>
+
+    <p>
+      Through strategic market participation, portfolio diversification,
+      and disciplined risk management, our platform aims to help investors
+      grow their capital while maintaining transparency and control over
+      their investment activities.
+    </p>
+
+    <p>
+      Members can monitor their account balances, track investment
+      performance, submit deposits and withdrawals, and receive real-time
+      notifications through a secure investor dashboard.
+    </p>
+
+    <p>
+      Our mission is to provide a simple, reliable, and professional
+      environment where individuals can participate in modern digital
+      investment opportunities with confidence.
+    </p>
+  </div>
+</section>
+
       <section style={darkSection}>
         <h2 style={sectionTitle}>Investment Plans</h2>
         <div style={grid}>
