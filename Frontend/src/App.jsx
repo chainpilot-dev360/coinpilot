@@ -340,7 +340,7 @@ function App() {
             ← Back to Home
           </button>
 
-          <h1 style={{ marginBottom: 5 }}>ChainPilot</h1>
+          <h1 style={{ marginBottom: 5 }}>CoinPilot</h1>
           <p style={muted}>Crypto investment dashboard</p>
 
           <div style={{ marginBottom: 20 }}>
@@ -526,7 +526,7 @@ function App() {
           <button onClick={() => setMenuOpen(!menuOpen)} style={menuButton}>
             ☰
           </button>
-          <h3>ChainPilot</h3>
+          <h3>CoinPilot</h3>
         </div>
       )}
 
@@ -544,7 +544,7 @@ function App() {
             : "translateX(0)",
         }}
       >
-        <h2 style={{ marginBottom: 4 }}>ChainPilot</h2>
+        <h2 style={{ marginBottom: 4 }}>CoinPilot</h2>
         <p style={mutedSmall}>{user.role}</p>
 
         <nav style={{ marginTop: 30 }}>
