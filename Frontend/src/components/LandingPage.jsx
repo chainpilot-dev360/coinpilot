@@ -227,6 +227,27 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
            />
          </div>
       </section>
+
+      <section style={darkSection}>
+        <h2 style={sectionTitle}>Built for Security and Transparency</h2>
+
+        <div style={grid}>
+          <Card
+            title="Account Protection"
+            text="Email verification and secure authentication help protect every investor account."
+          />
+
+          <Card
+            title="Transparent Activity"
+            text="Users can track deposits, withdrawals, investments, balances, and notifications from one dashboard."
+          />
+
+          <Card
+            title="Admin Review Process"
+            text="Deposits, withdrawals, KYC requests, and investment activities are reviewed through secure admin controls."
+           />
+         </div>
+      </section>
       
       <section style={darkSection}>
         <h2 style={sectionTitle}>Investment Plans</h2>
