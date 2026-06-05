@@ -296,8 +296,42 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
         </div>
 
         <div style={footerLinks}>
-          <button onClick={onRegisterClick} style={footerLink}>Create Account</button>
-          <button onClick={onLoginClick} style={footerLink}>Login</button>
+          <button onClick={onRegisterClick} style={footerLink}>
+            Create Account
+          </button>
+
+          <button onClick={onLoginClick} style={footerLink}>
+            Login
+          </button>
+
+          <button
+            onClick={() => (window.location.href = "/privacy-policy")}
+            style={footerLink}
+          >
+            Privacy Policy
+          </button>
+
+          <button
+            onClick={() => (window.location.href = "/terms")}
+            style={footerLink}
+          >
+            Terms & Conditions
+          </button>
+
+          <button
+            onClick={() => (window.location.href = "/risk-disclosure")}
+            style={footerLink}
+          >
+             Risk Disclosure
+          </button>
+
+          <button
+            onClick={() => (window.location.href = "/aml-policy")}
+            style={footerLink}
+          >
+             AML Policy
+          </button>
+
           <a href={`mailto:${settings.support_email}`} style={footerAnchor}>
             {settings.support_email}
           </a>
