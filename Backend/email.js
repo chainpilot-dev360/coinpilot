@@ -56,17 +56,38 @@ export async function sendVerificationEmail(to, name, token) {
 
     await sendBrevoEmail({
       to,
-      subject: `Verify your ${config.siteName} email`,
+      subject: `Verify your ${config.siteName} account`,
       html: `
-        <h2>Hello ${name},</h2>
-        <p>Please verify your email address to activate your ${config.siteName} account.</p>
+        <h2>Welcome to ${config.siteName}, ${name}</h2>
+
         <p>
-          <a href="${verifyUrl}" style="background:#2563eb;color:white;padding:12px 18px;border-radius:8px;text-decoration:none;">
-            Verify Email
+          Thank you for creating your ${config.siteName} account.
+          To complete your registration and help secure your account,
+          please verify your email address by clicking the button below.
+        </p>
+
+        <p style="margin:30px 0;">
+          <a href="${verifyUrl}" style="background:#2563eb;color:#ffffff;padding:14px 24px;text-decoration:none;border-radius:8px;font-weight:600;display:inline-block;">
+             Verify My Email
           </a>
         </p>
-        <p>If the button does not work, copy this link:</p>
-        <p>${verifyUrl}</p>
+
+        <p>
+          This verification helps us confirm ownership of your email address
+          and protect your ${config.siteName} account.
+        </p>
+
+        <p>
+          If you did not create a ${config.siteName} account, you can safely ignore this email.
+        </p>
+
+        <br>
+
+        <p>
+          Regards,<br>
+          ${config.siteName} Support Team<br>
+          ${process.env.FRONTEND_URL || config.frontendUrl}
+        </p>
       `,
     });
   } catch (error) {
