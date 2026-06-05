@@ -204,6 +204,30 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
   </div>
 </section>
 
+      <section style={section}>
+        <h2 style={sectionTitle}>What Our Investors Say</h2>
+
+        <div style={grid}>
+          <Testimonial
+            name="Michael Johnson"
+            location="United States"
+            text="CoinPilot provides a straightforward investment experience with an excellent dashboard and responsive support."
+           />
+
+          <Testimonial
+            name="Sarah Williams"
+            location="United Kingdom"
+            text="The platform is easy to navigate and gives me full visibility into my portfolio performance."
+           />
+
+          <Testimonial
+            name="David Cooper"
+            location="Canada"
+            text="I appreciate the transparency and professional approach. Everything is organized and easy to understand."
+           />
+         </div>
+      </section>
+      
       <section style={darkSection}>
         <h2 style={sectionTitle}>Investment Plans</h2>
         <div style={grid}>
@@ -292,6 +316,24 @@ function Plan({ title, amount, returnText }) {
       <p style={muted}>Minimum investment</p>
       <h3>{returnText}</h3>
       <p style={muted}>Projected daily return</p>
+    </div>
+  );
+}
+
+function Testimonial({ name, location, text }) {
+  return (
+    <div className="fade-in" style={testimonialCard}>
+      <div style={stars}>★★★★★</div>
+
+      <p style={testimonialText}>
+        "{text}"
+      </p>
+
+      <h4 style={{ marginBottom: "5px" }}>{name}</h4>
+
+      <small style={{ color: "#94a3b8" }}>
+        {location}
+      </small>
     </div>
   );
 }
@@ -440,6 +482,27 @@ const card = {
   border: "1px solid rgba(255,255,255,0.08)",
   backdropFilter: "blur(12px)",
   boxShadow: "0 20px 45px rgba(0,0,0,0.25)",
+};
+
+const testimonialCard = {
+  background: "rgba(30,41,59,0.75)",
+  padding: "28px",
+  borderRadius: "18px",
+  border: "1px solid rgba(255,255,255,0.08)",
+  textAlign: "left",
+  boxShadow: "0 20px 45px rgba(0,0,0,0.25)",
+};
+
+const testimonialText = {
+  color: "#cbd5e1",
+  lineHeight: "1.7",
+  marginBottom: "18px",
+};
+
+const stars = {
+  color: "#fbbf24",
+  fontSize: "18px",
+  marginBottom: "14px",
 };
 
 const planCard = {
