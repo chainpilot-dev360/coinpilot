@@ -14,6 +14,10 @@ import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import Referrals from "./pages/Referrals";
 import ReceiptVerification from "./components/ReceiptVerification";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
+import RiskDisclosure from "./pages/RiskDisclosure";
+import AMLPolicy from "./pages/AMLPolicy";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -25,6 +29,10 @@ function App() {
   const isAboutPage = window.location.pathname === "/about";
   const isServicesPage = window.location.pathname === "/services";
   const isContactPage = window.location.pathname === "/contact";
+  const isPrivacyPolicyPage = window.location.pathname === "/privacy-policy";
+  const isTermsPage = window.location.pathname === "/terms";
+  const isRiskDisclosurePage = window.location.pathname === "/risk-disclosure";
+  const isAMLPolicyPage = window.location.pathname === "/aml-policy";
   
   const isVerifyReceiptPage =
   window.location.pathname === "/verify";
@@ -315,6 +323,22 @@ function App() {
 
   if (!user && isContactPage) {
     return <Contact />;
+  }
+
+  if (!user && isPrivacyPolicyPage) {
+    return <PrivacyPolicy />;
+  }
+
+  if (!user && isTermsPage) {
+    return <TermsConditions />;
+  }
+
+  if (!user && isRiskDisclosurePage) {
+    return <RiskDisclosure />;
+  }
+
+  if (!user && isAMLPolicyPage) {
+    return <AMLPolicy />;
   }
 
   if (!user && !showAuth) {
