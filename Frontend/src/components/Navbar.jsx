@@ -1,7 +1,7 @@
 export default function Navbar() {
   return (
     <nav style={{ display: "flex", justifyContent: "space-between", padding: "24px 40px", borderBottom: "1px solid #1e293b" }}>
-      <h2>ChainPilot</h2>
+      <h2>CoinPilot</h2>
 
       <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
         <span>Dashboard</span>
