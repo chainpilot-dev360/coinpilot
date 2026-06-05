@@ -47,7 +47,11 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
       >
         <nav style={nav}>
           <div style={brand}>
-            <div style={logoMark}>{settings.company_short_name}</div>
+            <img
+              src="https://res.cloudinary.com/dlvtuijb1/image/upload/v1779874195/WhatsApp_Image_2026-05-27_at_10.29.15_AM_llqpmg.jpg"
+              alt="CoinPilot Logo"
+              style={logoImage}
+            />
             <div>
               <h2 style={brandName}>{settings.site_name}</h2>
               <small style={brandTag}>{siteConfig.tagline}</small>
@@ -235,7 +239,11 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
 
       <footer style={footer}>
         <div style={footerBrand}>
-          <div style={logoMark}>CP</div>
+          <img
+            src="https://res.cloudinary.com/dlvtuijb1/image/upload/v1779874195/WhatsApp_Image_2026-05-27_at_10.29.15_AM_llqpmg.jpg"
+            alt="CoinPilot Logo"
+            style={logoImage}
+          />
           <div>
             <h3 style={{ margin: 0 }}>{settings.site_name}</h3>
             <p style={footerText}>Premium digital asset portfolio platform.</p>
@@ -335,6 +343,12 @@ const logoMark = {
   justifyContent: "center",
   fontWeight: "bold",
   boxShadow: "0 15px 35px rgba(56,189,248,0.35)",
+};
+
+const logoImage = {
+  width: "60px",
+  height: "60px",
+  objectFit: "contain",
 };
 
 const brandName = {
