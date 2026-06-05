@@ -149,9 +149,9 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
       </section>
 
       <section style={statsSection}>
-        <Stat number="12,500+" label="Active Users" />
-        <Stat number="$2.8M+" label="Processed Deposits" />
-        <Stat number="8,900+" label="Investments Created" />
+        <Stat number="2.5M+" label="Active Users" />
+        <Stat number="$10.8M+" label="Processed Deposits" />
+        <Stat number="2M+" label="Investments Created" />
       </section>
 
       <section style={section}>
