@@ -38,7 +38,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: "chainpilot_uploads",
+    folder: "coinpilot_uploads",
     allowed_formats: ["jpg", "jpeg", "png", "webp"],
   },
 });
@@ -220,11 +220,11 @@ setInterval(async () => {
 }, 60000);
 
 app.get("/", (req, res) => {
-  res.send("ChainPilot backend is running 🚀");
+  res.send("CoinPilot backend is running 🚀");
 });
 
 app.get("/api/message", (req, res) => {
-  res.json({ message: "Hello from ChainPilot backend" });
+  res.json({ message: "Hello from CoinPilot backend" });
 });
 
 app.post("/api/auth/register", authLimiter, async (req, res) => {
@@ -387,8 +387,8 @@ if (referral) {
 
     await createNotification(
       user.id,
-      "Welcome to ChainPilot",
-      "Your ChainPilot account has been created successfully.",
+      "Welcome to CoinPilot",
+      "Your CoinPilot account has been created successfully.",
       "SUCCESS"
     );
 
