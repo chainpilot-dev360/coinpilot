@@ -658,41 +658,40 @@ function openDashboardSection(sectionId) {
             Support
           </button>
 
-          <button
             <button
-  onClick={() => openDashboardSection("change-password-section")}
-  style={menu}
->
-  Change Password
-</button>
+              onClick={() => openDashboardSection("change-password-section")}
+              style={menu}
+            >
+              Change Password
+            </button>
 
-<button
-  onClick={() => openDashboardSection("account-statement-section")}
-  style={menu}
->
-  Account Statement
-</button>
+            <button
+              onClick={() => openDashboardSection("account-statement-section")}
+              style={menu}
+            >
+               Account Statement
+            </button>
 
-<button
-  onClick={() => openDashboardSection("deposit-history-section")}
-  style={menu}
->
-  Deposit History
-</button>
+            <button
+              onClick={() => openDashboardSection("deposit-history-section")}
+              style={menu}
+            >
+               Deposit History
+            </button>
 
-<button
-  onClick={() => openDashboardSection("withdrawal-history-section")}
-  style={menu}
->
-  Withdrawal History
-</button>
+            <button
+              onClick={() => openDashboardSection("withdrawal-history-section")}
+              style={menu}
+            >
+               Withdrawal History
+            </button>
 
-<button
-  onClick={() => openDashboardSection("support-inbox-section")}
-  style={menu}
->
-  Support Inbox
-</button>
+            <button
+              onClick={() => openDashboardSection("support-inbox-section")}
+              style={menu}
+            >
+               Support Inbox
+            </button>
 
           {user.role === "ADMIN" && (
             <button
