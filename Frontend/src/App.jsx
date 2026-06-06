@@ -68,7 +68,6 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [dashboardTarget, setDashboardTarget] = useState("");
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -218,12 +217,7 @@ function openDashboardSection(sectionId) {
 
   setMenuOpen(false);
 }
-
-function openDashboardSection(sectionId) {
-  setActiveTab("dashboard");
-  setDashboardTarget(sectionId);
-  setMenuOpen(false);
-}
+  
   function openLogin() {
     setAuthMode("login");
     setShowAuth(true);
