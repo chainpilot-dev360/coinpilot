@@ -53,6 +53,10 @@ function AdminPanel() {
   const [supportReplies, setSupportReplies] = useState({});
   const [replyInputs, setReplyInputs] = useState({});
 
+  const [broadcastTitle, setBroadcastTitle] = useState("");
+  const [broadcastMessage, setBroadcastMessage] = useState("");
+  const [broadcastType, setBroadcastType] = useState("INFO");
+
   useEffect(() => {
   loadData();
   loadStats();
@@ -775,6 +779,53 @@ async function updateTicketStatus(ticketId, status) {
   }
 }
 
+async function sendBroadcast() {
+  if (!broadcastTitle.trim()) {
+    return alert("Please enter a broadcast title");
+  }
+
+  if (!broadcastMessage.trim()) {
+    return alert("Please enter a broadcast message");
+  }
+
+  if (
+    !confirm(
+      "Send this announcement to all users?"
+    )
+  ) {
+    return;
+  }
+
+  try {
+    const res = await axios.post(
+      `${API_URL}/api/admin/broadcast`,
+      {
+        title: broadcastTitle,
+        message: broadcastMessage,
+        type: broadcastType,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert(res.data.message);
+
+    setBroadcastTitle("");
+    setBroadcastMessage("");
+    setBroadcastType("INFO");
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      error.response?.data?.message ||
+      "Failed to send broadcast"
+    );
+  }
+}
+
 async function updateKyc(id, status) {
   try {
     await axios.post(
@@ -823,6 +874,56 @@ async function updateKyc(id, status) {
       <h2>Admin Control Center</h2>
       
       <SystemSettings token={token} />
+
+      <div style={sectionStyle}>
+  <h3>Broadcast Announcement</h3>
+
+  <input
+    placeholder="Announcement Title"
+    value={broadcastTitle}
+    onChange={(e) =>
+      setBroadcastTitle(e.target.value)
+    }
+    style={inputStyle}
+  />
+
+  <textarea
+    placeholder="Announcement Message"
+    value={broadcastMessage}
+    onChange={(e) =>
+      setBroadcastMessage(e.target.value)
+    }
+    style={{
+      width: "100%",
+      minHeight: "120px",
+      padding: "12px",
+      borderRadius: "10px",
+      border: "1px solid #334155",
+      background: "#020617",
+      color: "white",
+      marginBottom: "15px",
+    }}
+  />
+
+  <select
+    value={broadcastType}
+    onChange={(e) =>
+      setBroadcastType(e.target.value)
+    }
+    style={inputStyle}
+  >
+    <option value="INFO">INFO</option>
+    <option value="SUCCESS">SUCCESS</option>
+    <option value="WARNING">WARNING</option>
+  </select>
+
+  <button
+    onClick={sendBroadcast}
+    style={approveButton}
+  >
+    Send Announcement To All Users
+  </button>
+</div>
 
       <button onClick={loadData} style={buttonStyle}>
         Refresh Admin Data
