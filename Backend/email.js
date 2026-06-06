@@ -5,7 +5,7 @@ dotenv.config();
 
 const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
-async function sendBrevoEmail({ to, subject, html }) {
+export async function sendBrevoEmail({ to, subject, html }) {
   if (!process.env.BREVO_API_KEY) {
     console.error("BREVO_API_KEY is missing");
     return;
