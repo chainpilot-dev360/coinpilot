@@ -211,7 +211,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
           <Testimonial
             name="Michael Johnson"
             location="United States"
-            text="CoinPilot provides a straightforward investment experience with an excellent dashboard and responsive support."
+            text={`${settings.site_name} provides a straightforward investment experience with an excellent dashboard and responsive support.`}
            />
 
           <Testimonial
