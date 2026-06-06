@@ -50,6 +50,8 @@ function AdminPanel() {
   const [broadcastTitle, setBroadcastTitle] = useState("");
   const [broadcastMessage, setBroadcastMessage] = useState("");
   const [broadcastType, setBroadcastType] = useState("INFO");
+  const [sendInApp, setSendInApp] = useState(true);
+  const [sendEmail, setSendEmail] = useState(false);
 
   const [kycList, setKycList] = useState([]);
 
@@ -699,6 +701,8 @@ async function openMessages(userId) {
         title: broadcastTitle,
         message: broadcastMessage,
         type: broadcastType,
+        sendInApp,
+        sendEmail,
       },
       {
         headers: {
@@ -837,6 +841,8 @@ async function sendBroadcast() {
         title: broadcastTitle,
         message: broadcastMessage,
         type: broadcastType,
+        sendInApp,
+        sendEmail,
       },
       {
         headers: {
@@ -850,6 +856,9 @@ async function sendBroadcast() {
     setBroadcastTitle("");
     setBroadcastMessage("");
     setBroadcastType("INFO");
+
+    setSendInApp(true);
+    setSendEmail(false);
   } catch (error) {
     console.error(error);
 
@@ -950,6 +959,26 @@ async function updateKyc(id, status) {
     <option value="SUCCESS">SUCCESS</option>
     <option value="WARNING">WARNING</option>
   </select>
+
+  <label style={{ display: "block", marginBottom: "10px" }}>
+  <input
+    type="checkbox"
+    checked={sendInApp}
+    onChange={(e) => setSendInApp(e.target.checked)}
+    style={{ marginRight: "8px" }}
+  />
+  Send as in-app notification
+</label>
+
+<label style={{ display: "block", marginBottom: "15px" }}>
+  <input
+    type="checkbox"
+    checked={sendEmail}
+    onChange={(e) => setSendEmail(e.target.checked)}
+    style={{ marginRight: "8px" }}
+  />
+  Send as email notification
+</label>
 
   <button
     onClick={sendBroadcast}
