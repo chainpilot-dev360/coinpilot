@@ -12,6 +12,7 @@ export default function useSystemSettings() {
     investment_email: siteConfig.investmentEmail,
     btc_wallet: siteConfig.btcWallet,
     eth_wallet: siteConfig.ethWallet,
+    company_logo: "",
   });
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function useSystemSettings() {
             res.data.investment_email || siteConfig.investmentEmail,
           btc_wallet: res.data.btc_wallet || siteConfig.btcWallet,
           eth_wallet: res.data.eth_wallet || siteConfig.ethWallet,
+          company_logo: res.data.company_logo || "",
         });
       } catch (error) {
         console.error("Failed to load public system settings", error);
