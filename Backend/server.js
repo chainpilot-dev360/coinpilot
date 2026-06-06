@@ -3408,7 +3408,13 @@ app.put("/api/admin/support/tickets/:id/status", requireAuth, requireAdmin, asyn
 
 app.post("/api/admin/broadcast", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const { title, message, type } = req.body;
+    const {
+      title,
+      message,
+      type,
+      sendInApp = true,
+      sendEmail = false,
+    } = req.body;
 
     if (!title || !message) {
       return res.status(400).json({
@@ -3417,22 +3423,53 @@ app.post("/api/admin/broadcast", requireAuth, requireAdmin, async (req, res) => 
     }
 
     const users = await pool.query(`
-      SELECT id FROM users
+      SELECT id, email, full_name
+      FROM users
       WHERE role != 'ADMIN'
     `);
 
+    let emailSentCount = 0;
+
     for (const user of users.rows) {
-      await pool.query(
-        `
-        INSERT INTO notifications (user_id, title, message, type, sent_by_admin)
-        VALUES ($1, $2, $3, $4, true)
-        `,
-        [user.id, title, message, type || "INFO"]
-      );
+      if (sendInApp) {
+        await pool.query(
+          `
+          INSERT INTO notifications (user_id, title, message, type, sent_by_admin)
+          VALUES ($1, $2, $3, $4, true)
+          `,
+          [user.id, title, message, type || "INFO"]
+        );
+      }
+
+      if (sendEmail && user.email) {
+        try {
+          await transporter.sendMail({
+            from: process.env.SMTP_FROM,
+            to: user.email,
+            subject: title,
+            html: `
+              <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                <h2>${title}</h2>
+                <p>Hello ${user.full_name || "Investor"},</p>
+                <p>${message}</p>
+                <br />
+                <p>Regards,</p>
+                <p><strong>CoinPilot Support Team</strong></p>
+              </div>
+            `,
+          });
+
+          emailSentCount++;
+        } catch (emailError) {
+          console.error("Broadcast email failed:", emailError);
+        }
+      }
     }
 
     res.json({
-      message: `Broadcast sent to ${users.rows.length} users`,
+      message: `Broadcast completed. In-app: ${
+        sendInApp ? users.rows.length : 0
+      }, Email sent: ${emailSentCount}`,
     });
   } catch (error) {
     console.error("Broadcast error:", error);
