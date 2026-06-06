@@ -3406,6 +3406,42 @@ app.put("/api/admin/support/tickets/:id/status", requireAuth, requireAdmin, asyn
   }
 });
 
+app.post("/api/admin/broadcast", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { title, message, type } = req.body;
+
+    if (!title || !message) {
+      return res.status(400).json({
+        message: "Title and message are required",
+      });
+    }
+
+    const users = await pool.query(`
+      SELECT id FROM users
+      WHERE role != 'ADMIN'
+    `);
+
+    for (const user of users.rows) {
+      await pool.query(
+        `
+        INSERT INTO notifications (user_id, title, message, type, sent_by_admin)
+        VALUES ($1, $2, $3, $4, true)
+        `,
+        [user.id, title, message, type || "INFO"]
+      );
+    }
+
+    res.json({
+      message: `Broadcast sent to ${users.rows.length} users`,
+    });
+  } catch (error) {
+    console.error("Broadcast error:", error);
+    res.status(500).json({
+      message: "Failed to send broadcast",
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://127.0.0.1:${PORT}`);
 });
