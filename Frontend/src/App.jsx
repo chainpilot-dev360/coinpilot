@@ -13,6 +13,7 @@ import VerifyEmail from "./components/VerifyEmail";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import Referrals from "./pages/Referrals";
+import Support from "./pages/Support";
 import ReceiptVerification from "./components/ReceiptVerification";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
@@ -600,6 +601,13 @@ function App() {
             Referrals
           </button>
 
+          <button
+            onClick={() => openTab("support")}
+            style={activeTab === "support" ? activeMenu : menu}
+          >
+            Support
+          </button>
+
           {user.role === "ADMIN" && (
             <button
               onClick={() => openTab("admin")}
@@ -755,6 +763,12 @@ function App() {
         {activeTab === "referrals" && (
           <section style={panel}>
             <Referrals />
+          </section>
+        )}
+
+        {activeTab === "support" && (
+          <section style={panel}>
+            <Support token={token} />
           </section>
         )}
 
