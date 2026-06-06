@@ -13,6 +13,7 @@ export default function useSystemSettings() {
     btc_wallet: siteConfig.btcWallet,
     eth_wallet: siteConfig.ethWallet,
     company_logo: "",
+    tagline: siteConfig.tagline || "",
   });
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function useSystemSettings() {
           btc_wallet: res.data.btc_wallet || siteConfig.btcWallet,
           eth_wallet: res.data.eth_wallet || siteConfig.ethWallet,
           company_logo: res.data.company_logo || "",
+          tagline: res.data.tagline || siteConfig.tagline || "",
         });
       } catch (error) {
         console.error("Failed to load public system settings", error);
