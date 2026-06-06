@@ -34,9 +34,8 @@ function App() {
   const isTermsPage = window.location.pathname === "/terms";
   const isRiskDisclosurePage = window.location.pathname === "/risk-disclosure";
   const isAMLPolicyPage = window.location.pathname === "/aml-policy";
-  
-  const isVerifyReceiptPage =
-  window.location.pathname === "/verify";
+
+  const isVerifyReceiptPage = window.location.pathname === "/verify";
 
   const [authMode, setAuthMode] = useState("login");
   const [showAuth, setShowAuth] = useState(false);
@@ -51,7 +50,7 @@ function App() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [referral, setReferral] = useState("");
-  
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const refCode = params.get("ref");
@@ -62,7 +61,7 @@ function App() {
       setAuthMode("register");
     }
   }, []);
-  
+
   const [loginId, setLoginId] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -82,6 +81,9 @@ function App() {
   const [depositAmount, setDepositAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const [plans, setPlans] = useState([]);
   const [selectedPlanId, setSelectedPlanId] = useState("");
@@ -144,46 +146,47 @@ function App() {
   }, []);
 
   async function register() {
-  try {
-    const res = await axios.post(`${API_URL}/api/auth/register`, {
-      username,
-      firstName,
-      lastName,
-      sex,
-      email,
-      country,
-      accountCurrency,
-      password,
-      confirmPassword,
-      referral,
-    });
+    try {
+      const res = await axios.post(`${API_URL}/api/auth/register`, {
+        username,
+        firstName,
+        lastName,
+        sex,
+        email,
+        country,
+        accountCurrency,
+        password,
+        confirmPassword,
+        referral,
+      });
 
-    showNotification(
-      res.data.message || "Registration successful. Please verify your email before logging in.",
-      "success"
-     );
-  } catch (error) {
-    showNotification(
-      error.response?.data?.message || "Registration failed",
-      "error"
-    );
+      showNotification(
+        res.data.message ||
+          "Registration successful. Please verify your email before logging in.",
+        "success"
+      );
+    } catch (error) {
+      showNotification(
+        error.response?.data?.message || "Registration failed",
+        "error"
+      );
+    }
   }
-}
 
   async function login() {
-  try {
-    const res = await axios.post(`${API_URL}/api/auth/login`, {
-      loginId,
-      password,
-    });
+    try {
+      const res = await axios.post(`${API_URL}/api/auth/login`, {
+        loginId,
+        password,
+      });
 
-    localStorage.setItem("token", res.data.token);
-    setToken(res.data.token);
-    showNotification("Login successful", "success");
-  } catch (error) {
-    showNotification(error.response?.data?.message || "Login failed", "error");
+      localStorage.setItem("token", res.data.token);
+      setToken(res.data.token);
+      showNotification("Login successful", "success");
+    } catch (error) {
+      showNotification(error.response?.data?.message || "Login failed", "error");
+    }
   }
-}
 
   function logout() {
     localStorage.removeItem("token");
@@ -255,6 +258,34 @@ function App() {
     } catch (error) {
       showNotification(
         error.response?.data?.message || "Withdrawal failed",
+        "error"
+      );
+    }
+  }
+
+  async function changePassword() {
+    if (!currentPassword || !newPassword) {
+      return showNotification("Please enter current and new password", "error");
+    }
+
+    try {
+      await axios.post(
+        `${API_URL}/api/auth/change-password`,
+        {
+          currentPassword,
+          newPassword,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      showNotification("Password changed successfully", "success");
+      setCurrentPassword("");
+      setNewPassword("");
+    } catch (error) {
+      showNotification(
+        error.response?.data?.message || "Failed to change password",
         "error"
       );
     }
@@ -385,158 +416,154 @@ function App() {
           </div>
 
           {authMode === "register" && (
-  <>
-    <input
-      placeholder="Username *"
-      value={username}
-      onChange={(e) => setUsername(e.target.value)}
-      style={input}
-    />
+            <>
+              <input
+                placeholder="Username *"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                style={input}
+              />
 
-    <input
-      placeholder="First Name *"
-      value={firstName}
-      onChange={(e) => setFirstName(e.target.value)}
-      style={input}
-    />
+              <input
+                placeholder="First Name *"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                style={input}
+              />
 
-    <input
-      placeholder="Last Name *"
-      value={lastName}
-      onChange={(e) => setLastName(e.target.value)}
-      style={input}
-    />
+              <input
+                placeholder="Last Name *"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                style={input}
+              />
 
-    <select
-      value={sex}
-      onChange={(e) => setSex(e.target.value)}
-      style={input}
-    >
-      <option value="">--Select Sex *--</option>
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-    </select>
-  </>
-)}
+              <select value={sex} onChange={(e) => setSex(e.target.value)} style={input}>
+                <option value="">--Select Sex *--</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </>
+          )}
 
-<input
-  placeholder={authMode === "login" ? "Username or Email *" : "Email *"}
-  value={authMode === "login" ? loginId : email}
-  onChange={(e) =>
-    authMode === "login"
-      ? setLoginId(e.target.value)
-      : setEmail(e.target.value)
-  }
-  style={input}
-/>
+          <input
+            placeholder={authMode === "login" ? "Username or Email *" : "Email *"}
+            value={authMode === "login" ? loginId : email}
+            onChange={(e) =>
+              authMode === "login"
+                ? setLoginId(e.target.value)
+                : setEmail(e.target.value)
+            }
+            style={input}
+          />
 
-{authMode === "register" && (
-  <>
-    <select
-  value={country}
-  onChange={(e) => setCountry(e.target.value)}
-  style={input}
->
-  <option value="">--Select Country *--</option>
+          {authMode === "register" && (
+            <>
+              <select
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                style={input}
+              >
+                <option value="">--Select Country *--</option>
 
-  <option value="United States">United States</option>
-  <option value="United Kingdom">United Kingdom</option>
-  <option value="Canada">Canada</option>
-  <option value="Australia">Australia</option>
-  <option value="Germany">Germany</option>
-  <option value="France">France</option>
-  <option value="Netherlands">Netherlands</option>
-  <option value="Switzerland">Switzerland</option>
+                <option value="United States">United States</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Canada">Canada</option>
+                <option value="Australia">Australia</option>
+                <option value="Germany">Germany</option>
+                <option value="France">France</option>
+                <option value="Netherlands">Netherlands</option>
+                <option value="Switzerland">Switzerland</option>
 
-  <option value="Nigeria">Nigeria</option>
-  <option value="Ghana">Ghana</option>
-  <option value="Kenya">Kenya</option>
-  <option value="South Africa">South Africa</option>
+                <option value="Nigeria">Nigeria</option>
+                <option value="Ghana">Ghana</option>
+                <option value="Kenya">Kenya</option>
+                <option value="South Africa">South Africa</option>
 
-  <option value="India">India</option>
-  <option value="China">China</option>
-  <option value="Japan">Japan</option>
-  <option value="Singapore">Singapore</option>
+                <option value="India">India</option>
+                <option value="China">China</option>
+                <option value="Japan">Japan</option>
+                <option value="Singapore">Singapore</option>
 
-  <option value="Brazil">Brazil</option>
-  <option value="Mexico">Mexico</option>
+                <option value="Brazil">Brazil</option>
+                <option value="Mexico">Mexico</option>
 
-  <option value="United Arab Emirates">United Arab Emirates</option>
-  <option value="Saudi Arabia">Saudi Arabia</option>
-</select>
+                <option value="United Arab Emirates">United Arab Emirates</option>
+                <option value="Saudi Arabia">Saudi Arabia</option>
+              </select>
 
-    <select
-  value={accountCurrency}
-  onChange={(e) => setAccountCurrency(e.target.value)}
-  style={input}
->
-  <option value="USD">USD - United States Dollar</option>
-  <option value="EUR">EUR - Euro</option>
-  <option value="GBP">GBP - British Pound</option>
-  <option value="NGN">NGN - Nigerian Naira</option>
-  <option value="CAD">CAD - Canadian Dollar</option>
-  <option value="AUD">AUD - Australian Dollar</option>
-  <option value="CHF">CHF - Swiss Franc</option>
-  <option value="JPY">JPY - Japanese Yen</option>
-  <option value="CNY">CNY - Chinese Yuan</option>
-  <option value="INR">INR - Indian Rupee</option>
-  <option value="ZAR">ZAR - South African Rand</option>
-  <option value="SGD">SGD - Singapore Dollar</option>
-  <option value="AED">AED - UAE Dirham</option>
-  <option value="SAR">SAR - Saudi Riyal</option>
-</select>
-  </>
-)}
+              <select
+                value={accountCurrency}
+                onChange={(e) => setAccountCurrency(e.target.value)}
+                style={input}
+              >
+                <option value="USD">USD - United States Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="NGN">NGN - Nigerian Naira</option>
+                <option value="CAD">CAD - Canadian Dollar</option>
+                <option value="AUD">AUD - Australian Dollar</option>
+                <option value="CHF">CHF - Swiss Franc</option>
+                <option value="JPY">JPY - Japanese Yen</option>
+                <option value="CNY">CNY - Chinese Yuan</option>
+                <option value="INR">INR - Indian Rupee</option>
+                <option value="ZAR">ZAR - South African Rand</option>
+                <option value="SGD">SGD - Singapore Dollar</option>
+                <option value="AED">AED - UAE Dirham</option>
+                <option value="SAR">SAR - Saudi Riyal</option>
+              </select>
+            </>
+          )}
 
-<input
-  type="password"
-  placeholder="Password *"
-  value={password}
-  onChange={(e) => setPassword(e.target.value)}
-  style={input}
-/>
+          <input
+            type="password"
+            placeholder="Password *"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={input}
+          />
 
-{authMode === "register" && (
-  <>
-    <input
-      type="password"
-      placeholder="Confirm Password *"
-      value={confirmPassword}
-      onChange={(e) => setConfirmPassword(e.target.value)}
-      style={input}
-    />
+          {authMode === "register" && (
+            <>
+              <input
+                type="password"
+                placeholder="Confirm Password *"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                style={input}
+              />
 
-    <input
-      placeholder="Referral Username or Email Address"
-      value={referral}
-      onChange={(e) => setReferral(e.target.value)}
-      style={input}
-    />
-  </>
-)}
+              <input
+                placeholder="Referral Username or Email Address"
+                value={referral}
+                onChange={(e) => setReferral(e.target.value)}
+                style={input}
+              />
+            </>
+          )}
 
-{authMode === "login" ? (
-  <>
-    <button onClick={login} style={primaryButton}>
-      Login
-    </button>
+          {authMode === "login" ? (
+            <>
+              <button onClick={login} style={primaryButton}>
+                Login
+              </button>
 
-    <p style={forgotWrapper}>
-      <span
-        onClick={() => {
-          window.location.href = "/forgot-password";
-        }}
-        style={forgotLink}
-      >
-        Forgot Password?
-      </span>
-    </p>
-  </>
-) : (
-  <button onClick={register} style={primaryButton}>
-    Register
-  </button>
-)}
+              <p style={forgotWrapper}>
+                <span
+                  onClick={() => {
+                    window.location.href = "/forgot-password";
+                  }}
+                  style={forgotLink}
+                >
+                  Forgot Password?
+                </span>
+              </p>
+            </>
+          ) : (
+            <button onClick={register} style={primaryButton}>
+              Register
+            </button>
+          )}
         </div>
       </div>
     );
@@ -574,83 +601,83 @@ function App() {
 
         <nav style={{ marginTop: 30 }}>
           <button
-  onClick={() => openTab("dashboard")}
-  style={activeTab === "dashboard" ? activeMenu : menu}
->
-  Dashboard
-</button>
+            onClick={() => openTab("dashboard")}
+            style={activeTab === "dashboard" ? activeMenu : menu}
+          >
+            Dashboard
+          </button>
 
-<button
-  onClick={() => openTab("wallet")}
-  style={activeTab === "wallet" ? activeMenu : menu}
->
-  Wallet
-</button>
+          <button
+            onClick={() => openTab("wallet")}
+            style={activeTab === "wallet" ? activeMenu : menu}
+          >
+            Wallet
+          </button>
 
-<button
-  onClick={() => openTab("invest")}
-  style={activeTab === "invest" ? activeMenu : menu}
->
-  Invest
-</button>
+          <button
+            onClick={() => openTab("invest")}
+            style={activeTab === "invest" ? activeMenu : menu}
+          >
+            Invest
+          </button>
 
-<button
-  onClick={() => openTab("referrals")}
-  style={activeTab === "referrals" ? activeMenu : menu}
->
-  Referrals
-</button>
+          <button
+            onClick={() => openTab("referrals")}
+            style={activeTab === "referrals" ? activeMenu : menu}
+          >
+            Referrals
+          </button>
 
-<button
-  onClick={() => openTab("support")}
-  style={activeTab === "support" ? activeMenu : menu}
->
-  Support
-</button>
+          <button
+            onClick={() => openTab("support")}
+            style={activeTab === "support" ? activeMenu : menu}
+          >
+            Support
+          </button>
 
-<button
-  onClick={() => openTab("changePassword")}
-  style={activeTab === "changePassword" ? activeMenu : menu}
->
-  Change Password
-</button>
+          <button
+            onClick={() => openTab("changePassword")}
+            style={activeTab === "changePassword" ? activeMenu : menu}
+          >
+            Change Password
+          </button>
 
-<button
-  onClick={() => openTab("accountStatement")}
-  style={activeTab === "accountStatement" ? activeMenu : menu}
->
-  Account Statement
-</button>
+          <button
+            onClick={() => openTab("accountStatement")}
+            style={activeTab === "accountStatement" ? activeMenu : menu}
+          >
+            Account Statement
+          </button>
 
-<button
-  onClick={() => openTab("depositHistory")}
-  style={activeTab === "depositHistory" ? activeMenu : menu}
->
-  Deposit History
-</button>
+          <button
+            onClick={() => openTab("depositHistory")}
+            style={activeTab === "depositHistory" ? activeMenu : menu}
+          >
+            Deposit History
+          </button>
 
-<button
-  onClick={() => openTab("withdrawalHistory")}
-  style={activeTab === "withdrawalHistory" ? activeMenu : menu}
->
-  Withdrawal History
-</button>
+          <button
+            onClick={() => openTab("withdrawalHistory")}
+            style={activeTab === "withdrawalHistory" ? activeMenu : menu}
+          >
+            Withdrawal History
+          </button>
 
-<button
-  onClick={() => openTab("supportInbox")}
-  style={activeTab === "supportInbox" ? activeMenu : menu}
->
-  Support Inbox
-</button>
+          <button
+            onClick={() => openTab("supportInbox")}
+            style={activeTab === "supportInbox" ? activeMenu : menu}
+          >
+            Support Inbox
+          </button>
 
-{user.role === "ADMIN" && (
-  <button
-    onClick={() => openTab("admin")}
-    style={activeTab === "admin" ? activeMenu : menu}
-  >
-    Admin
-  </button>
-)}
+          {user.role === "ADMIN" && (
+            <button
+              onClick={() => openTab("admin")}
+              style={activeTab === "admin" ? activeMenu : menu}
+            >
+              Admin
+            </button>
+          )}
         </nav>
 
         <button onClick={logout} style={logoutButton}>
@@ -808,39 +835,59 @@ function App() {
         )}
 
         {activeTab === "changePassword" && (
-  <section style={panel}>
-    <h2>Change Password</h2>
-    <p style={muted}>Update your account password securely.</p>
-  </section>
-)}
+          <section style={panel}>
+            <h2>Change Password</h2>
+            <p style={muted}>Update your account password securely.</p>
 
-{activeTab === "accountStatement" && (
-  <section style={panel}>
-    <h2>Account Statement</h2>
-    <p style={muted}>Generate and download your account statement.</p>
-  </section>
-)}
+            <input
+              type="password"
+              placeholder="Current Password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              style={input}
+            />
 
-{activeTab === "depositHistory" && (
-  <section style={panel}>
-    <h2>Deposit History</h2>
-    <p style={muted}>View all your previous deposit records.</p>
-  </section>
-)}
+            <input
+              type="password"
+              placeholder="New Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              style={input}
+            />
 
-{activeTab === "withdrawalHistory" && (
-  <section style={panel}>
-    <h2>Withdrawal History</h2>
-    <p style={muted}>View all your previous withdrawal records.</p>
-  </section>
-)}
+            <button onClick={changePassword} style={primaryButton}>
+              Update Password
+            </button>
+          </section>
+        )}
 
-{activeTab === "supportInbox" && (
-  <section style={panel}>
-    <h2>Support Inbox</h2>
-    <p style={muted}>View support messages and replies from admin.</p>
-  </section>
-)}
+        {activeTab === "accountStatement" && (
+          <section style={panel}>
+            <h2>Account Statement</h2>
+            <p style={muted}>Generate and download your account statement.</p>
+          </section>
+        )}
+
+        {activeTab === "depositHistory" && (
+          <section style={panel}>
+            <h2>Deposit History</h2>
+            <p style={muted}>View all your previous deposit records.</p>
+          </section>
+        )}
+
+        {activeTab === "withdrawalHistory" && (
+          <section style={panel}>
+            <h2>Withdrawal History</h2>
+            <p style={muted}>View all your previous withdrawal records.</p>
+          </section>
+        )}
+
+        {activeTab === "supportInbox" && (
+          <section style={panel}>
+            <h2>Support Inbox</h2>
+            <p style={muted}>View support messages and replies from admin.</p>
+          </section>
+        )}
 
         {activeTab === "admin" && user.role === "ADMIN" && (
           <section style={panel}>
