@@ -47,6 +47,10 @@ function AdminPanel() {
   const [inputs, setInputs] = useState({});
   const [stats, setStats] = useState(null);
 
+  const [broadcastTitle, setBroadcastTitle] = useState("");
+  const [broadcastMessage, setBroadcastMessage] = useState("");
+  const [broadcastType, setBroadcastType] = useState("INFO");
+
   const [kycList, setKycList] = useState([]);
 
   const [supportTickets, setSupportTickets] = useState([]);
@@ -686,6 +690,40 @@ async function openMessages(userId) {
       alert(error.response?.data?.message || "Error rejecting withdrawal");
     }
   }
+
+  async function sendBroadcast() {
+  if (!broadcastTitle || !broadcastMessage) {
+    return alert("Please enter title and message");
+  }
+
+  try {
+    await axios.post(
+      `${API_URL}/api/admin/broadcast`,
+      {
+        title: broadcastTitle,
+        message: broadcastMessage,
+        type: broadcastType,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert("Announcement sent successfully");
+
+    setBroadcastTitle("");
+    setBroadcastMessage("");
+    setBroadcastType("INFO");
+  } catch (error) {
+    console.error(error);
+    alert(
+      error.response?.data?.message ||
+      "Failed to send announcement"
+    );
+  }
+}
 
   async function loadKyc() {
   try {
