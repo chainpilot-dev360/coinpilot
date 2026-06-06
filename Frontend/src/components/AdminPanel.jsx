@@ -49,15 +49,21 @@ function AdminPanel() {
 
   const [kycList, setKycList] = useState([]);
 
+  const [supportTickets, setSupportTickets] = useState([]);
+  const [supportReplies, setSupportReplies] = useState({});
+  const [replyInputs, setReplyInputs] = useState({});
+
   useEffect(() => {
   loadData();
   loadStats();
   loadKyc();
+  loadSupportTickets();
 
   const interval = setInterval(() => {
     loadData();
     loadStats();
     loadKyc();
+    loadSupportTickets();
   }, 30000);
 
   return () => clearInterval(interval);
@@ -688,6 +694,87 @@ async function openMessages(userId) {
   }
 }
 
+async function loadSupportTickets() {
+  try {
+    const res = await axios.get(`${API_URL}/api/admin/support/tickets`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setSupportTickets(res.data || []);
+  } catch (error) {
+    console.error("Failed to load support tickets", error);
+  }
+}
+
+async function loadTicketReplies(ticketId) {
+  try {
+    const res = await axios.get(
+      `${API_URL}/api/support/tickets/${ticketId}/replies`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    setSupportReplies({
+      ...supportReplies,
+      [ticketId]: res.data || [],
+    });
+  } catch (error) {
+    console.error("Failed to load ticket replies", error);
+    alert("Failed to load ticket replies");
+  }
+}
+
+async function sendTicketReply(ticketId) {
+  const reply = replyInputs[ticketId];
+
+  if (!reply || !reply.trim()) {
+    return alert("Please enter a reply");
+  }
+
+  try {
+    await axios.post(
+      `${API_URL}/api/support/tickets/${ticketId}/replies`,
+      { message: reply.trim() },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    setReplyInputs({
+      ...replyInputs,
+      [ticketId]: "",
+    });
+
+    await loadTicketReplies(ticketId);
+    await loadSupportTickets();
+
+    alert("Reply sent successfully");
+  } catch (error) {
+    console.error(error);
+    alert(error.response?.data?.message || "Failed to send reply");
+  }
+}
+
+async function updateTicketStatus(ticketId, status) {
+  try {
+    await axios.put(
+      `${API_URL}/api/admin/support/tickets/${ticketId}/status`,
+      { status },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    await loadSupportTickets();
+
+    alert("Ticket status updated");
+  } catch (error) {
+    console.error(error);
+    alert(error.response?.data?.message || "Failed to update ticket status");
+  }
+}
+
 async function updateKyc(id, status) {
   try {
     await axios.post(
@@ -1173,6 +1260,109 @@ async function updateKyc(id, status) {
           )}
         </div>
       )}
+
+      <h3>Support Tickets</h3>
+
+<div style={cardStyle}>
+  {supportTickets.length === 0 ? (
+    <p>No support tickets yet</p>
+  ) : (
+    supportTickets.map((ticket) => (
+      <div key={ticket.id} style={miniCard}>
+        <p>
+          <strong>Ticket #{ticket.id}</strong>
+        </p>
+
+        <p>
+          <strong>User:</strong> {ticket.full_name} ({ticket.email})
+        </p>
+
+        <p>
+          <strong>Subject:</strong> {ticket.subject}
+        </p>
+
+        <p>
+          <strong>Message:</strong> {ticket.message}
+        </p>
+
+        <p>
+          <strong>Status:</strong> {ticket.status}
+        </p>
+
+        <p>
+          <strong>Priority:</strong> {ticket.priority}
+        </p>
+
+        <select
+          value={ticket.status}
+          onChange={(e) => updateTicketStatus(ticket.id, e.target.value)}
+          style={inputStyle}
+        >
+          <option value="OPEN">OPEN</option>
+          <option value="PENDING">PENDING</option>
+          <option value="RESOLVED">RESOLVED</option>
+        </select>
+
+        <button
+          onClick={() => loadTicketReplies(ticket.id)}
+          style={buttonStyle}
+        >
+          View Replies
+        </button>
+
+        {supportReplies[ticket.id] && (
+          <div style={sectionStyle}>
+            <h4>Replies</h4>
+
+            {supportReplies[ticket.id].length === 0 ? (
+              <p>No replies yet</p>
+            ) : (
+              supportReplies[ticket.id].map((reply) => (
+                <div key={reply.id} style={logCard}>
+                  <p>
+                    <strong>{reply.sender_role}:</strong> {reply.message}
+                  </p>
+
+                  <small style={muted}>
+                    {new Date(reply.created_at).toLocaleString()}
+                  </small>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        <textarea
+          placeholder="Write admin reply..."
+          value={replyInputs[ticket.id] || ""}
+          onChange={(e) =>
+            setReplyInputs({
+              ...replyInputs,
+              [ticket.id]: e.target.value,
+            })
+          }
+          style={{
+            width: "100%",
+            minHeight: "90px",
+            padding: "10px",
+            borderRadius: "8px",
+            border: "1px solid #334155",
+            background: "#020617",
+            color: "white",
+            marginTop: "10px",
+          }}
+        />
+
+        <button
+          onClick={() => sendTicketReply(ticket.id)}
+          style={approveButton}
+        >
+          Send Reply
+        </button>
+      </div>
+    ))
+  )}
+</div>
 
       <h3>KYC Requests</h3>
 
