@@ -68,6 +68,7 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [dashboardTarget, setDashboardTarget] = useState("");
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -197,10 +198,32 @@ function App() {
   }
 
   function openTab(tab) {
-    setActiveTab(tab);
-    setMenuOpen(false);
-  }
+  setActiveTab(tab);
+  setMenuOpen(false);
+}
 
+function openDashboardSection(sectionId) {
+  setActiveTab("dashboard");
+
+  setTimeout(() => {
+    const section = document.getElementById(sectionId);
+
+    if (section) {
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, 300);
+
+  setMenuOpen(false);
+}
+
+function openDashboardSection(sectionId) {
+  setActiveTab("dashboard");
+  setDashboardTarget(sectionId);
+  setMenuOpen(false);
+}
   function openLogin() {
     setAuthMode("login");
     setShowAuth(true);
@@ -636,39 +659,40 @@ function App() {
           </button>
 
           <button
-            onClick={() => openTab("changePassword")}
-            style={activeTab === "changePassword" ? activeMenu : menu}
-          >
-            Change Password
-          </button>
+            <button
+  onClick={() => openDashboardSection("change-password-section")}
+  style={menu}
+>
+  Change Password
+</button>
 
-          <button
-            onClick={() => openTab("accountStatement")}
-            style={activeTab === "accountStatement" ? activeMenu : menu}
-          >
-            Account Statement
-          </button>
+<button
+  onClick={() => openDashboardSection("account-statement-section")}
+  style={menu}
+>
+  Account Statement
+</button>
 
-          <button
-            onClick={() => openTab("depositHistory")}
-            style={activeTab === "depositHistory" ? activeMenu : menu}
-          >
-            Deposit History
-          </button>
+<button
+  onClick={() => openDashboardSection("deposit-history-section")}
+  style={menu}
+>
+  Deposit History
+</button>
 
-          <button
-            onClick={() => openTab("withdrawalHistory")}
-            style={activeTab === "withdrawalHistory" ? activeMenu : menu}
-          >
-            Withdrawal History
-          </button>
+<button
+  onClick={() => openDashboardSection("withdrawal-history-section")}
+  style={menu}
+>
+  Withdrawal History
+</button>
 
-          <button
-            onClick={() => openTab("supportInbox")}
-            style={activeTab === "supportInbox" ? activeMenu : menu}
-          >
-            Support Inbox
-          </button>
+<button
+  onClick={() => openDashboardSection("support-inbox-section")}
+  style={menu}
+>
+  Support Inbox
+</button>
 
           {user.role === "ADMIN" && (
             <button
