@@ -291,7 +291,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
          />
           <div>
             <h3 style={{ margin: 0 }}>{settings.site_name}</h3>
-            <p style={footerText}>Premium digital asset portfolio platform.</p>
+            <p style={footerText}>{settings.tagline}</p>
           </div>
         </div>
 
