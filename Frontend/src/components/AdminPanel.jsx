@@ -40,6 +40,9 @@ function AdminPanel() {
 
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("Loading admin data...");
+  const [roleFilter, setRoleFilter] = useState("ALL");
+  const [kycStatusFilter, setKycStatusFilter] = useState("ALL");
+  const [accountStatusFilter, setAccountStatusFilter] = useState("ALL");
 
   const [balanceAmount, setBalanceAmount] = useState("");
   const [balanceReason, setBalanceReason] = useState("");
@@ -885,15 +888,38 @@ async function updateKyc(id, status) {
 }
 
   const filteredUsers = users.filter((user) => {
-    const name = user.full_name || "";
-    const email = user.email || "";
+  const name = user.full_name || "";
+  const email = user.email || "";
+  const role = user.role || "";
+  const kycStatus = user.kyc_status || "";
 
-    return (
-      name.toLowerCase().includes(search.toLowerCase()) ||
-      email.toLowerCase().includes(search.toLowerCase()) ||
-      String(user.id).includes(search)
-    );
-  });
+  const matchesSearch =
+    name.toLowerCase().includes(search.toLowerCase()) ||
+    email.toLowerCase().includes(search.toLowerCase()) ||
+    String(user.id).includes(search);
+
+  const matchesRole =
+    roleFilter === "ALL" || role.toUpperCase() === roleFilter;
+
+  const matchesKyc =
+    kycStatusFilter === "ALL" ||
+    kycStatus.toUpperCase() === kycStatusFilter;
+
+  const matchesAccountStatus =
+    accountStatusFilter === "ALL" ||
+    (accountStatusFilter === "ACTIVE" && !user.is_frozen) ||
+    (accountStatusFilter === "FROZEN" && user.is_frozen) ||
+    (accountStatusFilter === "DEPOSITS_DISABLED" && user.deposits_disabled) ||
+    (accountStatusFilter === "WITHDRAWALS_DISABLED" &&
+      user.withdrawals_disabled);
+
+  return (
+    matchesSearch &&
+    matchesRole &&
+    matchesKyc &&
+    matchesAccountStatus
+  );
+});
 
   const selectedUser = users.find((u) => u.id === selectedUserId);
 
@@ -1061,12 +1087,54 @@ async function updateKyc(id, status) {
       </button>
     </div>
 
-      <input
-        placeholder="Search by name, email, or ID"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={inputStyle}
-      />
+      <div
+  style={{
+    display: "flex",
+    gap: "10px",
+    flexWrap: "wrap",
+    marginBottom: "15px",
+  }}
+>
+  <input
+    placeholder="Search by name, email, or ID"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    style={inputStyle}
+  />
+
+  <select
+    value={roleFilter}
+    onChange={(e) => setRoleFilter(e.target.value)}
+    style={inputStyle}
+  >
+    <option value="ALL">All Roles</option>
+    <option value="USER">Users</option>
+    <option value="ADMIN">Admins</option>
+  </select>
+
+  <select
+    value={kycStatusFilter}
+    onChange={(e) => setKycStatusFilter(e.target.value)}
+    style={inputStyle}
+  >
+    <option value="ALL">All KYC Status</option>
+    <option value="PENDING">Pending KYC</option>
+    <option value="APPROVED">Approved KYC</option>
+    <option value="REJECTED">Rejected KYC</option>
+  </select>
+
+  <select
+    value={accountStatusFilter}
+    onChange={(e) => setAccountStatusFilter(e.target.value)}
+    style={inputStyle}
+  >
+    <option value="ALL">All Account Status</option>
+    <option value="ACTIVE">Active Accounts</option>
+    <option value="FROZEN">Frozen Accounts</option>
+    <option value="DEPOSITS_DISABLED">Deposits Disabled</option>
+    <option value="WITHDRAWALS_DISABLED">Withdrawals Disabled</option>
+  </select>
+</div>
 
       {filteredUsers.length === 0 ? (
         <p>No users found</p>
