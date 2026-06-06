@@ -1006,7 +1006,7 @@ async function changePassword() {
                   withdrawals: withdrawalHistory || [],
                   currentBalance,
                   admin_note:
-                    "Official account statement generated from CoinPilot dashboard.",
+                    "Official account statement generated from {settings.site_name} dashboard.",
                 },
               });
 
