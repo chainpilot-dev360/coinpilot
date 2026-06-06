@@ -574,48 +574,83 @@ function App() {
 
         <nav style={{ marginTop: 30 }}>
           <button
-            onClick={() => openTab("dashboard")}
-            style={activeTab === "dashboard" ? activeMenu : menu}
-          >
-            Dashboard
-          </button>
+  onClick={() => openTab("dashboard")}
+  style={activeTab === "dashboard" ? activeMenu : menu}
+>
+  Dashboard
+</button>
 
-          <button
-            onClick={() => openTab("wallet")}
-            style={activeTab === "wallet" ? activeMenu : menu}
-          >
-            Wallet
-          </button>
+<button
+  onClick={() => openTab("wallet")}
+  style={activeTab === "wallet" ? activeMenu : menu}
+>
+  Wallet
+</button>
 
-          <button
-            onClick={() => openTab("invest")}
-            style={activeTab === "invest" ? activeMenu : menu}
-          >
-            Invest
-          </button>
+<button
+  onClick={() => openTab("invest")}
+  style={activeTab === "invest" ? activeMenu : menu}
+>
+  Invest
+</button>
 
-          <button
-            onClick={() => openTab("referrals")}
-            style={activeTab === "referrals" ? activeMenu : menu}
-          >
-            Referrals
-          </button>
+<button
+  onClick={() => openTab("referrals")}
+  style={activeTab === "referrals" ? activeMenu : menu}
+>
+  Referrals
+</button>
 
-          <button
-            onClick={() => openTab("support")}
-            style={activeTab === "support" ? activeMenu : menu}
-          >
-            Support
-          </button>
+<button
+  onClick={() => openTab("support")}
+  style={activeTab === "support" ? activeMenu : menu}
+>
+  Support
+</button>
 
-          {user.role === "ADMIN" && (
-            <button
-              onClick={() => openTab("admin")}
-              style={activeTab === "admin" ? activeMenu : menu}
-            >
-              Admin
-            </button>
-          )}
+<button
+  onClick={() => openTab("changePassword")}
+  style={activeTab === "changePassword" ? activeMenu : menu}
+>
+  Change Password
+</button>
+
+<button
+  onClick={() => openTab("accountStatement")}
+  style={activeTab === "accountStatement" ? activeMenu : menu}
+>
+  Account Statement
+</button>
+
+<button
+  onClick={() => openTab("depositHistory")}
+  style={activeTab === "depositHistory" ? activeMenu : menu}
+>
+  Deposit History
+</button>
+
+<button
+  onClick={() => openTab("withdrawalHistory")}
+  style={activeTab === "withdrawalHistory" ? activeMenu : menu}
+>
+  Withdrawal History
+</button>
+
+<button
+  onClick={() => openTab("supportInbox")}
+  style={activeTab === "supportInbox" ? activeMenu : menu}
+>
+  Support Inbox
+</button>
+
+{user.role === "ADMIN" && (
+  <button
+    onClick={() => openTab("admin")}
+    style={activeTab === "admin" ? activeMenu : menu}
+  >
+    Admin
+  </button>
+)}
         </nav>
 
         <button onClick={logout} style={logoutButton}>
