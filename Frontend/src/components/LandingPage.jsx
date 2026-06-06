@@ -54,7 +54,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
             />
             <div>
               <h2 style={brandName}>{settings.site_name}</h2>
-              <small style={brandTag}>{siteConfig.tagline}</small>
+              <small style={brandTag}>{settings.tagline}</small>
             </div>
           </div>
 
