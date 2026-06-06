@@ -807,6 +807,41 @@ function App() {
           </section>
         )}
 
+        {activeTab === "changePassword" && (
+  <section style={panel}>
+    <h2>Change Password</h2>
+    <p style={muted}>Update your account password securely.</p>
+  </section>
+)}
+
+{activeTab === "accountStatement" && (
+  <section style={panel}>
+    <h2>Account Statement</h2>
+    <p style={muted}>Generate and download your account statement.</p>
+  </section>
+)}
+
+{activeTab === "depositHistory" && (
+  <section style={panel}>
+    <h2>Deposit History</h2>
+    <p style={muted}>View all your previous deposit records.</p>
+  </section>
+)}
+
+{activeTab === "withdrawalHistory" && (
+  <section style={panel}>
+    <h2>Withdrawal History</h2>
+    <p style={muted}>View all your previous withdrawal records.</p>
+  </section>
+)}
+
+{activeTab === "supportInbox" && (
+  <section style={panel}>
+    <h2>Support Inbox</h2>
+    <p style={muted}>View support messages and replies from admin.</p>
+  </section>
+)}
+
         {activeTab === "admin" && user.role === "ADMIN" && (
           <section style={panel}>
             <AdminPanel token={token} />
