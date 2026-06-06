@@ -2594,7 +2594,8 @@ app.get("/api/system-settings", async (req, res) => {
         support_email,
         investment_email,
         btc_wallet,
-        eth_wallet
+        eth_wallet,
+        company_logo
       FROM system_settings
       ORDER BY id ASC
       LIMIT 1
