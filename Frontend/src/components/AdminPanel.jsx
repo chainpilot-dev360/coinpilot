@@ -57,10 +57,6 @@ function AdminPanel() {
   const [supportReplies, setSupportReplies] = useState({});
   const [replyInputs, setReplyInputs] = useState({});
 
-  const [broadcastTitle, setBroadcastTitle] = useState("");
-  const [broadcastMessage, setBroadcastMessage] = useState("");
-  const [broadcastType, setBroadcastType] = useState("INFO");
-
   useEffect(() => {
   loadData();
   loadStats();
