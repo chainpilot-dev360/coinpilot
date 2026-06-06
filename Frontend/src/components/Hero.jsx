@@ -6,7 +6,7 @@ export default function Hero() {
       </h1>
 
       <p style={{ color: "#cbd5e1", fontSize: "18px", maxWidth: "700px", margin: "0 auto" }}>
-        CoinPilot is a modern crypto investment dashboard for monitoring balances,
+        Professional investment dashboard for monitoring balances,
         transactions, and portfolio performance.
       </p>
     </section>
