@@ -2546,6 +2546,7 @@ app.put("/api/admin/system-settings", requireAuth, requireAdmin, async (req, res
     btc_wallet,
     eth_wallet,
     company_logo,
+    tagline,
   } = req.body;
 
   try {
@@ -2560,6 +2561,7 @@ app.put("/api/admin/system-settings", requireAuth, requireAdmin, async (req, res
         btc_wallet = $5,
         eth_wallet = $6,
         company_logo = $7,
+        tagline = $8,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = (
         SELECT id FROM system_settings ORDER BY id ASC LIMIT 1
@@ -2574,6 +2576,7 @@ app.put("/api/admin/system-settings", requireAuth, requireAdmin, async (req, res
         btc_wallet,
         eth_wallet,
         company_logo,
+        tagline,
       ]
     );
 
@@ -2598,7 +2601,8 @@ app.get("/api/system-settings", async (req, res) => {
         investment_email,
         btc_wallet,
         eth_wallet,
-        company_logo
+        company_logo,
+        tagline
       FROM system_settings
       ORDER BY id ASC
       LIMIT 1
