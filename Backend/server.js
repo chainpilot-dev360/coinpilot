@@ -3221,6 +3221,191 @@ if (statementResult.rows.length > 0) {
   }
 });
 
+// Create support ticket
+app.post("/api/support/tickets", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId || req.user.id;
+    const { subject, message, priority } = req.body;
+
+    if (!subject || !message) {
+      return res.status(400).json({ message: "Subject and message are required" });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO support_tickets (user_id, subject, message, priority)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+      `,
+      [userId, subject, message, priority || "NORMAL"]
+    );
+
+    res.status(201).json({
+      message: "Support ticket created successfully",
+      ticket: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Create support ticket error:", error);
+    res.status(500).json({ message: "Failed to create support ticket" });
+  }
+});
+
+// Get my support tickets
+app.get("/api/support/tickets/me", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId || req.user.id;
+
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM support_tickets
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      `,
+      [userId]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Fetch user support tickets error:", error);
+    res.status(500).json({ message: "Failed to fetch support tickets" });
+  }
+});
+
+// Get replies for one ticket
+app.get("/api/support/tickets/:id/replies", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId || req.user.id;
+    const ticketId = Number(req.params.id);
+
+    const ticket = await pool.query(
+      "SELECT * FROM support_tickets WHERE id = $1",
+      [ticketId]
+    );
+
+    if (ticket.rows.length === 0) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+
+    if (ticket.rows[0].user_id !== userId && req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const replies = await pool.query(
+      `
+      SELECT *
+      FROM support_ticket_replies
+      WHERE ticket_id = $1
+      ORDER BY created_at ASC
+      `,
+      [ticketId]
+    );
+
+    res.json(replies.rows);
+  } catch (error) {
+    console.error("Fetch ticket replies error:", error);
+    res.status(500).json({ message: "Failed to fetch replies" });
+  }
+});
+
+// Reply to support ticket
+app.post("/api/support/tickets/:id/replies", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId || req.user.id;
+    const ticketId = Number(req.params.id);
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ message: "Message is required" });
+    }
+
+    const ticket = await pool.query(
+      "SELECT * FROM support_tickets WHERE id = $1",
+      [ticketId]
+    );
+
+    if (ticket.rows.length === 0) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+
+    if (ticket.rows[0].user_id !== userId && req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO support_ticket_replies (ticket_id, sender_id, sender_role, message)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+      `,
+      [ticketId, userId, req.user.role || "USER", message]
+    );
+
+    await pool.query(
+      `
+      UPDATE support_tickets
+      SET updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+      `,
+      [ticketId]
+    );
+
+    res.status(201).json({
+      message: "Reply sent successfully",
+      reply: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Reply support ticket error:", error);
+    res.status(500).json({ message: "Failed to send reply" });
+  }
+});
+
+// Admin: get all support tickets
+app.get("/api/admin/support/tickets", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT st.*, u.full_name, u.email
+      FROM support_tickets st
+      JOIN users u ON u.id = st.user_id
+      ORDER BY st.updated_at DESC
+      `
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Admin fetch support tickets error:", error);
+    res.status(500).json({ message: "Failed to fetch support tickets" });
+  }
+});
+
+// Admin: update ticket status
+app.put("/api/admin/support/tickets/:id/status", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const ticketId = Number(req.params.id);
+    const { status } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE support_tickets
+      SET status = $1,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = $2
+      RETURNING *
+      `,
+      [status || "OPEN", ticketId]
+    );
+
+    res.json({
+      message: "Ticket status updated",
+      ticket: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Update ticket status error:", error);
+    res.status(500).json({ message: "Failed to update ticket status" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://127.0.0.1:${PORT}`);
 });
