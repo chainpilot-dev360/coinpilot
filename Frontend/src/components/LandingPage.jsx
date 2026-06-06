@@ -165,7 +165,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
       </section>
 
       <section style={section}>
-  <h2 style={sectionTitle}>About CoinPilot Investments</h2>
+  <h2 style={sectionTitle}>About {settings.site_name} Investments</h2>
 
   <div
     style={{
@@ -178,7 +178,7 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
     }}
   >
     <p>
-      CoinPilot is a digital asset investment platform designed to provide
+      {settings.site_name} is a digital asset investment platform designed to provide
       investors with access to professionally managed opportunities across
       multiple financial markets.
     </p>
