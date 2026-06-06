@@ -48,8 +48,8 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
         <nav style={nav}>
           <div style={brand}>
             <img
-              src="https://res.cloudinary.com/dlvtuijb1/image/upload/v1779874195/WhatsApp_Image_2026-05-27_at_10.29.15_AM_llqpmg.jpg"
-              alt="CoinPilot Logo"
+              src={settings.company_logo}
+              alt={`${settings.site_name} Logo`}
               style={logoImage}
             />
             <div>
@@ -284,11 +284,11 @@ function LandingPage({ onLoginClick, onRegisterClick }) {
 
       <footer style={footer}>
         <div style={footerBrand}>
-          <img
-            src="https://res.cloudinary.com/dlvtuijb1/image/upload/v1779874195/WhatsApp_Image_2026-05-27_at_10.29.15_AM_llqpmg.jpg"
-            alt="CoinPilot Logo"
-            style={logoImage}
-          />
+         <img
+           src={settings.company_logo}
+           alt={`${settings.site_name} Logo`}
+           style={logoImage}
+         />
           <div>
             <h3 style={{ margin: 0 }}>{settings.site_name}</h3>
             <p style={footerText}>Premium digital asset portfolio platform.</p>
