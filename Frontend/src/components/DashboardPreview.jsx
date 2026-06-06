@@ -14,6 +14,8 @@ import KycPanel from "./KycPanel";
 import TransactionReceipt from "./TransactionReceipt";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const DEFAULT_COMPANY_LOGO =
+  "https://res.cloudinary.com/dlvtuijb1/image/upload/v1779874195/WhatsApp_Image_2026-05-27_at_10.29.15_AM_llqpmg.jpg";
 
 const tickerItems = [
   { symbol: "BTC/USD", price: "$67,240", change: "+2.4%" },
@@ -695,7 +697,7 @@ async function changePassword() {
         </div>
 
         <img
-          src={settings.company_logo}
+          src={settings.company_logo || DEFAULT_COMPANY_LOGO}
           alt="Company Logo"
           style={{
             width: "100px",
