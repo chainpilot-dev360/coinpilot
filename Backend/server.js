@@ -13,6 +13,7 @@ import {
   sendWelcomeEmail,
   sendVerificationEmail,
   sendPasswordResetEmail,
+  sendBrevoEmail,
 } from "./email.js";
 import { logAdminAction } from "./utils/adminLogger.js";
 
@@ -3443,8 +3444,7 @@ app.post("/api/admin/broadcast", requireAuth, requireAdmin, async (req, res) => 
 
       if (sendEmail && user.email) {
         try {
-          await transporter.sendMail({
-            from: process.env.SMTP_FROM,
+          await sendBrevoEmail({
             to: user.email,
             subject: title,
             html: `
@@ -3458,7 +3458,6 @@ app.post("/api/admin/broadcast", requireAuth, requireAdmin, async (req, res) => 
               </div>
             `,
           });
-
           emailSentCount++;
         } catch (emailError) {
           console.error("Broadcast email failed:", emailError);
