@@ -11,6 +11,7 @@ export default function SystemSettings({ token }) {
     investment_email: "",
     btc_wallet: "",
     eth_wallet: "",
+    company_logo: "",
   });
 
   const [loading, setLoading] = useState(true);
@@ -35,6 +36,7 @@ export default function SystemSettings({ token }) {
         investment_email: res.data.investment_email || "",
         btc_wallet: res.data.btc_wallet || "",
         eth_wallet: res.data.eth_wallet || "",
+        company_logo: res.data.company_logo || "",
       });
     } catch (error) {
       alert(error.response?.data?.message || "Failed to load system settings");
@@ -94,6 +96,24 @@ export default function SystemSettings({ token }) {
         style={input}
       />
 
+      <label style={label}>Company Logo URL</label>
+      <input
+        value={settings.company_logo}
+        onChange={(e) => updateField("company_logo", e.target.value)}
+        style={input}
+      />
+
+      {settings.company_logo && (
+        <div style={logoPreviewBox}>
+          <p style={mutedSmall}>Logo Preview</p>
+          <img
+            src={settings.company_logo}
+            alt="Company Logo Preview"
+            style={logoPreview}
+          />
+        </div>
+      )}
+
       <label style={label}>Support Email</label>
       <input
         value={settings.support_email}
@@ -143,6 +163,12 @@ const muted = {
   marginBottom: "20px",
 };
 
+const mutedSmall = {
+  color: "#94a3b8",
+  fontSize: "14px",
+  marginBottom: "8px",
+};
+
 const label = {
   display: "block",
   marginBottom: "6px",
@@ -160,6 +186,23 @@ const input = {
   border: "1px solid #334155",
   background: "#020617",
   color: "white",
+};
+
+const logoPreviewBox = {
+  background: "#020617",
+  padding: "14px",
+  borderRadius: "12px",
+  marginBottom: "16px",
+  border: "1px solid #334155",
+  maxWidth: "220px",
+};
+
+const logoPreview = {
+  width: "120px",
+  height: "120px",
+  borderRadius: "16px",
+  objectFit: "cover",
+  display: "block",
 };
 
 const button = {
