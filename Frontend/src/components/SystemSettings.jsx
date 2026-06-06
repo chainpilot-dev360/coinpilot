@@ -12,6 +12,7 @@ export default function SystemSettings({ token }) {
     btc_wallet: "",
     eth_wallet: "",
     company_logo: "",
+    tagline: "",
   });
 
   const [loading, setLoading] = useState(true);
@@ -37,6 +38,7 @@ export default function SystemSettings({ token }) {
         btc_wallet: res.data.btc_wallet || "",
         eth_wallet: res.data.eth_wallet || "",
         company_logo: res.data.company_logo || "",
+        tagline: res.data.tagline || "",
       });
     } catch (error) {
       alert(error.response?.data?.message || "Failed to load system settings");
@@ -100,6 +102,14 @@ export default function SystemSettings({ token }) {
       <input
         value={settings.company_logo}
         onChange={(e) => updateField("company_logo", e.target.value)}
+        style={input}
+      />
+
+      <label style={label}>Tagline</label>
+
+      <input
+        value={settings.tagline}
+        onChange={(e) => updateField("tagline", e.target.value)}
         style={input}
       />
 
