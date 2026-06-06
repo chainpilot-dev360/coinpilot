@@ -978,6 +978,7 @@ async function changePassword() {
       </div>
 
       <button
+        id="account-statement-section"
         onClick={() => {
           const statementRef =
             "STMT-" +
@@ -1028,7 +1029,7 @@ async function changePassword() {
       Generate Account Statement
     </button>
 
-      <h3>Deposit History</h3>
+      <h3 id="deposit-history-section">Deposit History</h3>
 
       {depositHistory.length === 0 ? (
         <EmptyState
@@ -1126,7 +1127,7 @@ async function changePassword() {
         ))
       )}
 
-      <h3>Withdrawal History</h3>
+      <h3 id="withdrawal-history-section">Withdrawal History</h3>
 
       {withdrawalHistory.length === 0 ? (
         <EmptyState
@@ -1296,6 +1297,7 @@ async function changePassword() {
   }}
 >
   <h3
+  id="support-inbox-section"
   onClick={openSupportInbox}
   style={{
     cursor: "pointer",
@@ -1408,7 +1410,7 @@ async function changePassword() {
         ))
       )}
       
-      <h3>Security Settings</h3>
+      <h3 id="change-password-section">Security Settings</h3>
 
       <div style={card}>
         <h4>Change Password</h4>
