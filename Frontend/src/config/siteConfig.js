@@ -1,17 +1,17 @@
 export const siteConfig = {
-  siteName: "CoinPilot",
+  siteName: "Investment Platform",
 
   tagline: "Digital Asset Growth Platform",
 
-  supportEmail: "support@coinpilot.com",
+  supportEmail: "support@coinpilot.us",
 
-  investmentEmail: "investments@coinpilot.com",
+  investmentEmail: "investments@coinpilot.us",
 
   copyrightText:
     "Secure digital investment infrastructure for modern investors worldwide.",
 
   companyDescription:
-    "CoinPilot is a modern cryptocurrency investment and portfolio management platform focused on secure digital asset growth and transparent financial operations.",
+    "Modern cryptocurrency investment and portfolio management platform focused on secure digital asset growth and transparent financial operations.",
 
   btcWallet:
     "bc1qkqwr63l6x3rqskej75sqxvx74eew9w5smfn4p8",
