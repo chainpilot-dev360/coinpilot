@@ -1,5 +1,5 @@
 export const siteConfig = {
-  siteName: "Investment Platform",
+  siteName: "CoinPilot",
 
   tagline: "Digital Asset Growth Platform",
 
