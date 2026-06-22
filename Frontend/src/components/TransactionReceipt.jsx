@@ -7,11 +7,11 @@ const COMPANY = {
   tagline: "Digital Investment Platform",
   logo:
     "https://res.cloudinary.com/dlvtuijb1/image/upload/v1779874195/WhatsApp_Image_2026-05-27_at_10.29.15_AM_llqpmg.jpg",
-  website: "www.coinpilot.com",
-  email: "coinpilot@gmail.com",
-  phone: "+1552174458",
+  website: "www.coinpilot.us",
+  email: "support@coinpilot.us",
+  phone: "+12135827669",
   address: "125 Jefferson Avenue, Austin TX, USA",
-  registration: "C1234567",
+  registration: "TX-65-57389",
   ceo: "Peter Woods",
 };
 
